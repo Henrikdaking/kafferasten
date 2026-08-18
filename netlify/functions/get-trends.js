@@ -1,5 +1,3 @@
-import fetch from 'node-fetch';
-
 export async function handler(event, context) {
   const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
