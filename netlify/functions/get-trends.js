@@ -17,14 +17,14 @@ Returnera SVARET ENBART som giltig JSON utan markdown-formatering med följande 
   "image": "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=800",
   "imageCaption": "Foto / Bildkälla: Illustrativ bild",
   "content": "<p>Första stycket om nyheten...</p><p>Andra stycket med detaljer...</p>",
-  "updatedTime": "06:30",
+  "updatedTime": "07:00",
   "pollQuestion": "En rolig fråga till fikarasten relaterad till artikeln?",
   "pollOpt1": "Alternativ 1",
   "pollOpt2": "Alternativ 2",
   "sourcesHtml": "<a href='https://sverigesradio.se' target='_blank'>Sveriges Radio</a> • <a href='https://aftonbladet.se' target='_blank'>Aftonbladet</a>"
 }`;
 
-   const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-3.6-flash:generateContent?key=${GEMINI_API_KEY}`, {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-3.6-flash:generateContent?key=${GEMINI_API_KEY}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -56,3 +56,8 @@ Returnera SVARET ENBART som giltig JSON utan markdown-formatering med följande 
     };
   }
 }
+
+// Ställ in automatisk körning kl 07:00 och 13:00 (Svensk tid / UTC 05:00 och 11:00)
+export const config = {
+  schedule: "0 5,11 * * *"
+};
