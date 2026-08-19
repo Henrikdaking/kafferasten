@@ -43,6 +43,11 @@
             letter-spacing: -0.5px;
         }
 
+        header a {
+            color: #FFF;
+            text-decoration: none;
+        }
+
         header p {
             margin: 0.5rem 0 0;
             color: #E2D7CD;
@@ -109,6 +114,10 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
             margin-bottom: 1rem;
+        }
+
+        .tag-archive {
+            background: #6E5E56;
         }
 
         h2 {
@@ -200,40 +209,6 @@
             text-decoration: underline;
         }
 
-        .archive-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .archive-list li {
-            padding: 0.8rem 0;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .archive-list li:last-child {
-            border-bottom: none;
-        }
-
-        .archive-list a {
-            color: var(--primary-color);
-            text-decoration: none;
-            font-weight: 600;
-            display: block;
-            line-height: 1.3;
-        }
-
-        .archive-list a:hover {
-            color: var(--accent-color);
-        }
-
-        .archive-date {
-            font-size: 0.78rem;
-            color: var(--text-muted);
-            display: block;
-            margin-bottom: 0.2rem;
-        }
-
         .poll-option {
             display: block;
             background: var(--bg-color);
@@ -281,6 +256,26 @@
             margin-bottom: 1rem;
         }
 
+        .section-divider {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin: 2.5rem 0 1.5rem;
+        }
+
+        .section-divider h3 {
+            margin: 0;
+            white-space: nowrap;
+            font-size: 1.3rem;
+        }
+
+        .section-divider::after {
+            content: "";
+            height: 2px;
+            background: var(--border-color);
+            width: 100%;
+        }
+
         footer {
             text-align: center;
             padding: 2.5rem 1rem;
@@ -294,20 +289,21 @@
 <body>
 
     <header>
-        <h1>☕ Kafferasten.se</h1>
+        <h1><a href="index.html">☕ Kafferasten.se</a></h1>
         <p>Dagens snackisar och samtalsämnen till fikarasten</p>
     </header>
 
     <div class="schedule-banner">
-        <span>⏰ <strong>Nybryggt innehåll:</strong> Uppdateras varje arbetsdag i god tid till fikat vid både 09:00 och 15:00!</span>
-        <span class="status-badge">☕ Status: Nybryggt och klart!</span>
+        <span>⏰ <strong>RYKANDE FÄRSKT:</strong> <span id="fika-time-text">Laddar dagens snackis...</span></span>
+        <span class="status-badge">☕ Nybryggt & Klart</span>
     </div>
 
     <div class="container">
         <!-- HUVUDINNEHÅLL -->
         <main>
+            <!-- DAGENS FÄRSKA SNACKIS -->
             <article class="card">
-                <span class="tag">🚂 Nöje & TV-Trend</span>
+                <span class="tag" id="fika-badge">☕ DAGENS SNACKIS</span>
                 <h2>Gör er redo för fika-bråk: Årets ”På spåret”-deltagare är släppta!</h2>
                 
                 <img src="https://images.unsplash.com/photo-1474487548417-781cb71495f3?auto=format&fit=crop&w=1000&q=80" alt="Tågspår i höstljus" class="article-hero-img">
@@ -322,7 +318,7 @@
 
                     <p>SVT har precis öppnat spridaren och släppt årets par. Och det är ganska magiskt! Vi har mat- och livsnjutarparet <strong>Erik Haag och Lotta Lundgren</strong> som ska ställas mot bland annat Österbotten-stoltheterna i humorgruppen <strong>KAJ</strong>. Dessutom kliver radioproffset <strong>Gry Forssell</strong> in i kupén tillsammans med författaren <strong>Malin Persson Giolito</strong>.</p>
 
-                    <p>Frågan runt kaffemaskinen idag är ganska enkel: Vem blir kontorets mest självutnämnda expert på 10-poängarna i år, och vilket par kommer haverera totalt redan i första ronden? Släng ut frågan vid 15-fikat och se hur rummet delas i två läger!</p>
+                    <p>Frågan runt kaffemaskinen idag är ganska enkel: Vem blir kontorets mest självutnämnda expert på 10-poängarna i år, och vilket par kommer haverera totalt redan i första ronden? Släng ut frågan vid fikarasten och se hur rummet delas i två läger!</p>
                 </div>
 
                 <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 1.5rem 0;">
@@ -341,10 +337,9 @@
                 </div>
 
                 <div style="margin-top: 1.5rem;">
-                    <strong>Fördjupa dig i källorna:</strong>
+                    <strong>Exakt direktlänk till källan:</strong>
                     <ul class="sources-list">
-                        <li>🔗 <a href="https://www.svt.se/kultur" target="_blank" rel="noopener">SVT Kultur: Läs allt om deltagarna</a></li>
-                        <li>🔗 <a href="https://www.aftonbladet.se/nojesbladet" target="_blank" rel="noopener">Aftonbladet Nöje: Se hela listan och analysen</a></li>
+                        <li>🔗 <a href="https://www.aftonbladet.se/nojesbladet/a/M7aevm/de-tavlar-i-pa-sparet-2026" target="_blank" rel="noopener">Aftonbladet: Läs artikeln "De tävlar i På spåret 2026"</a></li>
                     </ul>
                 </div>
             </article>
@@ -367,29 +362,55 @@
                     <button onclick="submitPoll()" class="btn" style="background: var(--accent-color); color: #fff; border: none; margin-top: 0.5rem; padding: 0.75rem 1.5rem;">Skicka din röst</button>
                 </div>
 
-                <!-- RESULTAT VISAS EFTER RÖSTNING -->
                 <div id="poll-results" class="poll-results">
                     <strong>Tack för din röst! Så här gissar kollegorna vid kaffebordet:</strong>
-                    
                     <div style="margin-top: 1.2rem;">
                         <small>Haag & Lundgren: <strong>52%</strong></small>
                         <div class="progress-bar"><div class="progress-fill" style="width: 52%;"></div></div>
-
                         <small>Gry Forssell m.fl: <strong>21%</strong></small>
                         <div class="progress-bar"><div class="progress-fill" style="width: 21%;"></div></div>
-
                         <small>En ny uppstickare: <strong>27%</strong></small>
                         <div class="progress-bar"><div class="progress-fill" style="width: 27%;"></div></div>
                     </div>
                 </div>
             </section>
+
+            <!-- SEKTIONSAVSKILJARE FÖR TIDIGARE NYHETER -->
+            <div class="section-divider">
+                <h3>📜 Tidigare snackisar</h3>
+            </div>
+
+            <!-- TIDIGARE SNACKIS -->
+            <article class="card">
+                <span class="tag tag-archive">💼 Arbetsliv & Trend – Tidigare Snackis</span>
+                <h2>6 timmars arbetsdag: Är det dags för svenska arbetsplatser nu?</h2>
+
+                <div class="summary-box">
+                    <strong>⚡ Snabböversikt:</strong>
+                    Debatten om förkortad arbetstid har tagit ny fart efter flera framgångsrika tester. Här är argumenten du behöver ha koll på till kaffebordet!
+                </div>
+
+                <div class="article-content">
+                    <p>Frågan om sex timmars arbetsdag med bibehållen lön har seglat upp som en av de absolut hetaste frågorna på svenska arbetsplatser. Förespråkarna pekar på färska testprojekt där de anställda mått bättre och varit mindre sjukskrivna, medan kritiker varnar för att det blir alldeles för dyrt.</p>
+                    <p>Hur pratas det om detta hos er? Blir det en hetsig debatt vid kaffemaskinen eller skrattar chefen bara bort det?</p>
+                </div>
+
+                <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 1.5rem 0;">
+
+                <div style="margin-top: 1rem;">
+                    <strong>Läs mer i källan:</strong>
+                    <ul class="sources-list">
+                        <li>🔗 <a href="https://www.svt.se/nyheter/" target="_blank" rel="noopener">SVT Nyheter: Läs om debatten kring förkortad arbetstid</a></li>
+                    </ul>
+                </div>
+            </article>
+
         </main>
 
         <!-- SIDOKOLUMN -->
         <aside>
             <div class="card">
                 <h3>🥐 Dagens Fikatips</h3>
-                <!-- RIKTIG KANELBULLEBILD -->
                 <img src="https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=600&q=80" alt="Nygräddad Kanelbulle" class="fika-img">
                 <p><strong>Klassisk Kanelbulle</strong></p>
                 <p>Nybakad med mörkt pärlsocker och massor av kanel. Passar klockrent till ett mörkrostat kaffe eller en krämig havrelatte idag!</p>
@@ -397,14 +418,10 @@
             </div>
 
             <div class="card">
-                <h3>📁 Fikaarkivet</h3>
-                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">Missa inte våra tidigare snackisar på Kafferasten.se:</p>
-                <ul class="archive-list">
-                    <li>
-                        <span class="archive-date">Igår (Eftermiddag)</span>
-                        <a href="arkiv-01.html">6 timmars arbetsdag – Är det dags för oss nu?</a>
-                    </li>
-                </ul>
+                <h3>💡 Fikarast-fakta</h3>
+                <p style="font-size: 0.9rem; color: var(--text-color);">
+                    Visste du att ordet <strong>"Fika"</strong> är gammal svensk backslang för "Kaffi"? Man kastade ganska enkelt om stavelserna under 1800-talet!
+                </p>
             </div>
         </aside>
     </div>
@@ -444,6 +461,25 @@
             document.getElementById('poll-form').style.display = 'none';
             document.getElementById('poll-results').style.display = 'block';
         }
+
+        // Automatisk tidsstämpling anpassad för publicering 07:00 och 13:00
+        function updateFikaTime() {
+            const now = new Date();
+            const hours = now.getHours();
+            
+            const badge = document.getElementById('fika-badge');
+            const text = document.getElementById('fika-time-text');
+
+            if (hours >= 7 && hours < 13) {
+                if(badge) badge.innerText = "☕ MORGONFIKAT | Dagens färskaste snackis";
+                if(text) text.innerText = "Publicerad 07:00 – redo för 09:00-fikat!";
+            } else {
+                if(badge) badge.innerText = "☕ EFTERMIDDAGSFIKAT | Dagens färskaste snackis";
+                if(text) text.innerText = "Publicerad 13:00 – redo för 15:00-fikat!";
+            }
+        }
+
+        updateFikaTime();
     </script>
 
 </body>
