@@ -1,3 +1,7 @@
+// Global variabel i funktionen för att spara senaste nyheten i minnet
+let cachedNews = null;
+let lastFetchedTime = 0;
+
 export async function handler(event, context) {
   const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
@@ -5,6 +9,21 @@ export async function handler(event, context) {
     return {
       statusCode: 500,
       body: JSON.stringify({ error: "API-nyckel saknas i Netlify" }),
+    };
+  }
+
+  // Om vi redan har en nyhet sparad från de senaste 4 timmarna, returnera den direkt!
+  const NOW = Date.now();
+  const FOUR_HOURS = 4 * 60 * 60 * 1000;
+
+  if (cachedNews && (NOW - lastFetchedTime < FOUR_HOURS)) {
+    return {
+      statusCode: 200,
+      headers: {
+        "Content-Type": "application/json",
+        "Cache-Control": "public, max-age=3600, s-maxage=3600"
+      },
+      body: JSON.stringify(cachedNews),
     };
   }
 
@@ -24,7 +43,7 @@ Returnera SVARET ENBART som giltig JSON utan markdown-formatering med följande 
   "sourcesHtml": "<a href='https://sverigesradio.se' target='_blank'>Sveriges Radio</a> • <a href='https://aftonbladet.se' target='_blank'>Aftonbladet</a>"
 }`;
 
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-3.6-flash:generateContent?key=${GEMINI_API_KEY}`, {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -42,12 +61,21 @@ Returnera SVARET ENBART som giltig JSON utan markdown-formatering med följande 
       };
     }
 
-    const text = data.candidates[0].content.parts[0].text;
+    const rawText = data.candidates[0].content.parts[0].text;
+    const parsedData = JSON.parse(rawText);
+
+    // Spara i cachen
+    cachedNews = parsedData;
+    lastFetchedTime = NOW;
 
     return {
       statusCode: 200,
-      headers: { "Content-Type": "application/json" },
-      body: text,
+      headers: {
+        "Content-Type": "application/json",
+        // Cache-Control gör att Netlifys CDN-nätverk sparar svaret i 1 timme
+        "Cache-Control": "public, max-age=3600, s-maxage=3600"
+      },
+      body: JSON.stringify(parsedData),
     };
   } catch (error) {
     return {
@@ -57,7 +85,7 @@ Returnera SVARET ENBART som giltig JSON utan markdown-formatering med följande 
   }
 }
 
-// Ställ in automatisk körning kl 07:00 och 13:00 (Svensk tid / UTC 05:00 och 11:00)
+// Schemalägg körning
 export const config = {
   schedule: "0 5,11 * * *"
 };
