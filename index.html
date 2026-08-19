@@ -276,7 +276,6 @@
             width: 100%;
         }
 
-        /* KOMMENTARSFÄLT STYLES */
         .comment-input {
             width: 100%;
             padding: 0.8rem;
@@ -324,33 +323,24 @@
         <p>Dagens snackisar och samtalsämnen till fikarasten</p>
     </header>
 
-    <!-- STATUS BANNER MED REDAKTIONENS INFORMATION -->
+    <!-- STATUS BANNER -->
     <div class="schedule-banner">
-        <span>⏰ <strong>RYKANDE FÄRSKT:</strong> <span id="fika-time-text">Laddar dagens snackis...</span> (Redaktionen lägger ut nya snackisar runt 07:00 & 13:00 inför 09- & 15-fikat)</span>
+        <span>⏰ <strong>RYKANDE FÄRSKT:</strong> <span id="fika-time-text">Hämtar dagens Gemini-snackis...</span></span>
         <span class="status-badge">☕ Nybryggt</span>
     </div>
 
     <div class="container">
         <!-- HUVUDINNEHÅLL -->
         <main>
-            <!-- DAGENS FÄRSKA SNACKIS -->
+            <!-- DAGENS FÄRSKA SNACKIS (HÄMTAS FRÅN GEMINI VIA NETLIFY) -->
             <article class="card">
                 <span class="tag" id="fika-badge">☕ DAGENS SNACKIS</span>
-                <h2>Gör er redo för fika-bråk: Årets ”På spåret”-deltagare är släppta!</h2>
+                <h2 id="article-title">Brygger dagens snackis...</h2>
                 
-                <img src="https://images.unsplash.com/photo-1474487548417-781cb71495f3?auto=format&fit=crop&w=1000&q=80" alt="Tågspår i höstljus" class="article-hero-img">
+                <img id="article-img" src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=800" alt="Nyhetsbild" class="article-hero-img">
 
-                <div class="summary-box">
-                    <strong>⚡ Snabböversikt:</strong>
-                    SVT har kaskadsläppt namnen på alla som kliver in i dressinerna i höst. Med tungviktare som Erik Haag & Lotta Lundgren och uppstickare som humorgruppen KAJ finns det garanterat material för minst tre fikaraster.
-                </div>
-
-                <div class="article-content">
-                    <p>Det finns två saker som garanterat kan få fredagsstämningen på ett svenskt kontor att spåra ur helt: någon som tar den sista biten av tårtan utan att fråga, och uppställningen i <em>På spåret</em>.</p>
-
-                    <p>SVT har precis öppnat spridaren och släppt årets par. Och det är ganska magiskt! Vi har mat- och livsnjutarparet <strong>Erik Haag och Lotta Lundgren</strong> som ska ställas mot bland annat Österbotten-stoltheterna i humorgruppen <strong>KAJ</strong>. Dessutom kliver radioproffset <strong>Gry Forssell</strong> in i kupén tillsammans med författaren <strong>Malin Persson Giolito</strong>.</p>
-
-                    <p>Frågan runt kaffemaskinen idag är ganska enkel: Vem blir kontorets mest självutnämnda expert på 10-poängarna i år, och vilket par kommer haverera totalt redan i första ronden? Släng ut frågan vid fikarasten och se hur rummet delas i två läger!</p>
+                <div class="article-content" id="article-text">
+                    <p>Laddar in det absolut senaste samtalsämnet från redaktionen...</p>
                 </div>
 
                 <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 1.5rem 0;">
@@ -369,9 +359,9 @@
                 </div>
 
                 <div style="margin-top: 1.5rem;">
-                    <strong>Källa:</strong>
-                    <ul class="sources-list">
-                        <li>🔗 <a href="https://www.aftonbladet.se/nojesbladet/a/M7aevm/de-tavlar-i-pa-sparet-2026" target="_blank" rel="noopener">Aftonbladet: Läs artikeln "De tävlar i På spåret 2026"</a></li>
+                    <strong>Källor & Länkar:</strong>
+                    <ul class="sources-list" id="article-sources">
+                        <li>Laddar källor...</li>
                     </ul>
                 </div>
             </article>
@@ -379,30 +369,22 @@
             <!-- TYCK TILL & KOMMENTERA SEKTION -->
             <section class="card">
                 <h3>💬 Tyck till vid kaffebordet</h3>
-                <p><em>Dagens fråga:</em> <strong>Vilket par tror du tar hem På spåret i år?</strong></p>
+                <p><em>Dagens fråga:</em> <strong id="poll-question">Laddar fråga...</strong></p>
                 
                 <div id="poll-form">
-                    <label class="poll-option">
-                        <input type="radio" name="poll" value="1"> Erik Haag & Lotta Lundgren (Klockren rutin!)
-                    </label>
-                    <label class="poll-option">
-                        <input type="radio" name="poll" value="2"> Gry Forssell & Jonas Rhodiner
-                    </label>
-                    <label class="poll-option">
-                        <input type="radio" name="poll" value="3"> Någon av årets alla spännande uppstickare!
-                    </label>
-                    <button onclick="submitPoll()" class="btn" style="background: var(--accent-color); color: #fff; border: none; margin-top: 0.5rem; padding: 0.75rem 1.5rem;">Skicka din röst</button>
+                    <div id="poll-options-container">
+                        <!-- Fylls i dynamiskt -->
+                    </div>
+                    <button onclick="submitPoll()" class="btn" style="background: var(--accent-color); color: #fff; border: none; margin-top: 0.8rem; padding: 0.75rem 1.5rem;">Skicka din röst</button>
                 </div>
 
                 <div id="poll-results" class="poll-results">
                     <strong>Tack för din röst! Så här gissar kollegorna vid kaffebordet:</strong>
                     <div style="margin-top: 1.2rem;">
-                        <small>Haag & Lundgren: <strong>52%</strong></small>
-                        <div class="progress-bar"><div class="progress-fill" style="width: 52%;"></div></div>
-                        <small>Gry Forssell m.fl: <strong>21%</strong></small>
-                        <div class="progress-bar"><div class="progress-fill" style="width: 21%;"></div></div>
-                        <small>En ny uppstickare: <strong>27%</strong></small>
-                        <div class="progress-bar"><div class="progress-fill" style="width: 27%;"></div></div>
+                        <small>Alternativ 1: <strong>64%</strong></small>
+                        <div class="progress-bar"><div class="progress-fill" style="width: 64%;"></div></div>
+                        <small>Alternativ 2: <strong>36%</strong></small>
+                        <div class="progress-bar"><div class="progress-fill" style="width: 36%;"></div></div>
                     </div>
                 </div>
 
@@ -416,7 +398,7 @@
                 <div id="comments-list" style="margin-top: 1.2rem;">
                     <div class="comment-item">
                         <strong>Johan från IT:</strong>
-                        Haag & Lundgren sopar banan med de andra!
+                        Grymt ämne att ta upp på fikan idag!
                     </div>
                 </div>
             </section>
@@ -426,7 +408,7 @@
                 <h3>📜 Tidigare snackisar</h3>
             </div>
 
-            <!-- TIDIGARE SNACKIS -->
+            <!-- TIDIGARE SNACKIS ARCHIVE -->
             <article class="card">
                 <span class="tag tag-archive">💼 Arbetsliv & Trend – Tidigare Snackis</span>
                 <h2>6 timmars arbetsdag: Är det dags för svenska arbetsplatser nu?</h2>
@@ -438,7 +420,6 @@
 
                 <div class="article-content">
                     <p>Frågan om sex timmars arbetsdag med bibehållen lön har seglat upp som en av de absolut hetaste frågorna på svenska arbetsplatser. Förespråkarna pekar på färska testprojekt där de anställda mått bättre och varit mindre sjukskrivna, medan kritiker varnar för att det blir alldeles för dyrt.</p>
-                    <p>Hur pratas det om detta hos er? Blir det en hetsig debatt vid kaffemaskinen eller skrattar chefen bara bort det?</p>
                 </div>
 
                 <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 1.5rem 0;">
@@ -489,6 +470,7 @@
         <p>Kafferasten.se – Gör varje fikarast lite roligare och lite godare. ☕🥐</p>
     </footer>
 
+    <!-- INTERAKTIONER & ANROP TILL NETLIFY FUNCTION / GEMINI -->
     <script>
         const votes = {};
 
@@ -538,14 +520,13 @@
             textInput.value = '';
         }
 
-        // Tidsstämpling anpassad för redaktionell känsla
-        function updateFikaTime() {
-            const now = new Date();
-            const hours = now.getHours();
-            
+        // KOPPLING TILL GEMINI API VIA NETLIFY FUNCTION
+        async function loadGeminiNews() {
             const badge = document.getElementById('fika-badge');
             const text = document.getElementById('fika-time-text');
-
+            
+            // Uppdatera banner-text utifrån tid
+            const hours = new Date().getHours();
             if (hours >= 7 && hours < 13) {
                 if(badge) badge.innerText = "☕ MORGONFIKAT | Dagens färskaste snackis";
                 if(text) text.innerText = "Nypublicerat av redaktionen inför 09:00-fikat!";
@@ -553,10 +534,50 @@
                 if(badge) badge.innerText = "☕ EFTERMIDDAGSFIKAT | Dagens färskaste snackis";
                 if(text) text.innerText = "Nypublicerat av redaktionen inför 15:00-fikat!";
             }
+
+            try {
+                // Anrop till din Netlify serverless function
+                const res = await fetch('/.netlify/functions/get-trends');
+                if (!res.ok) throw new Error("Kunde inte hämta nyhet från Netlify");
+                
+                const data = await res.json();
+
+                // Fyll i datan från Gemini på sidan
+                if (data.title) {
+                    document.getElementById('article-title').innerText = data.title;
+                    if(data.image) document.getElementById('article-img').src = data.image;
+                    document.getElementById('article-text').innerHTML = data.content;
+                    
+                    if (data.sourcesHtml) {
+                        document.getElementById('article-sources').innerHTML = `<li>${data.sourcesHtml}</li>`;
+                    }
+
+                    if (data.pollQuestion) {
+                        document.getElementById('poll-question').innerText = data.pollQuestion;
+                        const pollBox = document.getElementById('poll-options-container');
+                        if (pollBox) {
+                            pollBox.innerHTML = `
+                                <label class="poll-option"><input type="radio" name="poll" value="1"> ${data.pollOpt1}</label>
+                                <label class="poll-option"><input type="radio" name="poll" value="2"> ${data.pollOpt2}</label>
+                            `;
+                        }
+                    }
+                }
+            } catch (err) {
+                console.log("Visar reservnyhet om Netlify-funktionen inte svarar ännu.", err);
+                // Reservnyhet om API har fördröjning
+                document.getElementById('article-title').innerText = "Dagens Kaffesnackis: Hur påverkar kaffepriserna fikarasten?";
+                document.getElementById('article-text').innerHTML = "<p>Kaffepriserna fortsätter att diskuterats flitigt runt om på de svenska kontoren. Ska vi satsa mer på havremjölk eller hålla fast vid den klassiska bryggen?</p>";
+                document.getElementById('poll-question').innerText = "Hur dricker du helst ditt kaffe på jobbet?";
+                document.getElementById('poll-options-container').innerHTML = `
+                    <label class="poll-option"><input type="radio" name="poll" value="1"> Svart mörkrost</label>
+                    <label class="poll-option"><input type="radio" name="poll" value="2"> Med mjölk / Havredryck</label>
+                `;
+            }
         }
 
-        updateFikaTime();
+        // Starta hämtning direkt vid laddning
+        loadGeminiNews();
     </script>
-
 </body>
 </html>
