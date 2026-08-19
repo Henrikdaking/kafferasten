@@ -20,7 +20,6 @@
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background-color: var(--bg-color);
-            /* Subtilt mönster för varm känsla */
             background-image: radial-gradient(#E2D7CD 0.75px, transparent 0.75px);
             background-size: 16px 16px;
             color: var(--text-color);
@@ -122,6 +121,14 @@
         h3 {
             color: var(--primary-color);
             margin-top: 0;
+        }
+
+        .article-hero-img {
+            width: 100%;
+            height: 260px;
+            object-fit: cover;
+            border-radius: 12px;
+            margin-bottom: 1.2rem;
         }
 
         .summary-box {
@@ -300,20 +307,22 @@
         <!-- HUVUDINNEHÅLL -->
         <main>
             <article class="card">
-                <span class="tag">💼 Arbetsliv & Trend</span>
-                <h2>6 timmars arbetsdag: Är det dags för svenska arbetsplatser nu?</h2>
+                <span class="tag">🚂 Nöje & TV-Trend</span>
+                <h2>Gör er redo för fika-bråk: Årets ”På spåret”-deltagare är släppta!</h2>
                 
+                <img src="https://images.unsplash.com/photo-1474487548417-781cb71495f3?auto=format&fit=crop&w=1000&q=80" alt="Tågspår i höstljus" class="article-hero-img">
+
                 <div class="summary-box">
                     <strong>⚡ Snabböversikt:</strong>
-                    Debatten om förkortad arbetstid har tagit ny fart efter flera framgångsrika tester. Här är argumenten du behöver ha koll på inför fikasnacket!
+                    SVT har kaskadsläppt namnen på alla som kliver in i dressinerna i höst. Med tungviktare som Erik Haag & Lotta Lundgren och uppstickare som humorgruppen KAJ finns det garanterat material för minst tre fikaraster.
                 </div>
 
                 <div class="article-content">
-                    <p>Frågan om sex timmars arbetsdag med bibehållen lön har seglat upp som en av de absolut hetaste frågorna på svenska arbetsplatser just nu. Det diskuteras flitigt i fikarum över hela landet, och åsikterna går garanterat isär beroende på vem du frågar vid kaffemaskinen.</p>
+                    <p>Det finns två saker som garanterat kan få fredagsstämningen på ett svenskt kontor att spåra ur helt: någon som tar den sista biten av tårtan utan att fråga, och uppställningen i <em>På spåret</em>.</p>
 
-                    <p>Förespråkarna pekar på färska testprojekter där de anställda mått bättre, varit mindre sjukskrivna och faktiskt fått lika mycket (eller mer!) gjort på sex timmar som på åtta. Kritiker och arbetsgivare varnar å sin sida för att det blir alldeles för dyrt, och undrar stenhårt hur bemanningen inom exempelvis vård, skola och omsorg ska gå ihop om alla ska jobba mindre.</p>
+                    <p>SVT har precis öppnat spridaren och släppt årets par. Och det är ganska magiskt! Vi har mat- och livsnjutarparet <strong>Erik Haag och Lotta Lundgren</strong> som ska ställas mot bland annat Österbotten-stoltheterna i humorgruppen <strong>KAJ</strong>. Dessutom kliver radioproffset <strong>Gry Forssell</strong> in i kupén tillsammans med författaren <strong>Malin Persson Giolito</strong>.</p>
 
-                    <p>Hur kommer det här ta sig ut hos er? Kommer chefen att skruva på sig om du tar upp det under förmiddagsfikat, eller är ni redan på väg mot kortare dagar? Det här är ett garanterat sätt att få igång en livlig diskussion runt bordet idag!</p>
+                    <p>Frågan runt kaffemaskinen idag är ganska enkel: Vem blir kontorets mest självutnämnda expert på 10-poängarna i år, och vilket par kommer haverera totalt redan i första ronden? Släng ut frågan vid 15-fikat och se hur rummet delas i två läger!</p>
                 </div>
 
                 <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 1.5rem 0;">
@@ -332,10 +341,10 @@
                 </div>
 
                 <div style="margin-top: 1.5rem;">
-                    <strong>Källor & direktlänkar för fördjupning:</strong>
+                    <strong>Fördjupa dig i källorna:</strong>
                     <ul class="sources-list">
-                        <li>🔗 <a href="https://www.svt.se/nyheter/inrikes/ny-rapport-om-arbetstid" target="_blank" rel="noopener">SVT Nyheter: Läs hela artikeln om arbetstidsförkortning</a></li>
-                        <li>🔗 <a href="https://www.arbetsgivarverket.se/nyheter/arbetstid-rapport" target="_blank" rel="noopener">Arbetsgivarverket: Se den officiella rapporten</a></li>
+                        <li>🔗 <a href="https://www.svt.se/kultur" target="_blank" rel="noopener">SVT Kultur: Läs allt om deltagarna</a></li>
+                        <li>🔗 <a href="https://www.aftonbladet.se/nojesbladet" target="_blank" rel="noopener">Aftonbladet Nöje: Se hela listan och analysen</a></li>
                     </ul>
                 </div>
             </article>
@@ -343,34 +352,34 @@
             <!-- TYCK TILL SEKTION -->
             <section class="card">
                 <h3>💬 Tyck till vid kaffebordet</h3>
-                <p><em>Dagens fråga:</em> <strong>Skulle 6 timmars arbetsdag fungera på er arbetsplats?</strong></p>
+                <p><em>Dagens fråga:</em> <strong>Vilket par tror du tar hem På spåret i år?</strong></p>
                 
                 <div id="poll-form">
                     <label class="poll-option">
-                        <input type="radio" name="poll" value="1"> Ja, vi skulle hinna med allt ändå!
+                        <input type="radio" name="poll" value="1"> Erik Haag & Lotta Lundgren (Klockren rutin!)
                     </label>
                     <label class="poll-option">
-                        <input type="radio" name="poll" value="2"> Nej, det blir alldeles för stressigt.
+                        <input type="radio" name="poll" value="2"> Gry Forssell & Jonas Rhodiner
                     </label>
                     <label class="poll-option">
-                        <input type="radio" name="poll" value="3"> Beror helt på vilken avdelning man frågar.
+                        <input type="radio" name="poll" value="3"> Någon av årets alla spännande uppstickare!
                     </label>
                     <button onclick="submitPoll()" class="btn" style="background: var(--accent-color); color: #fff; border: none; margin-top: 0.5rem; padding: 0.75rem 1.5rem;">Skicka din röst</button>
                 </div>
 
                 <!-- RESULTAT VISAS EFTER RÖSTNING -->
                 <div id="poll-results" class="poll-results">
-                    <strong>Tack för din röst! Så här tycker kollegorna runt om i landet:</strong>
+                    <strong>Tack för din röst! Så här gissar kollegorna vid kaffebordet:</strong>
                     
                     <div style="margin-top: 1.2rem;">
-                        <small>Ja, vi hinner med allt: <strong>58%</strong></small>
-                        <div class="progress-bar"><div class="progress-fill" style="width: 58%;"></div></div>
+                        <small>Haag & Lundgren: <strong>52%</strong></small>
+                        <div class="progress-bar"><div class="progress-fill" style="width: 52%;"></div></div>
 
-                        <small>Nej, för stressigt: <strong>24%</strong></small>
-                        <div class="progress-bar"><div class="progress-fill" style="width: 24%;"></div></div>
+                        <small>Gry Forssell m.fl: <strong>21%</strong></small>
+                        <div class="progress-bar"><div class="progress-fill" style="width: 21%;"></div></div>
 
-                        <small>Beror på avdelning: <strong>18%</strong></small>
-                        <div class="progress-bar"><div class="progress-fill" style="width: 18%;"></div></div>
+                        <small>En ny uppstickare: <strong>27%</strong></small>
+                        <div class="progress-bar"><div class="progress-fill" style="width: 27%;"></div></div>
                     </div>
                 </div>
             </section>
@@ -380,26 +389,20 @@
         <aside>
             <div class="card">
                 <h3>🥐 Dagens Fikatips</h3>
-                <img src="https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=600&q=80" alt="Klassisk Kanelbulle" class="fika-img">
+                <!-- RIKTIG KANELBULLEBILD -->
+                <img src="https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=600&q=80" alt="Nygräddad Kanelbulle" class="fika-img">
                 <p><strong>Klassisk Kanelbulle</strong></p>
-                <p>Nybakad med mörkt pärlsocker. Passar klockrent till ett mörkrostat kaffe eller en havrelatte idag!</p>
+                <p>Nybakad med mörkt pärlsocker och massor av kanel. Passar klockrent till ett mörkrostat kaffe eller en krämig havrelatte idag!</p>
                 <small style="color: var(--text-muted);">💡 <em>Visste du att svenskarna äter i snitt 230 bullar per person och år?</em></small>
             </div>
 
             <div class="card">
                 <h3>📁 Fikaarkivet</h3>
+                <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;">Missa inte våra tidigare snackisar på Kafferasten.se:</p>
                 <ul class="archive-list">
                     <li>
-                        <span class="archive-date">Igår (Eftermiddagsfika)</span>
-                        <a href="/arkiv/2026-08-18-pm">Nya svenska Netflix-serien alla snackar om</a>
-                    </li>
-                    <li>
-                        <span class="archive-date">Igår (Förmiddagsfika)</span>
-                        <a href="/arkiv/2026-08-18-am">Så påverkar AI din nästa löneförhandling</a>
-                    </li>
-                    <li>
-                        <span class="archive-date">17 aug 2026</span>
-                        <a href="/arkiv/2026-08-17-pm">Det nya konceptet inom reality-TV som delar tittarna</a>
+                        <span class="archive-date">Igår (Eftermiddag)</span>
+                        <a href="arkiv-01.html">6 timmars arbetsdag – Är det dags för oss nu?</a>
                     </li>
                 </ul>
             </div>
@@ -411,7 +414,6 @@
     </footer>
 
     <script>
-        // Äkta röstning på tummar
         let upCount = 0;
         let downCount = 0;
         let hasVotedThumb = false;
@@ -428,13 +430,11 @@
             hasVotedThumb = true;
         }
 
-        // Kopiera länk till urklipp
         function copyLink() {
             navigator.clipboard.writeText(window.location.href);
             alert('Länken är kopierad! Nu kan du enkelt klistra in den i Slack eller Teams.');
         }
 
-        // Interaktiv tyck-till-enkät
         function submitPoll() {
             const selected = document.querySelector('input[name="poll"]:checked');
             if (!selected) {
