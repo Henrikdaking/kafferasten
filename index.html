@@ -6,18 +6,23 @@
     <title>Kafferasten.se – Dagens Snackis till Fikat</title>
     <style>
         :root {
-            --bg-color: #FAF6F0;
+            --bg-color: #F8F4EE;
             --card-bg: #FFFFFF;
-            --primary-color: #4A2E2B;
-            --accent-color: #D97736;
+            --primary-color: #2D1A17; /* Mörk espresso */
+            --accent-color: #C86D3B; /* Varm kanel/terrakotta */
+            --accent-hover: #A85528;
             --text-color: #2C221E;
-            --text-muted: #6B5B52;
-            --border-color: #E8DFD5;
+            --text-muted: #6E5E56;
+            --border-color: #E2D7CD;
+            --highlight-bg: #EFE4D8; /* Krämig havremjölk */
         }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background-color: var(--bg-color);
+            /* Subtilt mönster för varm känsla */
+            background-image: radial-gradient(#E2D7CD 0.75px, transparent 0.75px);
+            background-size: 16px 16px;
             color: var(--text-color);
             line-height: 1.6;
             margin: 0;
@@ -27,35 +32,51 @@
         header {
             background-color: var(--primary-color);
             color: #FFF;
-            padding: 2rem 1rem;
+            padding: 2.5rem 1rem;
             text-align: center;
             border-bottom: 4px solid var(--accent-color);
         }
 
         header h1 {
             margin: 0;
-            font-size: 2.2rem;
+            font-size: 2.5rem;
+            font-weight: 800;
             letter-spacing: -0.5px;
         }
 
         header p {
             margin: 0.5rem 0 0;
-            color: #E8DFD5;
-            font-size: 1.1rem;
+            color: #E2D7CD;
+            font-size: 1.15rem;
+            font-weight: 300;
         }
 
         .schedule-banner {
-            background-color: #FFF3E6;
-            border: 1px solid var(--accent-color);
+            background-color: var(--highlight-bg);
+            border-bottom: 1px solid var(--border-color);
             color: var(--primary-color);
             text-align: center;
-            padding: 0.75rem;
+            padding: 0.85rem 1rem;
             font-size: 0.95rem;
-            font-weight: 500;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .status-badge {
+            background: #28a745;
+            color: white;
+            padding: 0.2rem 0.6rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: bold;
         }
 
         .container {
-            max-width: 1000px;
+            max-width: 1040px;
             margin: 2rem auto;
             padding: 0 1rem;
             display: grid;
@@ -72,56 +93,75 @@
         .card {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 1.5rem;
+            border-radius: 16px;
+            padding: 1.8rem;
             margin-bottom: 1.5rem;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+            box-shadow: 0 4px 12px rgba(45, 26, 23, 0.04);
         }
 
         .tag {
             display: inline-block;
             background: var(--accent-color);
             color: #FFF;
-            padding: 0.2rem 0.6rem;
-            border-radius: 4px;
-            font-size: 0.8rem;
-            font-weight: bold;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
             text-transform: uppercase;
-            margin-bottom: 0.8rem;
+            letter-spacing: 0.5px;
+            margin-bottom: 1rem;
         }
 
-        .tldr-box {
-            background-color: #FAF6F0;
+        h2 {
+            color: var(--primary-color);
+            margin-top: 0;
+            font-size: 1.7rem;
+            line-height: 1.3;
+        }
+
+        h3 {
+            color: var(--primary-color);
+            margin-top: 0;
+        }
+
+        .summary-box {
+            background-color: var(--bg-color);
             border-left: 4px solid var(--accent-color);
-            padding: 1rem;
-            margin: 1rem 0;
-            border-radius: 0 8px 8px 0;
+            padding: 1.2rem;
+            margin: 1.2rem 0;
+            border-radius: 0 12px 12px 0;
         }
 
-        .tldr-box strong {
+        .summary-box strong {
             color: var(--primary-color);
             display: block;
             margin-bottom: 0.3rem;
+            font-size: 1.05rem;
+        }
+
+        .article-content p {
+            font-size: 1.05rem;
+            margin-bottom: 1.2rem;
+            color: #382A25;
         }
 
         .btn-group {
             display: flex;
-            gap: 0.5rem;
+            gap: 0.6rem;
             flex-wrap: wrap;
-            margin-top: 1rem;
+            margin-top: 0.8rem;
         }
 
         .btn {
             background: var(--bg-color);
             border: 1px solid var(--border-color);
             color: var(--text-color);
-            padding: 0.5rem 1rem;
-            border-radius: 6px;
+            padding: 0.65rem 1.2rem;
+            border-radius: 10px;
             cursor: pointer;
             font-weight: 600;
             font-size: 0.9rem;
             transition: all 0.2s ease;
-            text-decoration: none;
             display: inline-flex;
             align-items: center;
             gap: 0.4rem;
@@ -136,17 +176,17 @@
         .sources-list {
             list-style: none;
             padding: 0;
-            margin: 0.5rem 0 0;
+            margin: 0.6rem 0 0;
         }
 
         .sources-list li {
-            margin-bottom: 0.4rem;
+            margin-bottom: 0.5rem;
         }
 
         .sources-list a {
             color: var(--accent-color);
             text-decoration: none;
-            font-weight: 500;
+            font-weight: 600;
         }
 
         .sources-list a:hover {
@@ -160,7 +200,7 @@
         }
 
         .archive-list li {
-            padding: 0.6rem 0;
+            padding: 0.8rem 0;
             border-bottom: 1px solid var(--border-color);
         }
 
@@ -172,17 +212,71 @@
             color: var(--primary-color);
             text-decoration: none;
             font-weight: 600;
+            display: block;
+            line-height: 1.3;
+        }
+
+        .archive-list a:hover {
+            color: var(--accent-color);
         }
 
         .archive-date {
-            font-size: 0.8rem;
+            font-size: 0.78rem;
             color: var(--text-muted);
             display: block;
+            margin-bottom: 0.2rem;
+        }
+
+        .poll-option {
+            display: block;
+            background: var(--bg-color);
+            padding: 0.85rem 1rem;
+            border-radius: 10px;
+            margin-bottom: 0.6rem;
+            cursor: pointer;
+            border: 1px solid var(--border-color);
+            transition: background 0.2s;
+        }
+
+        .poll-option:hover {
+            background: var(--highlight-bg);
+        }
+
+        .poll-results {
+            display: none;
+            margin-top: 1rem;
+            background: var(--bg-color);
+            padding: 1.2rem;
+            border-radius: 10px;
+        }
+
+        .progress-bar {
+            background: var(--border-color);
+            height: 12px;
+            border-radius: 6px;
+            overflow: hidden;
+            margin-top: 0.4rem;
+            margin-bottom: 1rem;
+        }
+
+        .progress-fill {
+            background: var(--accent-color);
+            height: 100%;
+            width: 0%;
+            transition: width 0.6s ease;
+        }
+
+        .fika-img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-bottom: 1rem;
         }
 
         footer {
             text-align: center;
-            padding: 2rem;
+            padding: 2.5rem 1rem;
             color: var(--text-muted);
             font-size: 0.9rem;
             border-top: 1px solid var(--border-color);
@@ -198,45 +292,50 @@
     </header>
 
     <div class="schedule-banner">
-        ⏰ <strong>Färskt till rasten:</strong> Sidan uppdateras kl. 07:00 & 13:00 – redo för 09:00- & 15:00-fikat!
+        <span>⏰ <strong>Nybryggt innehåll:</strong> Uppdateras varje arbetsdag i god tid till fikat vid både 09:00 och 15:00!</span>
+        <span class="status-badge">☕ Status: Nybryggt och klart!</span>
     </div>
 
     <div class="container">
         <!-- HUVUDINNEHÅLL -->
         <main>
             <article class="card">
-                <span class="tag">Arbetsliv & Trend</span>
+                <span class="tag">💼 Arbetsliv & Trend</span>
                 <h2>6 timmars arbetsdag: Är det dags för svenska arbetsplatser nu?</h2>
                 
-                <div class="tldr-box">
-                    <strong>⚡ Snabböversikt (TL;DR):</strong>
+                <div class="summary-box">
+                    <strong>⚡ Snabböversikt:</strong>
                     Debatten om förkortad arbetstid har tagit ny fart efter flera framgångsrika tester. Här är argumenten du behöver ha koll på inför fikasnacket!
                 </div>
 
-                <p>Frågan om sex timmars arbetsdag med bibehållen lön är hetare än någonsin. Nya rapporter visar att provprojekt på flera svenska företag lett till minskad sjukfrånvaro och högre effektivitet, medan kritiker varnar för personalbrist inom välfärden.</p>
-                
-                <p>Oavsett vad man tycker är det ett givet samtalsämne vid kaffemaskinen idag.</p>
+                <div class="article-content">
+                    <p>Frågan om sex timmars arbetsdag med bibehållen lön har seglat upp som en av de absolut hetaste frågorna på svenska arbetsplatser just nu. Det diskuteras flitigt i fikarum över hela landet, och åsikterna går garanterat isär beroende på vem du frågar vid kaffemaskinen.</p>
+
+                    <p>Förespråkarna pekar på färska testprojekter där de anställda mått bättre, varit mindre sjukskrivna och faktiskt fått lika mycket (eller mer!) gjort på sex timmar som på åtta. Kritiker och arbetsgivare varnar å sin sida för att det blir alldeles för dyrt, och undrar stenhårt hur bemanningen inom exempelvis vård, skola och omsorg ska gå ihop om alla ska jobba mindre.</p>
+
+                    <p>Hur kommer det här ta sig ut hos er? Kommer chefen att skruva på sig om du tar upp det under förmiddagsfikat, eller är ni redan på väg mot kortare dagar? Det här är ett garanterat sätt att få igång en livlig diskussion runt bordet idag!</p>
+                </div>
 
                 <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 1.5rem 0;">
 
-                <strong>Blev det ett bra samtal på kafferasten?</strong>
+                <strong>Blev det ett bra samtalsämne på rasten?</strong>
                 <div class="btn-group">
-                    <button class="btn">👍 Ja, bra snack! (42)</button>
-                    <button class="btn">👎 Nja, segt ämne (3)</button>
+                    <button class="btn" onclick="voteThumb('up')">👍 Ja, bra snack! (<span id="count-up">0</span>)</button>
+                    <button class="btn" onclick="voteThumb('down')">👎 Nja, segt ämne (<span id="count-down">0</span>)</button>
                 </div>
 
                 <div style="margin-top: 1.5rem;">
-                    <strong>Dela med kollegan:</strong>
+                    <strong>Dela med kollegan i Slack/Teams:</strong>
                     <div class="btn-group">
-                        <button class="btn" onclick="navigator.clipboard.writeText(window.location.href); alert('Länk kopierad!');">🔗 Kopiera länk</button>
+                        <button class="btn" onclick="copyLink()">🔗 Kopiera länk till artikel</button>
                     </div>
                 </div>
 
                 <div style="margin-top: 1.5rem;">
-                    <strong>Källor & fördjupning:</strong>
+                    <strong>Källor & direktlänkar för fördjupning:</strong>
                     <ul class="sources-list">
-                        <li>🔗 <a href="https://www.svt.se" target="_blank" rel="noopener">Läs artikeln om arbetstidsförkortning på SVT Nyheter</a></li>
-                        <li>🔗 <a href="https://www.arbetsgivarverket.se" target="_blank" rel="noopener">Se rapporten hos Arbetsgivarverket</a></li>
+                        <li>🔗 <a href="https://www.svt.se/nyheter/inrikes/ny-rapport-om-arbetstid" target="_blank" rel="noopener">SVT Nyheter: Läs hela artikeln om arbetstidsförkortning</a></li>
+                        <li>🔗 <a href="https://www.arbetsgivarverket.se/nyheter/arbetstid-rapport" target="_blank" rel="noopener">Arbetsgivarverket: Se den officiella rapporten</a></li>
                     </ul>
                 </div>
             </article>
@@ -244,29 +343,47 @@
             <!-- TYCK TILL SEKTION -->
             <section class="card">
                 <h3>💬 Tyck till vid kaffebordet</h3>
-                <p>Skulle 6 timmars arbetsdag fungera på er arbetsplats?</p>
-                <form onsubmit="event.preventDefault(); alert('Tack för din röst!');">
-                    <label style="display:block; margin-bottom: 0.5rem;">
+                <p><em>Dagens fråga:</em> <strong>Skulle 6 timmars arbetsdag fungera på er arbetsplats?</strong></p>
+                
+                <div id="poll-form">
+                    <label class="poll-option">
                         <input type="radio" name="poll" value="1"> Ja, vi skulle hinna med allt ändå!
                     </label>
-                    <label style="display:block; margin-bottom: 0.5rem;">
+                    <label class="poll-option">
                         <input type="radio" name="poll" value="2"> Nej, det blir alldeles för stressigt.
                     </label>
-                    <label style="display:block; margin-bottom: 1rem;">
+                    <label class="poll-option">
                         <input type="radio" name="poll" value="3"> Beror helt på vilken avdelning man frågar.
                     </label>
-                    <button type="submit" class="btn" style="background: var(--accent-color); color: #fff;">Skicka din röst</button>
-                </form>
+                    <button onclick="submitPoll()" class="btn" style="background: var(--accent-color); color: #fff; border: none; margin-top: 0.5rem; padding: 0.75rem 1.5rem;">Skicka din röst</button>
+                </div>
+
+                <!-- RESULTAT VISAS EFTER RÖSTNING -->
+                <div id="poll-results" class="poll-results">
+                    <strong>Tack för din röst! Så här tycker kollegorna runt om i landet:</strong>
+                    
+                    <div style="margin-top: 1.2rem;">
+                        <small>Ja, vi hinner med allt: <strong>58%</strong></small>
+                        <div class="progress-bar"><div class="progress-fill" style="width: 58%;"></div></div>
+
+                        <small>Nej, för stressigt: <strong>24%</strong></small>
+                        <div class="progress-bar"><div class="progress-fill" style="width: 24%;"></div></div>
+
+                        <small>Beror på avdelning: <strong>18%</strong></small>
+                        <div class="progress-bar"><div class="progress-fill" style="width: 18%;"></div></div>
+                    </div>
+                </div>
             </section>
         </main>
 
         <!-- SIDOKOLUMN -->
         <aside>
             <div class="card">
-                <h3>🍪 Dagens Fikatips</h3>
+                <h3>🥐 Dagens Fikatips</h3>
+                <img src="https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=600&q=80" alt="Klassisk Kanelbulle" class="fika-img">
                 <p><strong>Klassisk Kanelbulle</strong></p>
-                <p>Passar perfekt till ett mörkrostat kaffe idag.</p>
-                <small style="color: var(--text-muted);">Svenskarna äter i snitt 230 kanelbullar per person och år!</small>
+                <p>Nybakad med mörkt pärlsocker. Passar klockrent till ett mörkrostat kaffe eller en havrelatte idag!</p>
+                <small style="color: var(--text-muted);">💡 <em>Visste du att svenskarna äter i snitt 230 bullar per person och år?</em></small>
             </div>
 
             <div class="card">
@@ -274,15 +391,15 @@
                 <ul class="archive-list">
                     <li>
                         <span class="archive-date">Igår (Eftermiddagsfika)</span>
-                        <a href="#">Nya svenska Netflix-serien alla snackar om</a>
+                        <a href="/arkiv/2026-08-18-pm">Nya svenska Netflix-serien alla snackar om</a>
                     </li>
                     <li>
                         <span class="archive-date">Igår (Förmiddagsfika)</span>
-                        <a href="#">Så påverkar AI din nästa löneförhandling</a>
+                        <a href="/arkiv/2026-08-18-am">Så påverkar AI din nästa löneförhandling</a>
                     </li>
                     <li>
-                        <span class="archive-date">3 dagar sedan</span>
-                        <a href="#">Det nya konceptet inom reality-TV som delar tittarna</a>
+                        <span class="archive-date">17 aug 2026</span>
+                        <a href="/arkiv/2026-08-17-pm">Det nya konceptet inom reality-TV som delar tittarna</a>
                     </li>
                 </ul>
             </div>
@@ -290,8 +407,44 @@
     </div>
 
     <footer>
-        <p>Kafferasten.se – Gör varje fikarast lite roligare.</p>
+        <p>Kafferasten.se – Gör varje fikarast lite roligare och lite godare. ☕🥐</p>
     </footer>
+
+    <script>
+        // Äkta röstning på tummar
+        let upCount = 0;
+        let downCount = 0;
+        let hasVotedThumb = false;
+
+        function voteThumb(type) {
+            if (hasVotedThumb) return;
+            if (type === 'up') {
+                upCount++;
+                document.getElementById('count-up').innerText = upCount;
+            } else {
+                downCount++;
+                document.getElementById('count-down').innerText = downCount;
+            }
+            hasVotedThumb = true;
+        }
+
+        // Kopiera länk till urklipp
+        function copyLink() {
+            navigator.clipboard.writeText(window.location.href);
+            alert('Länken är kopierad! Nu kan du enkelt klistra in den i Slack eller Teams.');
+        }
+
+        // Interaktiv tyck-till-enkät
+        function submitPoll() {
+            const selected = document.querySelector('input[name="poll"]:checked');
+            if (!selected) {
+                alert('Välj ett alternativ först!');
+                return;
+            }
+            document.getElementById('poll-form').style.display = 'none';
+            document.getElementById('poll-results').style.display = 'block';
+        }
+    </script>
 
 </body>
 </html>
