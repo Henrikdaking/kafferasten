@@ -62,7 +62,7 @@
             text-align: center;
             padding: 0.85rem 1rem;
             font-size: 0.95rem;
-            font-weight: 600;
+            font-weight: 500;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -250,7 +250,7 @@
 
         .fika-img {
             width: 100%;
-            height: 180px;
+            height: 200px;
             object-fit: cover;
             border-radius: 10px;
             margin-bottom: 1rem;
@@ -276,6 +276,37 @@
             width: 100%;
         }
 
+        /* KOMMENTARSFÄLT STYLES */
+        .comment-input {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            margin-bottom: 0.8rem;
+            font-family: inherit;
+            box-sizing: border-box;
+            background: var(--bg-color);
+        }
+
+        .comment-input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+
+        .comment-item {
+            background: var(--bg-color);
+            padding: 0.8rem 1rem;
+            border-radius: 10px;
+            margin-bottom: 0.6rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .comment-item strong {
+            color: var(--primary-color);
+            display: block;
+            font-size: 0.85rem;
+        }
+
         footer {
             text-align: center;
             padding: 2.5rem 1rem;
@@ -293,9 +324,10 @@
         <p>Dagens snackisar och samtalsämnen till fikarasten</p>
     </header>
 
+    <!-- STATUS BANNER MED REDAKTIONENS INFORMATION -->
     <div class="schedule-banner">
-        <span>⏰ <strong>RYKANDE FÄRSKT:</strong> <span id="fika-time-text">Laddar dagens snackis...</span></span>
-        <span class="status-badge">☕ Nybryggt & Klart</span>
+        <span>⏰ <strong>RYKANDE FÄRSKT:</strong> <span id="fika-time-text">Laddar dagens snackis...</span> (Redaktionen lägger ut nya snackisar runt 07:00 & 13:00 inför 09- & 15-fikat)</span>
+        <span class="status-badge">☕ Nybryggt</span>
     </div>
 
     <div class="container">
@@ -325,8 +357,8 @@
 
                 <strong>Blev det ett bra samtalsämne på rasten?</strong>
                 <div class="btn-group">
-                    <button class="btn" onclick="voteThumb('up')">👍 Ja, bra snack! (<span id="count-up">0</span>)</button>
-                    <button class="btn" onclick="voteThumb('down')">👎 Nja, segt ämne (<span id="count-down">0</span>)</button>
+                    <button class="btn" onclick="voteThumb('main-up')">👍 Ja, bra snack! (<span id="count-main-up">0</span>)</button>
+                    <button class="btn" onclick="voteThumb('main-down')">👎 Nja, segt ämne (<span id="count-main-down">0</span>)</button>
                 </div>
 
                 <div style="margin-top: 1.5rem;">
@@ -337,14 +369,14 @@
                 </div>
 
                 <div style="margin-top: 1.5rem;">
-                    <strong>Exakt direktlänk till källan:</strong>
+                    <strong>Källa:</strong>
                     <ul class="sources-list">
                         <li>🔗 <a href="https://www.aftonbladet.se/nojesbladet/a/M7aevm/de-tavlar-i-pa-sparet-2026" target="_blank" rel="noopener">Aftonbladet: Läs artikeln "De tävlar i På spåret 2026"</a></li>
                     </ul>
                 </div>
             </article>
 
-            <!-- TYCK TILL SEKTION -->
+            <!-- TYCK TILL & KOMMENTERA SEKTION -->
             <section class="card">
                 <h3>💬 Tyck till vid kaffebordet</h3>
                 <p><em>Dagens fråga:</em> <strong>Vilket par tror du tar hem På spåret i år?</strong></p>
@@ -373,6 +405,20 @@
                         <div class="progress-bar"><div class="progress-fill" style="width: 27%;"></div></div>
                     </div>
                 </div>
+
+                <!-- KOMMENTARSFÄLT -->
+                <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 1.8rem 0 1.2rem;">
+                <h4>💭 Vad sägs i ert fikarum?</h4>
+                <input type="text" id="comment-name" placeholder="Ditt namn / Avdelning (valfritt)" class="comment-input">
+                <textarea id="comment-text" placeholder="Skriv en kommentar..." rows="3" class="comment-input"></textarea>
+                <button onclick="addComment()" class="btn" style="background: var(--primary-color); color: #fff;">Skicka kommentar</button>
+
+                <div id="comments-list" style="margin-top: 1.2rem;">
+                    <div class="comment-item">
+                        <strong>Johan från IT:</strong>
+                        Haag & Lundgren sopar banan med de andra!
+                    </div>
+                </div>
             </section>
 
             <!-- SEKTIONSAVSKILJARE FÖR TIDIGARE NYHETER -->
@@ -397,8 +443,21 @@
 
                 <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 1.5rem 0;">
 
-                <div style="margin-top: 1rem;">
-                    <strong>Läs mer i källan:</strong>
+                <strong>Blev det ett bra samtalsämne på rasten?</strong>
+                <div class="btn-group">
+                    <button class="btn" onclick="voteThumb('old1-up')">👍 Ja, bra snack! (<span id="count-old1-up">14</span>)</button>
+                    <button class="btn" onclick="voteThumb('old1-down')">👎 Nja, segt ämne (<span id="count-old1-down">2</span>)</button>
+                </div>
+
+                <div style="margin-top: 1.5rem;">
+                    <strong>Dela med kollegan i Slack/Teams:</strong>
+                    <div class="btn-group">
+                        <button class="btn" onclick="copyLink()">🔗 Kopiera länk till artikel</button>
+                    </div>
+                </div>
+
+                <div style="margin-top: 1.5rem;">
+                    <strong>Källa:</strong>
                     <ul class="sources-list">
                         <li>🔗 <a href="https://www.svt.se/nyheter/" target="_blank" rel="noopener">SVT Nyheter: Läs om debatten kring förkortad arbetstid</a></li>
                     </ul>
@@ -411,7 +470,7 @@
         <aside>
             <div class="card">
                 <h3>🥐 Dagens Fikatips</h3>
-                <img src="https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=600&q=80" alt="Nygräddad Kanelbulle" class="fika-img">
+                <img src="https://images.unsplash.com/photo-1555507036-ab1f4038808a?auto=format&fit=crop&w=600&q=80" alt="Nygräddade Kanelbullar" class="fika-img">
                 <p><strong>Klassisk Kanelbulle</strong></p>
                 <p>Nybakad med mörkt pärlsocker och massor av kanel. Passar klockrent till ett mörkrostat kaffe eller en krämig havrelatte idag!</p>
                 <small style="color: var(--text-muted);">💡 <em>Visste du att svenskarna äter i snitt 230 bullar per person och år?</em></small>
@@ -431,20 +490,15 @@
     </footer>
 
     <script>
-        let upCount = 0;
-        let downCount = 0;
-        let hasVotedThumb = false;
+        const votes = {};
 
-        function voteThumb(type) {
-            if (hasVotedThumb) return;
-            if (type === 'up') {
-                upCount++;
-                document.getElementById('count-up').innerText = upCount;
-            } else {
-                downCount++;
-                document.getElementById('count-down').innerText = downCount;
+        function voteThumb(id) {
+            if (votes[id]) return;
+            votes[id] = true;
+            const el = document.getElementById('count-' + id);
+            if (el) {
+                el.innerText = parseInt(el.innerText) + 1;
             }
-            hasVotedThumb = true;
         }
 
         function copyLink() {
@@ -462,7 +516,29 @@
             document.getElementById('poll-results').style.display = 'block';
         }
 
-        // Automatisk tidsstämpling anpassad för publicering 07:00 och 13:00
+        function addComment() {
+            const nameInput = document.getElementById('comment-name');
+            const textInput = document.getElementById('comment-text');
+            const name = nameInput.value.trim() || 'Anonym kollega';
+            const text = textInput.value.trim();
+
+            if (!text) {
+                alert('Skriv en kommentar först!');
+                return;
+            }
+
+            const list = document.getElementById('comments-list');
+            const commentDiv = document.createElement('div');
+            commentDiv.className = 'comment-item';
+            commentDiv.innerHTML = `<strong>${name}:</strong> ${text}`;
+            
+            list.prepend(commentDiv);
+
+            nameInput.value = '';
+            textInput.value = '';
+        }
+
+        // Tidsstämpling anpassad för redaktionell känsla
         function updateFikaTime() {
             const now = new Date();
             const hours = now.getHours();
@@ -472,10 +548,10 @@
 
             if (hours >= 7 && hours < 13) {
                 if(badge) badge.innerText = "☕ MORGONFIKAT | Dagens färskaste snackis";
-                if(text) text.innerText = "Publicerad 07:00 – redo för 09:00-fikat!";
+                if(text) text.innerText = "Nypublicerat av redaktionen inför 09:00-fikat!";
             } else {
                 if(badge) badge.innerText = "☕ EFTERMIDDAGSFIKAT | Dagens färskaste snackis";
-                if(text) text.innerText = "Publicerad 13:00 – redo för 15:00-fikat!";
+                if(text) text.innerText = "Nypublicerat av redaktionen inför 15:00-fikat!";
             }
         }
 
