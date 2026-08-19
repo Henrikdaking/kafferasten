@@ -3,641 +3,295 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kafferasten.se ☕️ – Räddar din fikarast varje dag</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <title>Kafferasten.se – Dagens Snackis till Fikat</title>
     <style>
         :root {
-            --bg-color: #0b0d10;
-            --card-bg: #151820;
-            --accent-coffee: #ff6b35;
-            --accent-cream: #f7c59f;
-            --accent-yellow: #ffb800;
-            --text-main: #f0f3f8;
-            --text-muted: #9ba1b0;
-            --border-color: #242a38;
-            --radius: 18px;
+            --bg-color: #FAF6F0;
+            --card-bg: #FFFFFF;
+            --primary-color: #4A2E2B;
+            --accent-color: #D97736;
+            --text-color: #2C221E;
+            --text-muted: #6B5B52;
+            --border-color: #E8DFD5;
         }
 
-        * {
-            box-sizing: border-box;
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
             margin: 0;
             padding: 0;
         }
 
-        body {
-            font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            line-height: 1.6;
-            padding: 20px 15px 80px 15px;
-            display: flex;
-            justify-content: center;
-        }
-
-        .container {
-            max-width: 680px;
-            width: 100%;
-        }
-
-        .timer-banner {
-            background: linear-gradient(135deg, rgba(255, 107, 53, 0.15), rgba(255, 184, 0, 0.08));
-            border: 1px solid rgba(255, 107, 53, 0.3);
-            border-radius: 14px;
-            padding: 12px 18px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 25px;
-            font-size: 0.88rem;
-            font-weight: 600;
-        }
-
-        .timer-badge {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: var(--accent-cream);
-        }
-
-        .timer-clock {
-            font-weight: 800;
-            color: var(--accent-yellow);
-            font-variant-numeric: tabular-nums;
-            background: rgba(0, 0, 0, 0.3);
-            padding: 4px 10px;
-            border-radius: 8px;
-            border: 1px solid rgba(255, 184, 0, 0.2);
-        }
-
         header {
+            background-color: var(--primary-color);
+            color: #FFF;
+            padding: 2rem 1rem;
             text-align: center;
-            padding: 20px 0 30px 0;
-            border-bottom: 1px solid var(--border-color);
-            margin-bottom: 30px;
+            border-bottom: 4px solid var(--accent-color);
         }
 
-        .logo-box {
-            display: inline-flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 15px;
+        header h1 {
+            margin: 0;
+            font-size: 2.2rem;
+            letter-spacing: -0.5px;
         }
 
-        .logo-svg {
-            width: 70px;
-            height: 70px;
-            background: linear-gradient(135deg, #1f2533, #151820);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 2px solid var(--accent-coffee);
-            box-shadow: 0 0 20px rgba(255, 107, 53, 0.25);
+        header p {
+            margin: 0.5rem 0 0;
+            color: #E8DFD5;
+            font-size: 1.1rem;
         }
 
-        h1 {
-            font-size: 2.5rem;
-            font-weight: 800;
-            letter-spacing: -0.8px;
-            color: #ffffff;
-            line-height: 1.1;
-        }
-
-        h1 span {
-            color: var(--accent-coffee);
-        }
-
-        .tagline {
-            color: var(--text-muted);
-            font-size: 0.98rem;
-            margin-top: 8px;
+        .schedule-banner {
+            background-color: #FFF3E6;
+            border: 1px solid var(--accent-color);
+            color: var(--primary-color);
+            text-align: center;
+            padding: 0.75rem;
+            font-size: 0.95rem;
             font-weight: 500;
         }
 
-        .meta-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        .container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
             background: var(--card-bg);
-            padding: 12px 20px;
+            border: 1px solid var(--border-color);
             border-radius: 12px;
-            border: 1px solid var(--border-color);
-            margin-bottom: 25px;
-            font-size: 0.85rem;
-            color: var(--text-muted);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
         }
 
-        .meta-date {
-            font-weight: 700;
-            color: var(--accent-yellow);
-        }
-
-        .article-card {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius);
-            padding: 30px;
-            margin-bottom: 30px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-        }
-
-        .article-badge {
+        .tag {
             display: inline-block;
-            background: rgba(255, 107, 53, 0.15);
-            color: var(--accent-coffee);
-            font-weight: 800;
-            font-size: 0.75rem;
-            padding: 4px 10px;
-            border-radius: 6px;
+            background: var(--accent-color);
+            color: #FFF;
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: bold;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 15px;
+            margin-bottom: 0.8rem;
         }
 
-        .article-title {
-            font-size: 1.8rem;
-            font-weight: 800;
-            line-height: 1.25;
-            margin-bottom: 20px;
-            color: #ffffff;
+        .tldr-box {
+            background-color: #FAF6F0;
+            border-left: 4px solid var(--accent-color);
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0 8px 8px 0;
         }
 
-        /* Bildstilar */
-        .article-figure {
-            margin: 0 0 25px 0;
-            width: 100%;
-            border-radius: 12px;
-            overflow: hidden;
-            border: 1px solid var(--border-color);
-            background: #0b0d10;
-        }
-
-        .article-figure img {
-            width: 100%;
-            height: auto;
-            max-height: 380px;
-            object-fit: cover;
+        .tldr-box strong {
+            color: var(--primary-color);
             display: block;
+            margin-bottom: 0.3rem;
         }
 
-        .article-figure figcaption {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            padding: 8px 12px;
-            background: rgba(0,0,0,0.4);
-            border-top: 1px solid var(--border-color);
-        }
-
-        .article-body {
-            font-size: 1.05rem;
-            color: #d1d5db;
-            margin-bottom: 25px;
-        }
-
-        .article-body p {
-            margin-bottom: 16px;
-        }
-
-        .poll-section {
-            background: rgba(0, 0, 0, 0.25);
-            border: 1px solid var(--border-color);
-            border-radius: 14px;
-            padding: 20px;
-            margin-bottom: 25px;
-        }
-
-        .poll-title {
-            font-size: 1rem;
-            font-weight: 700;
-            margin-bottom: 14px;
-            color: var(--accent-cream);
+        .btn-group {
             display: flex;
-            align-items: center;
-            gap: 8px;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
         }
 
-        .poll-options {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .poll-btn {
-            background: #1a1f2c;
+        .btn {
+            background: var(--bg-color);
             border: 1px solid var(--border-color);
-            color: var(--text-main);
-            padding: 12px 16px;
-            border-radius: 10px;
+            color: var(--text-color);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
             font-weight: 600;
-            font-family: inherit;
-            cursor: pointer;
-            text-align: left;
-            transition: all 0.2s;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .poll-btn:hover {
-            border-color: var(--accent-coffee);
-            background: #22293a;
-        }
-
-        .sources-section {
-            border-top: 1px solid var(--border-color);
-            padding-top: 15px;
-            font-size: 0.85rem;
-            color: var(--text-muted);
-        }
-
-        .sources-section a {
-            color: var(--accent-yellow);
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
             text-decoration: none;
-            margin-left: 5px;
-        }
-
-        .comments-section {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius);
-            padding: 30px;
-            margin-bottom: 30px;
-        }
-
-        .comments-title {
-            font-size: 1.2rem;
-            font-weight: 700;
-            margin-bottom: 20px;
-        }
-
-        .comment-form {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin-bottom: 25px;
-        }
-
-        .comment-input, .comment-textarea {
-            background: #0b0d10;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 12px 15px;
-            color: white;
-            font-family: inherit;
-            font-size: 0.9rem;
-        }
-
-        .comment-input:focus, .comment-textarea:focus {
-            outline: none;
-            border-color: var(--accent-coffee);
-        }
-
-        .comment-textarea {
-            resize: vertical;
-            min-height: 80px;
-        }
-
-        .btn-submit {
-            background: var(--accent-coffee);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            padding: 12px;
-            font-weight: 700;
-            cursor: pointer;
-        }
-
-        .comment-list {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .comment-item {
-            background: #0b0d10;
-            padding: 14px 18px;
-            border-radius: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .comment-header {
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            margin-bottom: 6px;
-        }
-
-        .comment-author {
-            font-weight: 700;
-            color: var(--accent-yellow);
-        }
-
-        .comment-text {
-            font-size: 0.9rem;
-            color: var(--text-main);
-        }
-
-        .archive-section {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius);
-            padding: 25px 30px;
-        }
-
-        .archive-title {
-            font-size: 1.1rem;
-            font-weight: 700;
-            margin-bottom: 15px;
-            color: var(--accent-cream);
-            display: flex;
+            display: inline-flex;
             align-items: center;
-            gap: 8px;
+            gap: 0.4rem;
+        }
+
+        .btn:hover {
+            background: var(--accent-color);
+            color: #FFF;
+            border-color: var(--accent-color);
+        }
+
+        .sources-list {
+            list-style: none;
+            padding: 0;
+            margin: 0.5rem 0 0;
+        }
+
+        .sources-list li {
+            margin-bottom: 0.4rem;
+        }
+
+        .sources-list a {
+            color: var(--accent-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .sources-list a:hover {
+            text-decoration: underline;
         }
 
         .archive-list {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
+            list-style: none;
+            padding: 0;
+            margin: 0;
         }
 
-        .archive-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px;
-            background: #0b0d10;
-            border-radius: 8px;
-            border: 1px solid rgba(255, 255, 255, 0.03);
+        .archive-list li {
+            padding: 0.6rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .archive-list li:last-child {
+            border-bottom: none;
+        }
+
+        .archive-list a {
+            color: var(--primary-color);
             text-decoration: none;
-            color: var(--text-main);
-            font-size: 0.9rem;
             font-weight: 600;
         }
 
         .archive-date {
-            font-size: 0.78rem;
+            font-size: 0.8rem;
             color: var(--text-muted);
-            font-weight: 400;
+            display: block;
         }
 
         footer {
             text-align: center;
-            margin-top: 40px;
-            font-size: 0.8rem;
+            padding: 2rem;
             color: var(--text-muted);
-        }
-
-        @media (max-width: 500px) {
-            h1 { font-size: 1.9rem; }
-            .article-title { font-size: 1.4rem; }
-            .article-card, .comments-section, .archive-section { padding: 20px; }
-            .timer-banner { flex-direction: column; gap: 8px; text-align: center; }
+            font-size: 0.9rem;
+            border-top: 1px solid var(--border-color);
+            margin-top: 3rem;
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
+    <header>
+        <h1>☕ Kafferasten.se</h1>
+        <p>Dagens snackisar och samtalsämnen till fikarasten</p>
+    </header>
 
-        <div class="timer-banner">
-            <div class="timer-badge">
-                <span>☕️ Räddningen vid fikarasten</span>
-            </div>
-            <div class="timer-clock" id="fikaTimer">
-                Laddar fikatimer...
-            </div>
-        </div>
-        
-        <header>
-            <div class="logo-box">
-                <div class="logo-svg">
-                    <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#ff6b35" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M6 3c0 2 2 2 2 4" stroke="#ffb800" stroke-width="1.5"/>
-                        <path d="M12 2c0 2 2 2 2 4" stroke="#ffb800" stroke-width="1.5"/>
-                        <path d="M18 3c0 2 2 2 2 4" stroke="#ffb800" stroke-width="1.5"/>
-                        <path d="M17 8h1a4 4 0 0 1 0 8h-1"/>
-                        <path d="M3 8h14v7a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V8z"/>
-                        <line x1="2" y1="21" x2="18" y2="21"/>
-                    </svg>
-                </div>
-                <h1>Kafferasten<span>.se</span></h1>
-            </div>
-            <p class="tagline">Sajten som gör dig till kaffebordets intressantaste person på 2 minuter.</p>
-        </header>
-
-        <div class="meta-bar">
-            <div class="meta-date" id="update-time">⚡ Morgonens Snackis – Uppdaterad 06:30</div>
-            <div>Sverige just nu</div>
-        </div>
-
-        <article class="article-card">
-            <span class="article-badge">🔥 Dagens Hetaste Nyhet</span>
-            <h2 class="article-title" id="article-title">SVT:s nya dejtingchock: "Dejtingserien där man INTE får prata sågas längs med fotknölarna"</h2>
-            
-            <!-- Bildmall med bildtext -->
-            <figure class="article-figure" id="article-figure">
-                <img id="article-img" src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80" alt="Artikelbild">
-                <figcaption id="image-caption">Foto / Bildkälla: Illustrativ bild</figcaption>
-            </figure>
-
-            <div class="article-body" id="article-content">
-                <p>Har du sett klippen på TikTok eller X och undrat vad som pågår? SVT har precis släppt sin nya storsatsning <em>"Silent Attraction"</em> – och nätet har drabbats av kollektiv hjärnblödning.</p>
-                <p>Premissen i programmet är att radikala, progressiva kvinnor ska para ihop sig med helt konservativa män. Haken? De ska dejta helt utan att prata med varandra. Idén är att de inte ska "döma varandras åsikter", men i stället sitter deltagarna bara och stirrar på varandra i stel tystnad. Recensenterna tävlar just nu i vem som kan såga showen hårdast, och Aftonbladet kallar det redan för en "dassig spinoff".</p>
-            </div>
-
-            <div class="poll-section">
-                <div class="poll-title" id="poll-question">❓ DAGENS FIKA-FRÅGA: Skulle du kunna dejta i tystnad?</div>
-                <div class="poll-options" id="pollOptions">
-                    <button class="poll-btn" onclick="vote(1)">
-                        <span id="opt1-text">1. Ja, skönt att slippa snacka skit!</span>
-                        <span id="pct1"></span>
-                    </button>
-                    <button class="poll-btn" onclick="vote(2)">
-                        <span id="opt2-text">2. Aldrig i livet, hade dött av stelhet.</span>
-                        <span id="pct2"></span>
-                    </button>
-                </div>
-            </div>
-
-            <div class="sources-section" id="sources-container">
-                <span>Källor & fördjupning:</span>
-                <a href="#" id="source-link-1">SVT Nyheter</a> • 
-                <a href="#" id="source-link-2">Aftonbladet Kultur</a> • 
-                <a href="#" id="source-link-3">Omni</a>
-            </div>
-        </article>
-
-        <section class="comments-section">
-            <h3 class="comments-title">💬 Tyck till vid kaffebordet</h3>
-            
-            <form class="comment-form" id="commentForm">
-                <input type="text" id="authorInput" class="comment-input" placeholder="Ditt namn eller alias (valfritt)">
-                <textarea id="textInput" class="comment-textarea" placeholder="Vad tycker du om det här?" required></textarea>
-                <button type="submit" class="btn-submit">Publicera kommentar</button>
-            </form>
-
-            <div class="comment-list" id="commentList">
-                <div class="comment-item">
-                    <div class="comment-header">
-                        <span class="comment-author">Nisse_Målare</span>
-                        <span>Svarade nyss</span>
-                    </div>
-                    <div class="comment-text">
-                        Satt i fikarummet i morse och vi garvade ihjäl oss åt klippet. Vem godkände det här på SVT?! 😂
-                    </div>
-                </div>
-
-                <div class="comment-item">
-                    <div class="comment-header">
-                        <span class="comment-author">Kaffe_Kungen</span>
-                        <span>För 12 min sedan</span>
-                    </div>
-                    <div class="comment-text">
-                        Tyst dejt? Låter ju som en helt vanlig tisdagskväll hemma i soffan ju... 😉
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section class="archive-section">
-            <div class="archive-title">📁 FIKA-ARKIVET (Tidigare snackisar)</div>
-            <div class="archive-list">
-                <a href="#" class="archive-item">
-                    <span>AI-chocken: Alla pratar om de nya superassistenterna</span>
-                    <span class="archive-date">Igår</span>
-                </a>
-                <a href="#" class="archive-item">
-                    <span>Nya kontorsregeln: Får man verkligen mikra fisk på jobbet?</span>
-                    <span class="archive-date">I förrgår</span>
-                </a>
-            </div>
-        </section>
-
-        <footer>
-            <p>© Kafferasten.se • Gör dina fikaraster lite roligare varje dag.</p>
-        </footer>
-
+    <div class="schedule-banner">
+        ⏰ <strong>Färskt till rasten:</strong> Sidan uppdateras kl. 07:00 & 13:00 – redo för 09:00- & 15:00-fikat!
     </div>
 
-    <script>
-        // --- TIMER-FUNKTION ---
-        function updateFikaTimer() {
-            const now = new Date();
-            const day = now.getDay();
-            const timerEl = document.getElementById('fikaTimer');
-
-            if (day === 0 || day === 6) {
-                timerEl.innerHTML = "🎉 Helgläge! Njut av sovmorgonen";
-                return;
-            }
-
-            const currentHour = now.getHours();
-            let targetHour, targetLabel;
-
-            if (currentHour < 9) {
-                targetHour = 9;
-                targetLabel = "Morgonfika kl 09:00";
-            } else if (currentHour < 15) {
-                targetHour = 15;
-                targetLabel = "Eftermiddagsfika kl 15:00";
-            } else {
-                timerEl.innerHTML = "☕️ Dagens raster är klara! Vi ses imorgon 09:00";
-                return;
-            }
-
-            const targetTime = new Date();
-            targetTime.setHours(targetHour, 0, 0, 0);
-
-            const diffMs = targetTime - now;
-            const diffMins = Math.floor(diffMs / 60000);
-            const hoursLeft = Math.floor(diffMins / 60);
-            const minsLeft = diffMins % 60;
-
-            if (hoursLeft > 0) {
-                timerEl.innerHTML = `⏱️ ${targetLabel} om ${hoursLeft}t ${minsLeft}m`;
-            } else {
-                timerEl.innerHTML = `⏱️ ${targetLabel} om ${minsLeft} minuter!`;
-            }
-        }
-
-        updateFikaTimer();
-        setInterval(updateFikaTimer, 60000);
-
-        // --- POLL / OMRÖSTNING ---
-        let voted = false;
-        function vote(option) {
-            if (voted) return;
-            voted = true;
-
-            const pct1 = option === 1 ? '68%' : '32%';
-            const pct2 = option === 2 ? '68%' : '32%';
-
-            document.getElementById('pct1').innerText = `(${pct1})`;
-            document.getElementById('pct2').innerText = `(${pct2})`;
-
-            alert("Tack för din röst! Din åsikt är registrerad vid kaffebordet.");
-        }
-
-        // --- KOMMENTARSFUNKTION ---
-        document.getElementById('commentForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const authorInput = document.getElementById('authorInput');
-            const textInput = document.getElementById('textInput');
-            const commentList = document.getElementById('commentList');
-
-            const author = authorInput.value.trim() || 'Anonym fika-gäst';
-            const text = textInput.value.trim();
-
-            if (!text) return;
-
-            const newComment = document.createElement('div');
-            newComment.className = 'comment-item';
-            newComment.innerHTML = `
-                <div class="comment-header">
-                    <span class="comment-author">${author}</span>
-                    <span>Nyss</span>
+    <div class="container">
+        <!-- HUVUDINNEHÅLL -->
+        <main>
+            <article class="card">
+                <span class="tag">Arbetsliv & Trend</span>
+                <h2>6 timmars arbetsdag: Är det dags för svenska arbetsplatser nu?</h2>
+                
+                <div class="tldr-box">
+                    <strong>⚡ Snabböversikt (TL;DR):</strong>
+                    Debatten om förkortad arbetstid har tagit ny fart efter flera framgångsrika tester. Här är argumenten du behöver ha koll på inför fikasnacket!
                 </div>
-                <div class="comment-text">${text}</div>
-            `;
 
-            commentList.insertBefore(newComment, commentList.firstChild);
-
-            textInput.value = '';
-            authorInput.value = '';
-        });
-
-        // --- AUTOMATISK TRENDUPPDATERING (GOOGLE TRENDS) ---
-        async function fetchTrendingContent() {
-            try {
-                const response = await fetch('/.netlify/functions/get-trends');
-                if (!response.ok) return; // Kör vidare med standardtexten om funktionen saknas
+                <p>Frågan om sex timmars arbetsdag med bibehållen lön är hetare än någonsin. Nya rapporter visar att provprojekt på flera svenska företag lett till minskad sjukfrånvaro och högre effektivitet, medan kritiker varnar för personalbrist inom välfärden.</p>
                 
-                const data = await response.json();
+                <p>Oavsett vad man tycker är det ett givet samtalsämne vid kaffemaskinen idag.</p>
 
-                if (data.title) document.getElementById('article-title').innerText = data.title;
-                if (data.image) document.getElementById('article-img').src = data.image;
-                if (data.imageCaption) document.getElementById('image-caption').innerText = data.imageCaption;
-                if (data.content) document.getElementById('article-content').innerHTML = data.content;
-                if (data.updatedTime) document.getElementById('update-time').innerText = `⚡ Morgonens Snackis – Uppdaterad ${data.updatedTime}`;
-                
-                if (data.pollQuestion) document.getElementById('poll-question').innerText = `❓ DAGENS FIKA-FRÅGA: ${data.pollQuestion}`;
-                if (data.pollOpt1) document.getElementById('opt1-text').innerText = `1. ${data.pollOpt1}`;
-                if (data.pollOpt2) document.getElementById('opt2-text').innerText = `2. ${data.pollOpt2}`;
+                <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 1.5rem 0;">
 
-                if (data.sourcesHtml) {
-                    document.getElementById('sources-container').innerHTML = `<span>Källor & fördjupning:</span> ${data.sourcesHtml}`;
-                }
-            } catch (err) {
-                console.log("Använder standardinnehåll tills automatiska funktionen ansluts.");
-            }
-        }
+                <strong>Blev det ett bra samtal på kafferasten?</strong>
+                <div class="btn-group">
+                    <button class="btn">👍 Ja, bra snack! (42)</button>
+                    <button class="btn">👎 Nja, segt ämne (3)</button>
+                </div>
 
-        document.addEventListener('DOMContentLoaded', fetchTrendingContent);
-    </script>
+                <div style="margin-top: 1.5rem;">
+                    <strong>Dela med kollegan:</strong>
+                    <div class="btn-group">
+                        <button class="btn" onclick="navigator.clipboard.writeText(window.location.href); alert('Länk kopierad!');">🔗 Kopiera länk</button>
+                    </div>
+                </div>
+
+                <div style="margin-top: 1.5rem;">
+                    <strong>Källor & fördjupning:</strong>
+                    <ul class="sources-list">
+                        <li>🔗 <a href="https://www.svt.se" target="_blank" rel="noopener">Läs artikeln om arbetstidsförkortning på SVT Nyheter</a></li>
+                        <li>🔗 <a href="https://www.arbetsgivarverket.se" target="_blank" rel="noopener">Se rapporten hos Arbetsgivarverket</a></li>
+                    </ul>
+                </div>
+            </article>
+
+            <!-- TYCK TILL SEKTION -->
+            <section class="card">
+                <h3>💬 Tyck till vid kaffebordet</h3>
+                <p>Skulle 6 timmars arbetsdag fungera på er arbetsplats?</p>
+                <form onsubmit="event.preventDefault(); alert('Tack för din röst!');">
+                    <label style="display:block; margin-bottom: 0.5rem;">
+                        <input type="radio" name="poll" value="1"> Ja, vi skulle hinna med allt ändå!
+                    </label>
+                    <label style="display:block; margin-bottom: 0.5rem;">
+                        <input type="radio" name="poll" value="2"> Nej, det blir alldeles för stressigt.
+                    </label>
+                    <label style="display:block; margin-bottom: 1rem;">
+                        <input type="radio" name="poll" value="3"> Beror helt på vilken avdelning man frågar.
+                    </label>
+                    <button type="submit" class="btn" style="background: var(--accent-color); color: #fff;">Skicka din röst</button>
+                </form>
+            </section>
+        </main>
+
+        <!-- SIDOKOLUMN -->
+        <aside>
+            <div class="card">
+                <h3>🍪 Dagens Fikatips</h3>
+                <p><strong>Klassisk Kanelbulle</strong></p>
+                <p>Passar perfekt till ett mörkrostat kaffe idag.</p>
+                <small style="color: var(--text-muted);">Svenskarna äter i snitt 230 kanelbullar per person och år!</small>
+            </div>
+
+            <div class="card">
+                <h3>📁 Fikaarkivet</h3>
+                <ul class="archive-list">
+                    <li>
+                        <span class="archive-date">Igår (Eftermiddagsfika)</span>
+                        <a href="#">Nya svenska Netflix-serien alla snackar om</a>
+                    </li>
+                    <li>
+                        <span class="archive-date">Igår (Förmiddagsfika)</span>
+                        <a href="#">Så påverkar AI din nästa löneförhandling</a>
+                    </li>
+                    <li>
+                        <span class="archive-date">3 dagar sedan</span>
+                        <a href="#">Det nya konceptet inom reality-TV som delar tittarna</a>
+                    </li>
+                </ul>
+            </div>
+        </aside>
+    </div>
+
+    <footer>
+        <p>Kafferasten.se – Gör varje fikarast lite roligare.</p>
+    </footer>
+
 </body>
 </html>
