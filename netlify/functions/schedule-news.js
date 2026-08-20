@@ -33,7 +33,7 @@ export default async (request) => {
 
     // Hitta samma domän som scheduled-funktionen körs på.
     const url = new URL(
-      "/.netlify/functions/generate-news",
+      "/.netlify/functions/generate-news-background",
       request.url
     );
 
