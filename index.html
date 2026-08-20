@@ -3,34 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kafferasten.se – Dagens Snackis till Fikat</title>
+
+    <title>Kafferasten.se – Dagens snackis till fikat</title>
+
     <style>
         :root {
             --bg-color: #F8F4EE;
             --card-bg: #FFFFFF;
-            --primary-color: #2D1A17; /* Mörk espresso */
-            --accent-color: #C86D3B; /* Varm kanel/terrakotta */
+            --primary-color: #2D1A17;
+            --accent-color: #C86D3B;
             --accent-hover: #A85528;
             --text-color: #2C221E;
             --text-muted: #6E5E56;
             --border-color: #E2D7CD;
-            --highlight-bg: #EFE4D8; /* Krämig havremjölk */
+            --highlight-bg: #EFE4D8;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+                Roboto, Helvetica, Arial, sans-serif;
+
             background-color: var(--bg-color);
-            background-image: radial-gradient(#E2D7CD 0.75px, transparent 0.75px);
+            background-image:
+                radial-gradient(#E2D7CD 0.75px, transparent 0.75px);
             background-size: 16px 16px;
+
             color: var(--text-color);
             line-height: 1.6;
+
             margin: 0;
             padding: 0;
         }
 
         header {
             background-color: var(--primary-color);
-            color: #FFF;
+            color: white;
             padding: 2.5rem 1rem;
             text-align: center;
             border-bottom: 4px solid var(--accent-color);
@@ -44,7 +51,7 @@
         }
 
         header a {
-            color: #FFF;
+            color: white;
             text-decoration: none;
         }
 
@@ -59,10 +66,12 @@
             background-color: var(--highlight-bg);
             border-bottom: 1px solid var(--border-color);
             color: var(--primary-color);
+
             text-align: center;
             padding: 0.85rem 1rem;
             font-size: 0.95rem;
             font-weight: 500;
+
             display: flex;
             align-items: center;
             justify-content: center;
@@ -73,8 +82,10 @@
         .status-badge {
             background: #28a745;
             color: white;
+
             padding: 0.2rem 0.6rem;
             border-radius: 12px;
+
             font-size: 0.8rem;
             font-weight: bold;
         }
@@ -83,6 +94,7 @@
             max-width: 1040px;
             margin: 2rem auto;
             padding: 0 1rem;
+
             display: grid;
             grid-template-columns: 2fr 1fr;
             gap: 2rem;
@@ -98,33 +110,38 @@
             background: var(--card-bg);
             border: 1px solid var(--border-color);
             border-radius: 16px;
+
             padding: 1.8rem;
             margin-bottom: 1.5rem;
-            box-shadow: 0 4px 12px rgba(45, 26, 23, 0.04);
+
+            box-shadow:
+                0 4px 12px rgba(45, 26, 23, 0.04);
         }
 
         .tag {
             display: inline-block;
+
             background: var(--accent-color);
-            color: #FFF;
+            color: white;
+
             padding: 0.25rem 0.75rem;
             border-radius: 20px;
+
             font-size: 0.75rem;
             font-weight: 700;
+
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            margin-bottom: 1rem;
-        }
 
-        .tag-archive {
-            background: #6E5E56;
+            margin-bottom: 1rem;
         }
 
         h2 {
             color: var(--primary-color);
             margin-top: 0;
-            font-size: 1.7rem;
-            line-height: 1.3;
+
+            font-size: 1.9rem;
+            line-height: 1.25;
         }
 
         h3 {
@@ -135,7 +152,9 @@
         .article-hero-img {
             width: 100%;
             height: 260px;
+
             object-fit: cover;
+
             border-radius: 12px;
             margin-bottom: 1.2rem;
         }
@@ -143,14 +162,17 @@
         .summary-box {
             background-color: var(--bg-color);
             border-left: 4px solid var(--accent-color);
+
             padding: 1.2rem;
             margin: 1.2rem 0;
+
             border-radius: 0 12px 12px 0;
         }
 
         .summary-box strong {
             color: var(--primary-color);
             display: block;
+
             margin-bottom: 0.3rem;
             font-size: 1.05rem;
         }
@@ -161,10 +183,29 @@
             color: #382A25;
         }
 
+        .why-box {
+            background: var(--highlight-bg);
+            padding: 1.2rem;
+
+            border-radius: 12px;
+            margin: 1.5rem 0;
+        }
+
+        .why-box ul {
+            margin-bottom: 0;
+        }
+
+        .fresh-info {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-bottom: 1.2rem;
+        }
+
         .btn-group {
             display: flex;
             gap: 0.6rem;
             flex-wrap: wrap;
+
             margin-top: 0.8rem;
         }
 
@@ -172,20 +213,21 @@
             background: var(--bg-color);
             border: 1px solid var(--border-color);
             color: var(--text-color);
+
             padding: 0.65rem 1.2rem;
             border-radius: 10px;
+
             cursor: pointer;
+
             font-weight: 600;
             font-size: 0.9rem;
+
             transition: all 0.2s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.4rem;
         }
 
         .btn:hover {
             background: var(--accent-color);
-            color: #FFF;
+            color: white;
             border-color: var(--accent-color);
         }
 
@@ -196,7 +238,7 @@
         }
 
         .sources-list li {
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.6rem;
         }
 
         .sources-list a {
@@ -211,13 +253,17 @@
 
         .poll-option {
             display: block;
+
             background: var(--bg-color);
+
             padding: 0.85rem 1rem;
             border-radius: 10px;
             margin-bottom: 0.6rem;
+
             cursor: pointer;
-            border: 1px solid var(--border-color);
-            transition: background 0.2s;
+
+            border:
+                1px solid var(--border-color);
         }
 
         .poll-option:hover {
@@ -226,64 +272,28 @@
 
         .poll-results {
             display: none;
+
             margin-top: 1rem;
             background: var(--bg-color);
+
             padding: 1.2rem;
             border-radius: 10px;
         }
 
-        .progress-bar {
-            background: var(--border-color);
-            height: 12px;
-            border-radius: 6px;
-            overflow: hidden;
-            margin-top: 0.4rem;
-            margin-bottom: 1rem;
-        }
-
-        .progress-fill {
-            background: var(--accent-color);
-            height: 100%;
-            width: 0%;
-            transition: width 0.6s ease;
-        }
-
-        .fika-img {
-            width: 100%;
-            height: 200px;
-            object-fit: cover;
-            border-radius: 10px;
-            margin-bottom: 1rem;
-        }
-
-        .section-divider {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin: 2.5rem 0 1.5rem;
-        }
-
-        .section-divider h3 {
-            margin: 0;
-            white-space: nowrap;
-            font-size: 1.3rem;
-        }
-
-        .section-divider::after {
-            content: "";
-            height: 2px;
-            background: var(--border-color);
-            width: 100%;
-        }
-
         .comment-input {
             width: 100%;
+
             padding: 0.8rem;
-            border: 1px solid var(--border-color);
+
+            border:
+                1px solid var(--border-color);
+
             border-radius: 10px;
             margin-bottom: 0.8rem;
+
             font-family: inherit;
             box-sizing: border-box;
+
             background: var(--bg-color);
         }
 
@@ -294,290 +304,1106 @@
 
         .comment-item {
             background: var(--bg-color);
+
             padding: 0.8rem 1rem;
             border-radius: 10px;
+
             margin-bottom: 0.6rem;
-            border: 1px solid var(--border-color);
+
+            border:
+                1px solid var(--border-color);
         }
 
         .comment-item strong {
             color: var(--primary-color);
             display: block;
+
             font-size: 0.85rem;
+        }
+
+        .fika-img {
+            width: 100%;
+            height: 200px;
+
+            object-fit: cover;
+            border-radius: 10px;
+
+            margin-bottom: 1rem;
+        }
+
+        .coming-soon {
+            color: var(--text-muted);
+            font-size: 0.9rem;
         }
 
         footer {
             text-align: center;
+
             padding: 2.5rem 1rem;
+
             color: var(--text-muted);
             font-size: 0.9rem;
-            border-top: 1px solid var(--border-color);
+
+            border-top:
+                1px solid var(--border-color);
+
             margin-top: 3rem;
         }
     </style>
 </head>
+
 <body>
 
-    <header>
-        <h1><a href="index.html">☕ Kafferasten.se</a></h1>
-        <p>Dagens snackisar och samtalsämnen till fikarasten</p>
-    </header>
+<header>
+    <h1>
+        <a href="/">
+            ☕ Kafferasten.se
+        </a>
+    </h1>
 
-    <!-- STATUS BANNER -->
-    <div class="schedule-banner">
-        <span>⏰ <strong>RYKANDE FÄRSKT:</strong> <span id="fika-time-text">Hämtar dagens Gemini-snackis...</span></span>
-        <span class="status-badge">☕ Nybryggt</span>
+    <p>
+        Dagens snackisar och samtalsämnen till fikarasten
+    </p>
+</header>
+
+
+<div class="schedule-banner">
+
+    <span>
+        ⏰
+        <strong>RYKANDE FÄRSKT:</strong>
+        <span id="fika-time-text">
+            Hämtar senaste snackisen...
+        </span>
+    </span>
+
+    <span class="status-badge">
+        ☕ Nybryggt
+    </span>
+
+</div>
+
+
+<div class="container">
+
+<main>
+
+    <!-- DAGENS SNACKIS -->
+
+    <article class="card">
+
+        <span
+            class="tag"
+            id="fika-badge">
+            ☕ DAGENS SNACKIS
+        </span>
+
+        <h2 id="article-title">
+            Brygger dagens snackis...
+        </h2>
+
+        <!-- Tills vi bygger riktig bildhämtning använder vi en neutral fikabild -->
+
+        <img
+            id="article-img"
+            src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=1200&q=80"
+            alt="Kaffe och fikastämning"
+            class="article-hero-img"
+        >
+
+        <div
+            class="summary-box"
+            id="summary-box"
+            style="display:none;">
+
+            <strong>
+                ⚡ Snabböversikt
+            </strong>
+
+            <span id="article-summary"></span>
+
+        </div>
+
+
+        <div
+            class="fresh-info"
+            id="fresh-info">
+        </div>
+
+
+        <div
+            class="article-content"
+            id="article-text">
+
+            <p>
+                Hämtar senaste snackisen från redaktionen...
+            </p>
+
+        </div>
+
+
+        <div
+            class="why-box"
+            id="why-box"
+            style="display:none;">
+
+            <strong>
+                ☕ Därför passar den på fikat
+            </strong>
+
+            <ul id="why-list"></ul>
+
+        </div>
+
+
+        <hr
+            style="
+            border:0;
+            border-top:1px solid var(--border-color);
+            margin:1.5rem 0;
+            "
+        >
+
+
+        <strong>
+            Blev det ett bra samtalsämne på rasten?
+        </strong>
+
+        <div class="btn-group">
+
+            <button
+                class="btn"
+                onclick="voteThumb('main-up')">
+
+                👍 Ja, bra snack!
+                (<span id="count-main-up">0</span>)
+
+            </button>
+
+
+            <button
+                class="btn"
+                onclick="voteThumb('main-down')">
+
+                👎 Nja, segt ämne
+                (<span id="count-main-down">0</span>)
+
+            </button>
+
+        </div>
+
+
+        <div style="margin-top:1.5rem;">
+
+            <strong>
+                Dela med kollegan:
+            </strong>
+
+            <div class="btn-group">
+
+                <button
+                    class="btn"
+                    onclick="copyLink()">
+
+                    🔗 Kopiera länk
+
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <div style="margin-top:1.5rem;">
+
+            <strong>
+                Källor
+            </strong>
+
+            <ul
+                class="sources-list"
+                id="article-sources">
+
+                <li>
+                    Hämtar källor...
+                </li>
+
+            </ul>
+
+        </div>
+
+    </article>
+
+
+
+    <!-- POLL -->
+
+    <section class="card">
+
+        <h3>
+            💬 Dagens fikafråga
+        </h3>
+
+        <p>
+            <strong id="poll-question">
+                Hämtar fråga...
+            </strong>
+        </p>
+
+
+        <div id="poll-form">
+
+            <div id="poll-options-container"></div>
+
+            <button
+                onclick="submitPoll()"
+                class="btn"
+                style="
+                    background:var(--accent-color);
+                    color:white;
+                    border:none;
+                    margin-top:0.8rem;
+                ">
+
+                Skicka din röst
+
+            </button>
+
+        </div>
+
+
+        <div
+            id="poll-results"
+            class="poll-results">
+
+            ☕ Tack för din röst!
+
+        </div>
+
+
+        <hr
+            style="
+                border:0;
+                border-top:1px solid var(--border-color);
+                margin:1.8rem 0 1.2rem;
+            "
+        >
+
+
+        <h4>
+            💭 Vad sägs i ert fikarum?
+        </h4>
+
+
+        <input
+            type="text"
+            id="comment-name"
+            placeholder="Ditt namn / Avdelning (valfritt)"
+            class="comment-input"
+        >
+
+
+        <textarea
+            id="comment-text"
+            placeholder="Skriv en kommentar..."
+            rows="3"
+            class="comment-input">
+        </textarea>
+
+
+        <button
+            onclick="addComment()"
+            class="btn"
+            style="
+                background:var(--primary-color);
+                color:white;
+            ">
+
+            Skicka kommentar
+
+        </button>
+
+
+        <div
+            id="comments-list"
+            style="margin-top:1.2rem;">
+        </div>
+
+    </section>
+
+
+    <!-- ARKIV -->
+
+    <section class="card">
+
+        <h3>
+            📜 Tidigare snackisar
+        </h3>
+
+        <p class="coming-soon">
+            Arkivet kopplas in i nästa steg.
+            Alla nya snackisar sparas redan automatiskt.
+        </p>
+
+    </section>
+
+</main>
+
+
+
+<aside>
+
+    <div class="card">
+
+        <h3>
+            🥐 Dagens fikatips
+        </h3>
+
+        <img
+            src="https://images.unsplash.com/photo-1555507036-ab1f4038808a?auto=format&fit=crop&w=600&q=80"
+            alt="Kanelbullar"
+            class="fika-img"
+        >
+
+        <p>
+            <strong>
+                Klassisk kanelbulle
+            </strong>
+        </p>
+
+        <p>
+            Kanelbulle och kaffe.
+            Svårare än så behöver en svensk fikarast faktiskt inte vara.
+        </p>
+
     </div>
 
-    <div class="container">
-        <!-- HUVUDINNEHÅLL -->
-        <main>
-            <!-- DAGENS FÄRSKA SNACKIS (HÄMTAS FRÅN GEMINI VIA NETLIFY) -->
-            <article class="card">
-                <span class="tag" id="fika-badge">☕ DAGENS SNACKIS</span>
-                <h2 id="article-title">Brygger dagens snackis...</h2>
-                
-                <img id="article-img" src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=800" alt="Nyhetsbild" class="article-hero-img">
 
-                <div class="article-content" id="article-text">
-                    <p>Laddar in det absolut senaste samtalsämnet från redaktionen...</p>
-                </div>
+    <div class="card">
 
-                <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 1.5rem 0;">
+        <h3>
+            💡 Fikarast-fakta
+        </h3>
 
-                <strong>Blev det ett bra samtalsämne på rasten?</strong>
-                <div class="btn-group">
-                    <button class="btn" onclick="voteThumb('main-up')">👍 Ja, bra snack! (<span id="count-main-up">0</span>)</button>
-                    <button class="btn" onclick="voteThumb('main-down')">👎 Nja, segt ämne (<span id="count-main-down">0</span>)</button>
-                </div>
+        <p style="font-size:0.9rem;">
 
-                <div style="margin-top: 1.5rem;">
-                    <strong>Dela med kollegan i Slack/Teams:</strong>
-                    <div class="btn-group">
-                        <button class="btn" onclick="copyLink()">🔗 Kopiera länk till artikel</button>
-                    </div>
-                </div>
+            Ordet <strong>fika</strong>
+            brukar kopplas till gammal svensk
+            backslang där stavelserna i
+            "kaffi" kastades om.
 
-                <div style="margin-top: 1.5rem;">
-                    <strong>Källor & Länkar:</strong>
-                    <ul class="sources-list" id="article-sources">
-                        <li>Laddar källor...</li>
-                    </ul>
-                </div>
-            </article>
+        </p>
 
-            <!-- TYCK TILL & KOMMENTERA SEKTION -->
-            <section class="card">
-                <h3>💬 Tyck till vid kaffebordet</h3>
-                <p><em>Dagens fråga:</em> <strong id="poll-question">Laddar fråga...</strong></p>
-                
-                <div id="poll-form">
-                    <div id="poll-options-container">
-                        <!-- Fylls i dynamiskt -->
-                    </div>
-                    <button onclick="submitPoll()" class="btn" style="background: var(--accent-color); color: #fff; border: none; margin-top: 0.8rem; padding: 0.75rem 1.5rem;">Skicka din röst</button>
-                </div>
-
-                <div id="poll-results" class="poll-results">
-                    <strong>Tack för din röst! Så här gissar kollegorna vid kaffebordet:</strong>
-                    <div style="margin-top: 1.2rem;">
-                        <small>Alternativ 1: <strong>64%</strong></small>
-                        <div class="progress-bar"><div class="progress-fill" style="width: 64%;"></div></div>
-                        <small>Alternativ 2: <strong>36%</strong></small>
-                        <div class="progress-bar"><div class="progress-fill" style="width: 36%;"></div></div>
-                    </div>
-                </div>
-
-                <!-- KOMMENTARSFÄLT -->
-                <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 1.8rem 0 1.2rem;">
-                <h4>💭 Vad sägs i ert fikarum?</h4>
-                <input type="text" id="comment-name" placeholder="Ditt namn / Avdelning (valfritt)" class="comment-input">
-                <textarea id="comment-text" placeholder="Skriv en kommentar..." rows="3" class="comment-input"></textarea>
-                <button onclick="addComment()" class="btn" style="background: var(--primary-color); color: #fff;">Skicka kommentar</button>
-
-                <div id="comments-list" style="margin-top: 1.2rem;">
-                    <div class="comment-item">
-                        <strong>Johan från IT:</strong>
-                        Grymt ämne att ta upp på fikan idag!
-                    </div>
-                </div>
-            </section>
-
-            <!-- SEKTIONSAVSKILJARE FÖR TIDIGARE NYHETER -->
-            <div class="section-divider">
-                <h3>📜 Tidigare snackisar</h3>
-            </div>
-
-            <!-- TIDIGARE SNACKIS ARCHIVE -->
-            <article class="card">
-                <span class="tag tag-archive">💼 Arbetsliv & Trend – Tidigare Snackis</span>
-                <h2>6 timmars arbetsdag: Är det dags för svenska arbetsplatser nu?</h2>
-
-                <div class="summary-box">
-                    <strong>⚡ Snabböversikt:</strong>
-                    Debatten om förkortad arbetstid har tagit ny fart efter flera framgångsrika tester. Här är argumenten du behöver ha koll på till kaffebordet!
-                </div>
-
-                <div class="article-content">
-                    <p>Frågan om sex timmars arbetsdag med bibehållen lön har seglat upp som en av de absolut hetaste frågorna på svenska arbetsplatser. Förespråkarna pekar på färska testprojekt där de anställda mått bättre och varit mindre sjukskrivna, medan kritiker varnar för att det blir alldeles för dyrt.</p>
-                </div>
-
-                <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 1.5rem 0;">
-
-                <strong>Blev det ett bra samtalsämne på rasten?</strong>
-                <div class="btn-group">
-                    <button class="btn" onclick="voteThumb('old1-up')">👍 Ja, bra snack! (<span id="count-old1-up">14</span>)</button>
-                    <button class="btn" onclick="voteThumb('old1-down')">👎 Nja, segt ämne (<span id="count-old1-down">2</span>)</button>
-                </div>
-
-                <div style="margin-top: 1.5rem;">
-                    <strong>Dela med kollegan i Slack/Teams:</strong>
-                    <div class="btn-group">
-                        <button class="btn" onclick="copyLink()">🔗 Kopiera länk till artikel</button>
-                    </div>
-                </div>
-
-                <div style="margin-top: 1.5rem;">
-                    <strong>Källa:</strong>
-                    <ul class="sources-list">
-                        <li>🔗 <a href="https://www.svt.se/nyheter/" target="_blank" rel="noopener">SVT Nyheter: Läs om debatten kring förkortad arbetstid</a></li>
-                    </ul>
-                </div>
-            </article>
-
-        </main>
-
-        <!-- SIDOKOLUMN -->
-        <aside>
-            <div class="card">
-                <h3>🥐 Dagens Fikatips</h3>
-                <img src="https://images.unsplash.com/photo-1555507036-ab1f4038808a?auto=format&fit=crop&w=600&q=80" alt="Nygräddade Kanelbullar" class="fika-img">
-                <p><strong>Klassisk Kanelbulle</strong></p>
-                <p>Nybakad med mörkt pärlsocker och massor av kanel. Passar klockrent till ett mörkrostat kaffe eller en krämig havrelatte idag!</p>
-                <small style="color: var(--text-muted);">💡 <em>Visste du att svenskarna äter i snitt 230 bullar per person och år?</em></small>
-            </div>
-
-            <div class="card">
-                <h3>💡 Fikarast-fakta</h3>
-                <p style="font-size: 0.9rem; color: var(--text-color);">
-                    Visste du att ordet <strong>"Fika"</strong> är gammal svensk backslang för "Kaffi"? Man kastade ganska enkelt om stavelserna under 1800-talet!
-                </p>
-            </div>
-        </aside>
     </div>
 
-    <footer>
-        <p>Kafferasten.se – Gör varje fikarast lite roligare och lite godare. ☕🥐</p>
-    </footer>
+</aside>
 
-    <!-- INTERAKTIONER & ANROP TILL NETLIFY FUNCTION / GEMINI -->
-    <script>
-        const votes = {};
+</div>
 
-        function voteThumb(id) {
-            if (votes[id]) return;
-            votes[id] = true;
-            const el = document.getElementById('count-' + id);
-            if (el) {
-                el.innerText = parseInt(el.innerText) + 1;
+
+<footer>
+
+    <p>
+        Kafferasten.se –
+        något att prata om när kaffet är klart.
+        ☕
+    </p>
+
+</footer>
+
+
+
+<script>
+
+    const votes = {};
+
+
+    // --------------------------------------------------
+    // Lite städning av AI-text
+    // --------------------------------------------------
+
+    function cleanText(text) {
+
+        if (!text) return "";
+
+        return String(text)
+            .replace(/\*\*/g, "")
+            .replace(/\*/g, "")
+            .trim();
+    }
+
+
+    // --------------------------------------------------
+    // Hämta sparad senaste artikel
+    // --------------------------------------------------
+
+    async function loadLatestNews() {
+
+        const badge =
+            document.getElementById(
+                "fika-badge"
+            );
+
+        const timeText =
+            document.getElementById(
+                "fika-time-text"
+            );
+
+
+        try {
+
+            const response =
+                await fetch(
+                    "/.netlify/functions/latest-news"
+                );
+
+
+            if (!response.ok) {
+                throw new Error(
+                    "Kunde inte hämta senaste snackisen."
+                );
             }
-        }
 
-        function copyLink() {
-            navigator.clipboard.writeText(window.location.href);
-            alert('Länken är kopierad! Nu kan du enkelt klistra in den i Slack eller Teams.');
-        }
 
-        function submitPoll() {
-            const selected = document.querySelector('input[name="poll"]:checked');
-            if (!selected) {
-                alert('Välj ett alternativ först!');
-                return;
-            }
-            document.getElementById('poll-form').style.display = 'none';
-            document.getElementById('poll-results').style.display = 'block';
-        }
+            const result =
+                await response.json();
 
-        function addComment() {
-            const nameInput = document.getElementById('comment-name');
-            const textInput = document.getElementById('comment-text');
-            const name = nameInput.value.trim() || 'Anonym kollega';
-            const text = textInput.value.trim();
 
-            if (!text) {
-                alert('Skriv en kommentar först!');
-                return;
+            if (
+                !result.success ||
+                !result.latest
+            ) {
+                throw new Error(
+                    "Ingen sparad snackis hittades."
+                );
             }
 
-            const list = document.getElementById('comments-list');
-            const commentDiv = document.createElement('div');
-            commentDiv.className = 'comment-item';
-            commentDiv.innerHTML = `<strong>${name}:</strong> ${text}`;
-            
-            list.prepend(commentDiv);
 
-            nameInput.value = '';
-            textInput.value = '';
-        }
+            const latest =
+                result.latest;
 
-        // KOPPLING TILL GEMINI API VIA NETLIFY FUNCTION
-        async function loadGeminiNews() {
-            const badge = document.getElementById('fika-badge');
-            const text = document.getElementById('fika-time-text');
-            
-            // Uppdatera banner-text utifrån tid
-            const hours = new Date().getHours();
-            if (hours >= 7 && hours < 13) {
-                if(badge) badge.innerText = "☕ MORGONFIKAT | Dagens färskaste snackis";
-                if(text) text.innerText = "Nypublicerat av redaktionen inför 09:00-fikat!";
-            } else {
-                if(badge) badge.innerText = "☕ EFTERMIDDAGSFIKAT | Dagens färskaste snackis";
-                if(text) text.innerText = "Nypublicerat av redaktionen inför 15:00-fikat!";
+            const article =
+                latest.article;
+
+
+            // -------------------------
+            // Badge
+            // -------------------------
+
+            if (badge) {
+
+                badge.textContent =
+                    "☕ " +
+                    cleanText(
+                        article.category ||
+                        "Dagens snackis"
+                    );
+
             }
 
-            try {
-                // Anrop till din Netlify serverless function
-                const res = await fetch('/.netlify/functions/get-trends');
-                if (!res.ok) throw new Error("Kunde inte hämta nyhet från Netlify");
-                
-                const data = await res.json();
 
-                // Fyll i datan från Gemini på sidan
-                if (data.title) {
-                    document.getElementById('article-title').innerText = data.title;
-                    if(data.image) document.getElementById('article-img').src = data.image;
-                    document.getElementById('article-text').innerHTML = data.content;
-                    
-                    if (data.sourcesHtml) {
-                        document.getElementById('article-sources').innerHTML = `<li>${data.sourcesHtml}</li>`;
-                    }
+            // -------------------------
+            // Banner
+            // -------------------------
 
-                    if (data.pollQuestion) {
-                        document.getElementById('poll-question').innerText = data.pollQuestion;
-                        const pollBox = document.getElementById('poll-options-container');
-                        if (pollBox) {
-                            pollBox.innerHTML = `
-                                <label class="poll-option"><input type="radio" name="poll" value="1"> ${data.pollOpt1}</label>
-                                <label class="poll-option"><input type="radio" name="poll" value="2"> ${data.pollOpt2}</label>
-                            `;
-                        }
-                    }
+            if (timeText) {
+
+                timeText.textContent =
+                    "Senast uppdaterad " +
+                    formatPublishedTime(
+                        latest.createdAt
+                    );
+
+            }
+
+
+            // -------------------------
+            // Rubrik
+            // -------------------------
+
+            document
+                .getElementById(
+                    "article-title"
+                )
+                .textContent =
+                    cleanText(
+                        article.title
+                    );
+
+
+            // -------------------------
+            // Sammanfattning
+            // -------------------------
+
+            if (article.summary) {
+
+                document
+                    .getElementById(
+                        "summary-box"
+                    )
+                    .style.display =
+                        "block";
+
+
+                document
+                    .getElementById(
+                        "article-summary"
+                    )
+                    .textContent =
+                        cleanText(
+                            article.summary
+                        );
+
+            }
+
+
+            // -------------------------
+            // Färsk trigger
+            // -------------------------
+
+            const freshInfo =
+                document.getElementById(
+                    "fresh-info"
+                );
+
+
+            if (
+                latest.verifiedTrigger
+            ) {
+
+                freshInfo.textContent =
+                    "🔥 Det nya: " +
+                    cleanText(
+                        latest
+                            .verifiedTrigger
+                            .description
+                    );
+
+            }
+
+
+            // -------------------------
+            // Brödtext
+            // -------------------------
+
+            const textBox =
+                document.getElementById(
+                    "article-text"
+                );
+
+
+            textBox.innerHTML = "";
+
+
+            for (
+                const paragraph
+                of article.paragraphs || []
+            ) {
+
+                const p =
+                    document
+                        .createElement("p");
+
+
+                p.textContent =
+                    cleanText(
+                        paragraph
+                    );
+
+
+                textBox.appendChild(p);
+
+            }
+
+
+            // -------------------------
+            // Därför snackar vi om det
+            // -------------------------
+
+            if (
+                article.whyTalkAboutIt &&
+                article.whyTalkAboutIt.length
+            ) {
+
+                document
+                    .getElementById(
+                        "why-box"
+                    )
+                    .style.display =
+                        "block";
+
+
+                const list =
+                    document.getElementById(
+                        "why-list"
+                    );
+
+
+                list.innerHTML = "";
+
+
+                for (
+                    const reason
+                    of article.whyTalkAboutIt
+                ) {
+
+                    const li =
+                        document
+                            .createElement("li");
+
+
+                    li.textContent =
+                        cleanText(reason);
+
+
+                    list.appendChild(li);
+
                 }
-            } catch (err) {
-                console.log("Visar reservnyhet om Netlify-funktionen inte svarar ännu.", err);
-                // Reservnyhet om API har fördröjning
-                document.getElementById('article-title').innerText = "Dagens Kaffesnackis: Hur påverkar kaffepriserna fikarasten?";
-                document.getElementById('article-text').innerHTML = "<p>Kaffepriserna fortsätter att diskuterats flitigt runt om på de svenska kontoren. Ska vi satsa mer på havremjölk eller hålla fast vid den klassiska bryggen?</p>";
-                document.getElementById('poll-question').innerText = "Hur dricker du helst ditt kaffe på jobbet?";
-                document.getElementById('poll-options-container').innerHTML = `
-                    <label class="poll-option"><input type="radio" name="poll" value="1"> Svart mörkrost</label>
-                    <label class="poll-option"><input type="radio" name="poll" value="2"> Med mjölk / Havredryck</label>
-                `;
+
             }
+
+
+            // -------------------------
+            // Poll
+            // -------------------------
+
+            document
+                .getElementById(
+                    "poll-question"
+                )
+                .textContent =
+                    cleanText(
+                        article.pollQuestion
+                    );
+
+
+            const pollBox =
+                document.getElementById(
+                    "poll-options-container"
+                );
+
+
+            pollBox.innerHTML = "";
+
+
+            (
+                article.pollOptions || []
+            )
+            .forEach(
+                (option, index) => {
+
+                    const label =
+                        document
+                            .createElement(
+                                "label"
+                            );
+
+
+                    label.className =
+                        "poll-option";
+
+
+                    const radio =
+                        document
+                            .createElement(
+                                "input"
+                            );
+
+
+                    radio.type =
+                        "radio";
+
+                    radio.name =
+                        "poll";
+
+                    radio.value =
+                        String(index + 1);
+
+
+                    label.appendChild(
+                        radio
+                    );
+
+
+                    label.append(
+                        " " +
+                        cleanText(option)
+                    );
+
+
+                    pollBox.appendChild(
+                        label
+                    );
+
+                }
+            );
+
+
+            // -------------------------
+            // Källor
+            // -------------------------
+
+            const sourceList =
+                document.getElementById(
+                    "article-sources"
+                );
+
+
+            sourceList.innerHTML = "";
+
+
+            for (
+                const source
+                of latest.sources || []
+            ) {
+
+                if (
+                    !source ||
+                    !source.url
+                ) {
+                    continue;
+                }
+
+
+                const li =
+                    document
+                        .createElement("li");
+
+
+                const link =
+                    document
+                        .createElement("a");
+
+
+                link.href =
+                    source.url;
+
+                link.target =
+                    "_blank";
+
+                link.rel =
+                    "noopener noreferrer";
+
+
+                link.textContent =
+                    "🔗 " +
+                    cleanText(
+                        source.title ||
+                        new URL(
+                            source.url
+                        ).hostname
+                    );
+
+
+                li.appendChild(link);
+
+                sourceList.appendChild(li);
+
+            }
+
+
+            if (
+                sourceList.children.length
+                === 0
+            ) {
+
+                sourceList.innerHTML =
+                    "<li>Källor saknas.</li>";
+
+            }
+
+
+        } catch (error) {
+
+            console.error(
+                error
+            );
+
+
+            document
+                .getElementById(
+                    "article-title"
+                )
+                .textContent =
+                    "Kaffet är klart – snackisen dröjer lite";
+
+
+            document
+                .getElementById(
+                    "article-text"
+                )
+                .innerHTML =
+                    "<p>Redaktionen kunde inte hämta den senaste snackisen just nu. Testa att ladda om sidan om en liten stund.</p>";
+
+
+            document
+                .getElementById(
+                    "article-sources"
+                )
+                .innerHTML =
+                    "<li>Inga källor kunde hämtas.</li>";
+
         }
 
-        // Starta hämtning direkt vid laddning
-        loadGeminiNews();
-    </script>
+    }
+
+
+
+    // --------------------------------------------------
+    // Tid
+    // --------------------------------------------------
+
+    function formatPublishedTime(
+        isoDate
+    ) {
+
+        if (!isoDate) {
+            return "";
+        }
+
+
+        try {
+
+            return new Intl.DateTimeFormat(
+                "sv-SE",
+                {
+                    timeZone:
+                        "Europe/Stockholm",
+
+                    day:
+                        "numeric",
+
+                    month:
+                        "long",
+
+                    hour:
+                        "2-digit",
+
+                    minute:
+                        "2-digit"
+                }
+            )
+            .format(
+                new Date(isoDate)
+            );
+
+
+        } catch {
+
+            return "";
+
+        }
+
+    }
+
+
+
+    // --------------------------------------------------
+    // Tumme upp / ner
+    // --------------------------------------------------
+
+    function voteThumb(id) {
+
+        if (votes[id]) {
+            return;
+        }
+
+
+        votes[id] = true;
+
+
+        const element =
+            document.getElementById(
+                "count-" + id
+            );
+
+
+        if (element) {
+
+            element.textContent =
+                Number(
+                    element.textContent
+                ) + 1;
+
+        }
+
+    }
+
+
+
+    // --------------------------------------------------
+    // Kopiera länk
+    // --------------------------------------------------
+
+    async function copyLink() {
+
+        try {
+
+            await navigator
+                .clipboard
+                .writeText(
+                    window.location.href
+                );
+
+
+            alert(
+                "Länken är kopierad!"
+            );
+
+
+        } catch {
+
+            alert(
+                "Kunde inte kopiera länken."
+            );
+
+        }
+
+    }
+
+
+
+    // --------------------------------------------------
+    // Poll
+    // --------------------------------------------------
+
+    function submitPoll() {
+
+        const selected =
+            document.querySelector(
+                'input[name="poll"]:checked'
+            );
+
+
+        if (!selected) {
+
+            alert(
+                "Välj ett alternativ först!"
+            );
+
+            return;
+        }
+
+
+        document
+            .getElementById(
+                "poll-form"
+            )
+            .style.display =
+                "none";
+
+
+        document
+            .getElementById(
+                "poll-results"
+            )
+            .style.display =
+                "block";
+
+    }
+
+
+
+    // --------------------------------------------------
+    // Kommentar
+    //
+    // OBS: än så länge sparas kommentarer endast
+    // lokalt på sidan. Vi kopplar Blobs senare.
+    // --------------------------------------------------
+
+    function addComment() {
+
+        const nameInput =
+            document.getElementById(
+                "comment-name"
+            );
+
+
+        const textInput =
+            document.getElementById(
+                "comment-text"
+            );
+
+
+        const name =
+            nameInput.value.trim() ||
+            "Anonym kollega";
+
+
+        const text =
+            textInput.value.trim();
+
+
+        if (!text) {
+
+            alert(
+                "Skriv en kommentar först!"
+            );
+
+            return;
+        }
+
+
+        const list =
+            document.getElementById(
+                "comments-list"
+            );
+
+
+        const commentDiv =
+            document.createElement(
+                "div"
+            );
+
+
+        commentDiv.className =
+            "comment-item";
+
+
+        const strong =
+            document.createElement(
+                "strong"
+            );
+
+
+        strong.textContent =
+            name + ":";
+
+
+        commentDiv.appendChild(
+            strong
+        );
+
+
+        commentDiv.append(
+            document.createTextNode(
+                " " + text
+            )
+        );
+
+
+        list.prepend(
+            commentDiv
+        );
+
+
+        nameInput.value =
+            "";
+
+        textInput.value =
+            "";
+
+    }
+
+
+
+    // --------------------------------------------------
+    // START
+    // --------------------------------------------------
+
+    loadLatestNews();
+
+</script>
+
 </body>
 </html>
