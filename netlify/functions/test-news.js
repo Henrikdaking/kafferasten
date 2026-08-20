@@ -25,22 +25,15 @@ Du är redaktionen för Kafferasten.se.
 NUVARANDE TID I SVERIGE:
 ${nowInSweden}
 
-Ditt jobb är att använda Google Search och hitta den bästa AKTUELLA snackisen
-för en svensk kafferast.
-
-Kafferasten.se publicerar ett samtalsämne inför svenska arbetsplatsers
-fikaraster klockan 09 och 15.
-
-VAD ÄR EN BRA KAFFERASTEN-NYHET?
+Hitta med Google Search den bästa aktuella snackisen för en svensk kafferast.
 
 Prioritera:
 - underhållning, TV, streaming och populärkultur
 - arbetsliv och vardagsfenomen
-- teknik och konsumentnyheter som många kan relatera till
+- teknik och konsumentnyheter
 - märkliga, roliga eller oväntade riktiga nyheter
 - sport när ämnet är brett och samtalsvänligt
 - svenska trender som många kan ha en åsikt om
-- gärna något lite skvallrigt, överraskande eller diskussionsvänligt
 
 Undvik:
 - krig
@@ -50,29 +43,18 @@ Undvik:
 - tung partipolitik
 - börsrapporter
 - allvarliga sjukdomar
-- gamla nyheter som presenteras som nya
 
-AKTUALITET:
-Prioritera sådant som hänt eller blivit omskrivet de senaste 24 timmarna.
+Prioritera sådant som hänt de senaste 24 timmarna.
 Du får gå upp till 72 timmar tillbaka om ämnet är exceptionellt bra.
 
-KÄLLOR:
 Nyheten måste vara verklig.
 Använd minst två trovärdiga webbkällor när det är möjligt.
 Använd de faktiska artiklarna, inte mediernas startsidor.
 Hitta aldrig på citat, siffror, personer eller händelser.
 
-ARBETSSÄTT:
-Sök brett efter flera kandidater.
-Bedöm dem utifrån:
-1. aktualitet
-2. fikavänlighet
-3. igenkänning
-4. diskussionspotential
+Välj EN vinnare.
 
-Välj sedan EN vinnare.
-
-Returnera ENBART giltig JSON i exakt denna struktur:
+Returnera ENBART giltig JSON:
 
 {
   "title": "kort och lockande svensk rubrik",
@@ -88,7 +70,7 @@ Returnera ENBART giltig JSON i exakt denna struktur:
     "kort punkt 2",
     "kort punkt 3"
   ],
-  "pollQuestion": "en enkel fråga som folk faktiskt kan diskutera",
+  "pollQuestion": "en enkel fråga som folk kan diskutera",
   "pollOptions": [
     "alternativ 1",
     "alternativ 2"
@@ -138,33 +120,15 @@ Returnera ENBART giltig JSON i exakt denna struktur:
   }
 
   try {
-    let result;
+    let result = await callGemini(1);
 
-    // Fyra försök totalt.
-    // Vi väntar längre mellan varje försök.
-    const delays = [0, 2000, 5000, 10000];
-
-    for (let i = 0; i < delays.length; i++) {
-      if (delays[i] > 0) {
-        await sleep(delays[i]);
-      }
-
-      result = await callGemini(i + 1);
-
-      if (result.response.ok) {
-        break;
-      }
-
-      const status = result.response.status;
-
-      // Försök igen endast vid tillfälliga problem.
-      if (
-        status !== 408 &&
-        status !== 429 &&
-        status < 500
-      ) {
-        break;
-      }
+    if (
+      !result.response.ok &&
+      (result.response.status === 429 ||
+        result.response.status === 503)
+    ) {
+      await sleep(2000);
+      result = await callGemini(2);
     }
 
     if (!result.response.ok) {
@@ -172,7 +136,7 @@ Returnera ENBART giltig JSON i exakt denna struktur:
         JSON.stringify(
           {
             success: false,
-            error: "Gemini misslyckades efter automatiska försök",
+            error: "Gemini misslyckades efter två försök",
             diagnostics,
             details: result.data,
           },
@@ -221,7 +185,7 @@ Returnera ENBART giltig JSON i exakt denna struktur:
         JSON.stringify(
           {
             success: false,
-            error: "Gemini svarade men artikelns JSON kunde inte läsas",
+            error: "Artikelns JSON kunde inte läsas",
             diagnostics,
             rawText,
           },
@@ -248,9 +212,7 @@ Returnera ENBART giltig JSON i exakt denna struktur:
       }))
       .filter(
         (source, index, array) =>
-          index === array.findIndex(
-            (item) => item.url === source.url
-          )
+          index === array.findIndex((item) => item.url === source.url)
       );
 
     return new Response(
