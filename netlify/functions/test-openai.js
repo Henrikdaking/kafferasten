@@ -19,16 +19,27 @@ export default async () => {
     timeStyle: "short"
   }).format(now);
 
+  const todayInSweden = new Intl.DateTimeFormat("sv-SE", {
+    timeZone: "Europe/Stockholm",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit"
+  })
+    .format(now)
+    .replaceAll("-", "-");
+
   try {
     let totalUsage = {
       research1: null,
-      freshnessCheck1: null,
+      verification1: null,
       research2: null,
-      freshnessCheck2: null,
+      verification2: null,
       writing: null
     };
 
-    // Vi provar max två kandidater.
+    let rejectedTopic = "";
+
+    // Max två kandidater.
     for (let candidateAttempt = 1; candidateAttempt <= 2; candidateAttempt++) {
 
       // =====================================================
@@ -37,6 +48,7 @@ export default async () => {
 
       const research = await callOpenAI({
         apiKey: OPENAI_API_KEY,
+
         body: {
           model: "gpt-5.6-luna",
 
@@ -66,33 +78,37 @@ Du är researchredaktör för Kafferasten.se.
 Svensk tid just nu:
 ${nowInSweden}
 
+Dagens datum i Sverige:
+${todayInSweden}
+
 Hitta EN aktuell snackis som passar en svensk fikarast.
 
 Det här är kandidatförsök ${candidateAttempt} av 2.
 
-VIKTIGT:
-Nyheten måste ha en verklig NY TRIGGER som inträffat eller publicerats
-de senaste 72 timmarna.
+${rejectedTopic
+  ? `VIKTIGT: Välj INTE samma ämne som detta tidigare underkända ämne:\n${rejectedTopic}\n`
+  : ""}
 
-Det räcker INTE att ämnet är populärt.
-Något nytt måste faktiskt ha hänt.
+KRITISKT KRAV:
+Det måste finnas en verklig NY HÄNDELSE som inträffat inom de senaste 72 timmarna.
 
-Exempel på giltig trigger:
-- premiär idag eller igår
-- nytt besked
-- ny deltagarlista
-- ny trailer
-- nytt rekord
-- ny viral trend
-- ny undersökning
-- ny lansering
-- ny oväntad händelse
+Det räcker INTE med att:
+- en gammal nyhet fått en ny artikel
+- någon publicerat en sammanställning idag
+- ett gammalt ämne åter blivit populärt
+- en sida nyligen uppdaterats
 
-Ogiltigt:
-- gammal premiär
-- gammal intervju
-- gammalt rykte
-- äldre nyhet som råkar vara intressant
+Själva händelsen måste vara ny.
+
+Exempel på giltig ny trigger:
+- premiär inom 72 timmar
+- deltagare presenterades inom 72 timmar
+- trailer släpptes inom 72 timmar
+- nytt rekord sattes inom 72 timmar
+- nytt besked gavs inom 72 timmar
+- ny lansering skedde inom 72 timmar
+- ny undersökning publicerades inom 72 timmar
+- något blev viralt inom 72 timmar
 
 Prioritera:
 - nöje
@@ -102,7 +118,7 @@ Prioritera:
 - vardagsfenomen
 - teknik
 - konsumentnyheter
-- udda eller roliga nyheter
+- udda eller roliga riktiga nyheter
 - bred sport
 - sådant som får folk att säga "Har ni hört?"
 
@@ -116,18 +132,15 @@ Undvik:
 - allvarliga sjukdomar
 - rena börsnyheter
 
-Om detta är kandidatförsök 2:
-Välj INTE samma ämne som du nyss valde.
-
 Svara mycket kort:
 
 VINNARE:
 [ämnet]
 
-FÄRSK TRIGGER:
-[exakt vad som hände nyligen]
+FÖRESLAGEN TRIGGER:
+[exakt vad som ska vara den nya händelsen]
 
-TRIGGERDATUM:
+FÖRESLAGET TRIGGERDATUM:
 [YYYY-MM-DD]
 
 FAKTA:
@@ -161,10 +174,10 @@ Använd källhänvisningar.
       }
 
       // =====================================================
-      // STEG 2: KONTROLLERA AKTUALITET + OBEROENDE KÄLLA
+      // STEG 2: VERIFIERA SJÄLVA TRIGGERN
       // =====================================================
 
-      const freshnessCheck = await callOpenAI({
+      const verification = await callOpenAI({
         apiKey: OPENAI_API_KEY,
 
         body: {
@@ -174,7 +187,7 @@ Använd källhänvisningar.
             effort: "none"
           },
 
-          max_tool_calls: 2,
+          max_tool_calls: 3,
 
           tools: [
             {
@@ -196,89 +209,135 @@ Du är faktakontrollant för Kafferasten.se.
 Svensk tid just nu:
 ${nowInSweden}
 
-Kontrollera denna kandidat:
+Kontrollera detta föreslagna ämne:
 
 ${researchText}
 
-Ditt uppdrag är TVÅ saker:
+Du får INTE utgå från att ett färskt publiceringsdatum betyder att händelsen är färsk.
 
-1. AKTUALITET
-Bekräfta att det faktiskt finns en ny händelse eller publicering
-kopplad till ämnet från de senaste 72 timmarna.
+Ditt uppdrag:
 
-2. OBEROENDE KÄLLA
-Hitta minst en ytterligare trovärdig källa från en ANNAN organisation
-och ANNAN huvuddomän som bekräftar den centrala nyheten.
+1. Identifiera den EXAKTA händelse som skulle göra ämnet aktuellt.
+2. Fastställ datumet då händelsen faktiskt inträffade.
+3. Hitta EN SPECIFIK källa som uttryckligen stöder detta datum eller tydligt visar att händelsen inträffade då.
+4. Hitta dessutom minst EN ANDRA oberoende källa från en annan huvuddomän som bekräftar den centrala nyheten.
 
-Exempel:
-tv4.se och commercial.tv4.se räknas som SAMMA källa.
-svt.se och svtplay.se ska helst inte räknas som två helt oberoende redaktionella källor.
-Försök hitta en verkligt oberoende källa.
+KRAV:
+- själva händelsen måste vara högst 72 timmar gammal
+- artikelns publiceringsdatum får inte användas som bevis om händelsen är äldre
+- Reddit räknas inte
+- startsidor räknas inte
+- två subdomäner hos samma företag räknas som samma källa
+- om datumet inte går att fastställa säkert: svara NEJ
+- om triggerkällan inte tydligt stöder datumet: svara NEJ
 
-Använd inte Reddit.
-Använd inte startsidor.
-Använd faktiska artiklar eller officiella sidor.
-
-Svara exakt så här:
+Svara exakt i detta format:
 
 AKTUELL:
 JA eller NEJ
 
-FÄRSK TRIGGER:
-[kort beskrivning]
+TRIGGER:
+[kort och exakt beskrivning av den nya händelsen]
 
 TRIGGERDATUM:
 [YYYY-MM-DD eller OKÄNT]
 
-BEKRÄFTELSE:
+TRIGGERKÄLLA:
+[namnet på källan som styrker datumet]
+
+TRIGGERKÄLLA_URL:
+[den exakta artikel- eller sidlänken]
+
+OBEROENDE BEKRÄFTELSE:
 [kort vad den andra källan bekräftar]
 
-Använd källhänvisningar.
+Använd källhänvisningar i svaret.
 `
         }
       });
 
-      if (!freshnessCheck.ok) {
+      if (!verification.ok) {
         return jsonResponse({
           success: false,
-          stage: `freshness-check-${candidateAttempt}`,
-          statusFromOpenAI: freshnessCheck.status,
-          error: freshnessCheck.data.error || freshnessCheck.data
+          stage: `verification-${candidateAttempt}`,
+          statusFromOpenAI: verification.status,
+          error: verification.data.error || verification.data
         });
       }
 
       if (candidateAttempt === 1) {
-        totalUsage.freshnessCheck1 = freshnessCheck.data.usage || null;
+        totalUsage.verification1 = verification.data.usage || null;
       } else {
-        totalUsage.freshnessCheck2 = freshnessCheck.data.usage || null;
+        totalUsage.verification2 = verification.data.usage || null;
       }
 
-      const freshnessTextPart = getOutputTextPart(freshnessCheck.data);
-      const freshnessText = freshnessTextPart?.text || "";
-      const freshnessSources = extractCitedSources(freshnessTextPart);
+      const verificationTextPart = getOutputTextPart(verification.data);
+      const verificationText = verificationTextPart?.text || "";
+      const verificationSources = extractCitedSources(verificationTextPart);
 
-      const isFresh = /AKTUELL:\s*JA/i.test(freshnessText);
+      const isFresh = /AKTUELL:\s*JA/i.test(verificationText);
+
+      const triggerDate = extractField(
+        verificationText,
+        "TRIGGERDATUM"
+      );
+
+      const triggerDescription = extractField(
+        verificationText,
+        "TRIGGER"
+      );
+
+      const triggerSourceUrl = extractField(
+        verificationText,
+        "TRIGGERKÄLLA_URL"
+      );
+
+      const triggerSourceName = extractField(
+        verificationText,
+        "TRIGGERKÄLLA"
+      );
+
+      const validTriggerDate =
+        triggerDate &&
+        triggerDate !== "OKÄNT" &&
+        isDateWithinHours(triggerDate, now, 72);
 
       const allSources = dedupeSources([
         ...researchSources,
-        ...freshnessSources
+        ...verificationSources
       ]);
 
       const distinctSources = getDistinctDomainSources(allSources);
 
-      // Kandidaten faller: prova nästa.
-      if (!isFresh || distinctSources.length < 2) {
+      const triggerSourceActuallyExists =
+        triggerSourceUrl &&
+        allSources.some(source =>
+          normalizeUrl(source.url) === normalizeUrl(triggerSourceUrl)
+        );
+
+      const candidatePassed =
+        isFresh &&
+        validTriggerDate &&
+        triggerSourceActuallyExists &&
+        distinctSources.length >= 2;
+
+      if (!candidatePassed) {
+        rejectedTopic = researchText;
+
         if (candidateAttempt === 1) {
           continue;
         }
 
         return jsonResponse({
           success: false,
-          stage: "final-source-check",
+          stage: "final-verification",
           error:
-            "Ingen kandidat klarade både aktualitetskravet och två oberoende källor.",
+            "Ingen kandidat klarade kraven på verifierad färsk trigger och två oberoende källor.",
           lastResearchText: researchText,
-          lastFreshnessText: freshnessText,
+          lastVerificationText: verificationText,
+          triggerDate,
+          triggerDescription,
+          triggerSourceUrl,
           sources: distinctSources,
           usage: {
             ...totalUsage,
@@ -287,7 +346,10 @@ Använd källhänvisningar.
         });
       }
 
-      const selectedSources = distinctSources.slice(0, 3);
+      const selectedSources = selectSources(
+        distinctSources,
+        triggerSourceUrl
+      );
 
       // =====================================================
       // STEG 3: SKRIV ARTIKEL
@@ -309,15 +371,27 @@ Du är skribent på Kafferasten.se.
 Svensk tid:
 ${nowInSweden}
 
-Skriv en färdig artikel ENBART utifrån verifierad research nedan.
+Den verifierade färska händelsen är:
 
-RESEARCH:
+TRIGGER:
+${triggerDescription}
+
+TRIGGERDATUM:
+${triggerDate}
+
+TRIGGERKÄLLA:
+${triggerSourceName}
+
+TRIGGERKÄLLA_URL:
+${triggerSourceUrl}
+
+ÖVRIG RESEARCH:
 ${researchText}
 
-AKTUALITETSKONTROLL:
-${freshnessText}
+FAKTAKONTROLL:
+${verificationText}
 
-KÄLLOR:
+GODKÄNDA KÄLLOR:
 ${selectedSources
   .map(
     (source, index) =>
@@ -325,17 +399,20 @@ ${selectedSources
   )
   .join("\n")}
 
-Regler:
-- använd bara verifierade fakta
-- hitta aldrig på datum, citat, siffror eller personer
-- framhäv det som faktiskt är NYTT nu
+VIKTIGA REGLER:
+- använd bara verifierade fakta ovan
+- TRIGGERDATUM får inte ändras
+- hitta aldrig på datum
+- hitta aldrig på citat
+- hitta aldrig på siffror
+- hitta aldrig på personer eller detaljer
+- det som är NYTT nu ska stå tydligt tidigt i artikeln
 - skriv enkelt så att en 20-åring förstår
 - kort, lättsam och fikavänlig ton
 - inte stel nyhetsbyråtext
-- rubriken ska vara kort och lockande
-- 2 till 3 korta stycken
 - undvik clickbait
-- pollen ska ha exakt två tydliga alternativ
+- skriv 2 till 3 korta stycken
+- pollfrågan ska ha exakt två tydliga alternativ
 `,
 
           text: {
@@ -371,6 +448,10 @@ Regler:
                   },
 
                   freshTrigger: {
+                    type: "string"
+                  },
+
+                  triggerDate: {
                     type: "string"
                   },
 
@@ -411,6 +492,7 @@ Regler:
                   "category",
                   "summary",
                   "freshTrigger",
+                  "triggerDate",
                   "paragraphs",
                   "whyTalkAboutIt",
                   "pollQuestion",
@@ -450,11 +532,33 @@ Regler:
         });
       }
 
+      // Extra spärr:
+      // skribenten får inte ändra det verifierade datumet.
+      if (article.triggerDate !== triggerDate) {
+        return jsonResponse({
+          success: false,
+          stage: "writing-verification",
+          error:
+            "Skrivfasen ändrade det verifierade triggerdatumet och artikeln stoppades.",
+          verifiedTriggerDate: triggerDate,
+          articleTriggerDate: article.triggerDate
+        });
+      }
+
       return jsonResponse({
         success: true,
         generatedAt: nowInSweden,
         candidateAttempt,
+
+        verifiedTrigger: {
+          description: triggerDescription,
+          date: triggerDate,
+          sourceName: triggerSourceName,
+          sourceUrl: triggerSourceUrl
+        },
+
         article,
+
         sources: selectedSources,
 
         usage: {
@@ -533,20 +637,48 @@ function extractCitedSources(textPart) {
 }
 
 
+function extractField(text, fieldName) {
+  const regex = new RegExp(
+    `${fieldName}:\\s*([^\\n\\r]+)`,
+    "i"
+  );
+
+  const match = text.match(regex);
+
+  return match
+    ? match[1].trim()
+    : null;
+}
+
+
 function dedupeSources(sources) {
   return sources.filter(
     (source, index, array) =>
       index ===
       array.findIndex(
-        item => item.url === source.url
+        item =>
+          normalizeUrl(item.url) === normalizeUrl(source.url)
       )
   );
 }
 
 
-// Viktig fix:
-// subdomäner som commercial.tv4.se och www.tv4.se
-// ska räknas som samma huvuddomän: tv4.se
+function normalizeUrl(url) {
+  try {
+    const parsed = new URL(url);
+
+    parsed.searchParams.delete("utm_source");
+    parsed.searchParams.delete("utm_medium");
+    parsed.searchParams.delete("utm_campaign");
+
+    return parsed.toString().replace(/\/$/, "");
+  } catch {
+    return url;
+  }
+}
+
+
+// commercial.tv4.se och tv4.se blir båda tv4.se
 function getDomain(url) {
   try {
     const hostname = new URL(url)
@@ -583,6 +715,61 @@ function getDistinctDomainSources(sources) {
   }
 
   return result;
+}
+
+
+function selectSources(sources, triggerSourceUrl) {
+  const normalizedTrigger =
+    normalizeUrl(triggerSourceUrl);
+
+  const triggerSource = sources.find(
+    source =>
+      normalizeUrl(source.url) === normalizedTrigger
+  );
+
+  const others = sources.filter(
+    source =>
+      normalizeUrl(source.url) !== normalizedTrigger
+  );
+
+  const result = [];
+
+  if (triggerSource) {
+    result.push(triggerSource);
+  }
+
+  result.push(...others);
+
+  return result.slice(0, 3);
+}
+
+
+function isDateWithinHours(dateString, now, maxHours) {
+  try {
+    const eventDate = new Date(
+      `${dateString}T23:59:59+02:00`
+    );
+
+    if (Number.isNaN(eventDate.getTime())) {
+      return false;
+    }
+
+    const diffMs =
+      now.getTime() - eventDate.getTime();
+
+    const maxMs =
+      maxHours * 60 * 60 * 1000;
+
+    // framtidsdatum ska inte godkännas
+    if (diffMs < 0) {
+      return false;
+    }
+
+    return diffMs <= maxMs;
+
+  } catch {
+    return false;
+  }
 }
 
 
