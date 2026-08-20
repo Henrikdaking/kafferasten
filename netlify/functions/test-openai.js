@@ -30,6 +30,7 @@ export default async () => {
 
     // Vi provar max två kandidater.
     for (let candidateAttempt = 1; candidateAttempt <= 2; candidateAttempt++) {
+
       // =====================================================
       // STEG 1: HITTA EN KANDIDAT
       // =====================================================
@@ -73,7 +74,7 @@ VIKTIGT:
 Nyheten måste ha en verklig NY TRIGGER som inträffat eller publicerats
 de senaste 72 timmarna.
 
-Det räcker alltså INTE att ämnet är populärt.
+Det räcker INTE att ämnet är populärt.
 Något nytt måste faktiskt ha hänt.
 
 Exempel på giltig trigger:
@@ -160,7 +161,7 @@ Använd källhänvisningar.
       }
 
       // =====================================================
-      // STEG 2: KONTROLLERA AKTUALITET + HITTA ANDRA KÄLLAN
+      // STEG 2: KONTROLLERA AKTUALITET + OBEROENDE KÄLLA
       // =====================================================
 
       const freshnessCheck = await callOpenAI({
@@ -206,8 +207,13 @@ Bekräfta att det faktiskt finns en ny händelse eller publicering
 kopplad till ämnet från de senaste 72 timmarna.
 
 2. OBEROENDE KÄLLA
-Hitta minst en ytterligare trovärdig källa från en ANNAN domän
-som bekräftar den centrala nyheten.
+Hitta minst en ytterligare trovärdig källa från en ANNAN organisation
+och ANNAN huvuddomän som bekräftar den centrala nyheten.
+
+Exempel:
+tv4.se och commercial.tv4.se räknas som SAMMA källa.
+svt.se och svtplay.se ska helst inte räknas som två helt oberoende redaktionella källor.
+Försök hitta en verkligt oberoende källa.
 
 Använd inte Reddit.
 Använd inte startsidor.
@@ -251,9 +257,7 @@ Använd källhänvisningar.
       const freshnessText = freshnessTextPart?.text || "";
       const freshnessSources = extractCitedSources(freshnessTextPart);
 
-      // Hård kontroll av vad modellen själv säger.
-      const isFresh =
-        /AKTUELL:\s*JA/i.test(freshnessText);
+      const isFresh = /AKTUELL:\s*JA/i.test(freshnessText);
 
       const allSources = dedupeSources([
         ...researchSources,
@@ -540,11 +544,23 @@ function dedupeSources(sources) {
 }
 
 
+// Viktig fix:
+// subdomäner som commercial.tv4.se och www.tv4.se
+// ska räknas som samma huvuddomän: tv4.se
 function getDomain(url) {
   try {
-    return new URL(url)
+    const hostname = new URL(url)
       .hostname
       .replace(/^www\./, "");
+
+    const parts = hostname.split(".");
+
+    if (parts.length >= 2) {
+      return parts.slice(-2).join(".");
+    }
+
+    return hostname;
+
   } catch {
     return null;
   }
