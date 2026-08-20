@@ -34,11 +34,10 @@ export default async () => {
 
     let rejectedTopic = "";
 
-    // Vi provar maximalt två olika nyhetskandidater.
     for (let candidateAttempt = 1; candidateAttempt <= 2; candidateAttempt++) {
 
       // =====================================================
-      // STEG 1: HITTA EN BRA KANDIDAT
+      // STEG 1: HITTA KANDIDAT
       // =====================================================
 
       const research = await callOpenAI({
@@ -69,28 +68,17 @@ export default async () => {
           input: `
 Du är researchredaktör för Kafferasten.se.
 
-Svensk tid just nu:
+Svensk tid:
 ${nowInSweden}
 
 Hitta EN aktuell snackis som passar riktigt bra vid en svensk fikarast.
 
-Det här är kandidatförsök ${candidateAttempt} av 2.
+Detta är kandidatförsök ${candidateAttempt} av 2.
 
-NYHETEN MÅSTE HA EN FÄRSK TRIGGER.
+KRAV:
 Själva händelsen måste ha inträffat under de senaste 72 timmarna.
 
-En artikel som publicerats nyligen om en gammal händelse räcker INTE.
-
-Giltiga exempel:
-- ny premiär
-- ny trailer
-- nytt besked
-- ny deltagarlista
-- nytt rekord
-- ny viral trend
-- ny lansering
-- ny undersökning
-- något oväntat som precis inträffat
+En ny artikel om en gammal händelse räcker inte.
 
 Prioritera:
 - nöje
@@ -102,7 +90,7 @@ Prioritera:
 - konsumentnyheter
 - udda eller roliga nyheter
 - bred sport
-- ämnen som får folk att säga "Har ni hört?"
+- sådant som får folk att säga "Har ni hört?"
 
 Undvik:
 - krig
@@ -114,13 +102,13 @@ Undvik:
 - allvarliga sjukdomar
 - rena börsnyheter
 
+Använd inte Reddit som källa.
+
 ${rejectedTopic
-  ? `VIKTIGT: Välj INTE detta tidigare underkända ämne:\n${rejectedTopic}`
+  ? `Välj INTE detta tidigare underkända ämne:\n${rejectedTopic}`
   : ""}
 
-Sök inte bredare än nödvändigt.
-
-Svara kort enligt denna struktur:
+Svara kort:
 
 VINNARE:
 [ämnet]
@@ -158,14 +146,18 @@ Använd källhänvisningar.
 
       const researchPart = getOutputTextPart(research.data);
       const researchText = researchPart?.text || "";
-      const researchSources = extractCitedSources(researchPart);
+
+      const researchSources = filterAllowedSources(
+        extractCitedSources(researchPart)
+      );
 
       // =====================================================
-      // STEG 2: OBEROENDE FAKTA- OCH DATUMKONTROLL
+      // STEG 2: VERIFIERA TRIGGER + KÄLLOR
       // =====================================================
 
       const verification = await callOpenAI({
         apiKey: OPENAI_API_KEY,
+
         body: {
           model: "gpt-5.6-luna",
 
@@ -195,29 +187,30 @@ Du är faktakontrollant för Kafferasten.se.
 Svensk tid:
 ${nowInSweden}
 
-Kontrollera denna föreslagna nyhet:
+Kontrollera:
 
 ${researchText}
 
-Kontrollera särskilt SJÄLVA HÄNDELSEN.
-
-En färsk artikel om en äldre händelse får inte godkännas.
-
 Du ska:
 
-1. identifiera exakt vilken ny händelse som är triggern
-2. fastställa datumet för händelsen
-3. hitta en källa som faktiskt styrker detta datum
-4. hitta minst en ytterligare oberoende källa som stöder huvudnyheten
+1. kontrollera själva händelsen
+2. fastställa datumet för triggern
+3. hitta minst två oberoende källor
+4. säkerställa att händelsen är högst 72 timmar gammal
 
-Använd inte Reddit.
+Använd inte:
+- Reddit
+- forum
+- startsidor
+- rena sociala medier som verifieringskälla
 
-Försök använda:
-- etablerade redaktionella medier
+Prioritera:
+- etablerade medier
 - officiella organisationer
+- officiella pressidor
 - etablerade branschmedier
 
-Två sidor från samma organisation räknas inte som oberoende källor.
+Två sidor från samma organisation räknas inte som två oberoende källor.
 
 Svara exakt:
 
@@ -254,7 +247,10 @@ Använd källhänvisningar.
 
       const verificationPart = getOutputTextPart(verification.data);
       const verificationText = verificationPart?.text || "";
-      const verificationSources = extractCitedSources(verificationPart);
+
+      const verificationSources = filterAllowedSources(
+        extractCitedSources(verificationPart)
+      );
 
       const saysCurrent =
         /AKTUELL:\s*JA/i.test(verificationText);
@@ -277,7 +273,6 @@ Använd källhänvisningar.
         triggerDate &&
         isFreshDate(triggerDate, now, 72);
 
-      // Kandidaten underkänns.
       if (
         !saysCurrent ||
         !triggerIsFresh ||
@@ -311,15 +306,18 @@ Använd källhänvisningar.
         description:
           triggerDescription ||
           "Verifierad aktuell händelse",
+
         date: triggerDate,
+
         sourceName:
           selectedSources[0]?.title || "Källa",
+
         sourceUrl:
           selectedSources[0]?.url || null
       };
 
       // =====================================================
-      // STEG 3: SKRIV DEN FÄRDIGA ARTIKELN
+      // STEG 3: SKRIV ARTIKEL
       // =====================================================
 
       const writing = await callOpenAI({
@@ -335,10 +333,10 @@ Använd källhänvisningar.
           input: `
 Du är skribent på Kafferasten.se.
 
-Skriv en färdig artikel ENBART utifrån den verifierade informationen nedan.
-
-SVENSK TID:
+Svensk tid:
 ${nowInSweden}
+
+Skriv en färdig artikel ENBART utifrån verifierad information.
 
 RESEARCH:
 ${researchText}
@@ -361,15 +359,14 @@ ${selectedSources
   .join("\n")}
 
 REGLER:
-- använd endast verifierade fakta
+- använd bara verifierade fakta
 - hitta aldrig på datum, personer, citat eller siffror
 - framhäv vad som faktiskt är nytt
-- skriv enkelt så att en 20-åring förstår
-- lättsam och naturlig svenska
+- skriv enkelt
+- lättsam svenska
 - kort och fikavänlig
 - 2 eller 3 korta stycken
 - ingen clickbait
-- rubriken ska vara kort
 - pollfrågan ska ha exakt två alternativ
 `,
 
@@ -490,13 +487,13 @@ REGLER:
         });
       }
 
-      // Skrivfasen får aldrig själv ändra triggerdatum.
+      // Modellen får inte ändra triggern själv.
       article.triggerDate = triggerDate;
       article.freshTrigger =
         verifiedTrigger.description;
 
       // =====================================================
-      // STEG 4: BYGG DEN SPARADE POSTEN
+      // STEG 4: BYGG SPARAD POST
       // =====================================================
 
       const articleId =
@@ -504,18 +501,23 @@ REGLER:
 
       const savedNews = {
         id: articleId,
-        createdAt: now.toISOString(),
-        generatedAt: nowInSweden,
+
+        createdAt:
+          now.toISOString(),
+
+        generatedAt:
+          nowInSweden,
 
         verifiedTrigger,
 
         article,
 
-        sources: selectedSources
+        sources:
+          selectedSources
       };
 
       // =====================================================
-      // STEG 5: ARKIVERA GAMLA LATEST
+      // STEG 5: HÄMTA TIDIGARE LATEST
       // =====================================================
 
       const previousLatest =
@@ -523,6 +525,10 @@ REGLER:
           type: "json",
           consistency: "strong"
         });
+
+      // =====================================================
+      // STEG 6: ARKIVERA TIDIGARE
+      // =====================================================
 
       if (previousLatest?.id) {
         await store.setJSON(
@@ -532,7 +538,7 @@ REGLER:
       }
 
       // =====================================================
-      // STEG 6: SPARA NYA SOM LATEST
+      // STEG 7: SPARA NYA LATEST
       // =====================================================
 
       await store.setJSON(
@@ -540,8 +546,7 @@ REGLER:
         savedNews
       );
 
-      // Spara även den nya direkt i arkivet.
-      // Då finns varje publicerad artikel permanent.
+      // Spara även nya artikeln permanent i arkivet.
       await store.setJSON(
         `archive/${articleId}`,
         savedNews
@@ -549,18 +554,25 @@ REGLER:
 
       return jsonResponse({
         success: true,
+
         message:
           "Ny artikel skapad och sparad!",
+
         candidateAttempt,
-        latest: savedNews,
+
+        latest:
+          savedNews,
 
         archivedPrevious:
           previousLatest?.id || null,
 
         usage: {
           ...totalUsage,
+
           totalTokens:
-            calculateTotalTokens(totalUsage)
+            calculateTotalTokens(
+              totalUsage
+            )
         }
       });
     }
@@ -599,7 +611,8 @@ async function callOpenAI({
           `Bearer ${apiKey}`
       },
 
-      body: JSON.stringify(body)
+      body:
+        JSON.stringify(body)
     }
   );
 
@@ -615,22 +628,26 @@ async function callOpenAI({
 
 
 // =====================================================
-// TEXT & KÄLLOR
+// TEXT OCH KÄLLOR
 // =====================================================
 
 function getOutputTextPart(data) {
   const message =
     data.output?.find(
-      item => item.type === "message"
+      item =>
+        item.type === "message"
     );
 
   return message?.content?.find(
-    item => item.type === "output_text"
+    item =>
+      item.type === "output_text"
   );
 }
 
 
-function extractCitedSources(textPart) {
+function extractCitedSources(
+  textPart
+) {
   return (
     textPart?.annotations
       ?.filter(
@@ -638,32 +655,79 @@ function extractCitedSources(textPart) {
           annotation.type ===
           "url_citation"
       )
-      ?.map(annotation => ({
-        title:
-          annotation.title || "Källa",
-        url:
-          annotation.url
-      }))
-      ?.filter(source => source.url)
+      ?.map(
+        annotation => ({
+          title:
+            annotation.title ||
+            "Källa",
+
+          url:
+            annotation.url
+        })
+      )
+      ?.filter(
+        source =>
+          source.url
+      )
       || []
   );
 }
 
 
-function dedupeSources(sources) {
+// =====================================================
+// KÄLLFILTER
+// =====================================================
+
+function filterAllowedSources(
+  sources
+) {
   return sources.filter(
-    (source, index, array) =>
+    source => {
+      try {
+        const hostname =
+          new URL(source.url)
+            .hostname
+            .toLowerCase();
+
+        // Reddit ska aldrig användas.
+        if (
+          hostname === "reddit.com" ||
+          hostname.endsWith(".reddit.com")
+        ) {
+          return false;
+        }
+
+        return true;
+
+      } catch {
+        return false;
+      }
+    }
+  );
+}
+
+
+function dedupeSources(
+  sources
+) {
+  return sources.filter(
+    (
+      source,
+      index,
+      array
+    ) =>
       index ===
       array.findIndex(
         item =>
-          item.url === source.url
+          item.url ===
+          source.url
       )
   );
 }
 
 
 // =====================================================
-// DOMÄNKONTROLL
+// DOMÄNER
 // =====================================================
 
 function getDomain(url) {
@@ -671,12 +735,12 @@ function getDomain(url) {
     const hostname =
       new URL(url)
         .hostname
+        .toLowerCase()
         .replace(/^www\./, "");
 
     const parts =
       hostname.split(".");
 
-    // Några vanliga tvådelade toppdomäner.
     const twoPartSuffixes = [
       "co.uk",
       "com.au",
@@ -685,18 +749,24 @@ function getDomain(url) {
     ];
 
     const lastTwo =
-      parts.slice(-2).join(".");
+      parts
+        .slice(-2)
+        .join(".");
 
     if (
       parts.length >= 3 &&
-      twoPartSuffixes.includes(lastTwo)
+      twoPartSuffixes.includes(
+        lastTwo
+      )
     ) {
       return parts
         .slice(-3)
         .join(".");
     }
 
-    if (parts.length >= 2) {
+    if (
+      parts.length >= 2
+    ) {
       return lastTwo;
     }
 
@@ -716,7 +786,9 @@ function getDistinctDomainSources(
 
   const result = [];
 
-  for (const source of sources) {
+  for (
+    const source of sources
+  ) {
     const domain =
       getDomain(source.url);
 
@@ -728,6 +800,7 @@ function getDistinctDomainSources(
     }
 
     seenDomains.add(domain);
+
     result.push(source);
   }
 
@@ -739,7 +812,9 @@ function getDistinctDomainSources(
 // TRIGGERDATUM
 // =====================================================
 
-function extractTriggerDate(text) {
+function extractTriggerDate(
+  text
+) {
   const match =
     text.match(
       /TRIGGERDATUM:\s*(\d{4}-\d{2}-\d{2})/i
@@ -776,9 +851,6 @@ function isFreshDate(
   hours
 ) {
   try {
-    // Vi använder slutet av triggerdagen
-    // för att inte underkänna en korrekt
-    // nyhet bara för att exakt klockslag saknas.
     const trigger =
       new Date(
         `${dateString}T23:59:59Z`
@@ -789,7 +861,10 @@ function isFreshDate(
       trigger.getTime();
 
     const maxAge =
-      hours * 60 * 60 * 1000;
+      hours *
+      60 *
+      60 *
+      1000;
 
     return (
       difference <= maxAge &&
@@ -807,7 +882,9 @@ function isFreshDate(
 // ARTIKEL-ID
 // =====================================================
 
-function createArticleId(date) {
+function createArticleId(
+  date
+) {
   const formatter =
     new Intl.DateTimeFormat(
       "sv-SE",
@@ -844,16 +921,22 @@ function calculateTotalTokens(
   )
     .filter(Boolean)
     .reduce(
-      (sum, usage) =>
+      (
+        sum,
+        usage
+      ) =>
         sum +
-        (usage.total_tokens || 0),
+        (
+          usage.total_tokens ||
+          0
+        ),
       0
     );
 }
 
 
 // =====================================================
-// JSON RESPONSE
+// JSON
 // =====================================================
 
 function jsonResponse(
@@ -866,6 +949,7 @@ function jsonResponse(
       null,
       2
     ),
+
     {
       status,
 
