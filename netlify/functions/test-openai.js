@@ -2,14 +2,12 @@ export default async () => {
   const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
   if (!OPENAI_API_KEY) {
-    return new Response(
-      JSON.stringify({ error: "OPENAI_API_KEY saknas i Netlify" }),
+    return jsonResponse(
       {
-        status: 500,
-        headers: {
-          "Content-Type": "application/json; charset=utf-8"
-        }
-      }
+        success: false,
+        error: "OPENAI_API_KEY saknas i Netlify"
+      },
+      500
     );
   }
 
@@ -20,60 +18,56 @@ export default async () => {
   }).format(new Date());
 
   try {
-    const response = await fetch("https://api.openai.com/v1/responses", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${OPENAI_API_KEY}`
-      },
+    // =========================================================
+    // STEG 1: RESEARCH
+    // Hitta EN fikavänlig nyhet och 2-3 relevanta källor.
+    // =========================================================
 
-      body: JSON.stringify({
-        model: "gpt-5.6-luna",
-
-        reasoning: {
-          effort: "none"
+    const researchResponse = await fetch(
+      "https://api.openai.com/v1/responses",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${OPENAI_API_KEY}`
         },
 
-        tools: [
-          {
-            type: "web_search",
-            search_context_size: "low",
-            user_location: {
-              type: "approximate",
-              country: "SE",
-              timezone: "Europe/Stockholm"
+        body: JSON.stringify({
+          model: "gpt-5.6-luna",
+
+          reasoning: {
+            effort: "none"
+          },
+
+          max_tool_calls: 3,
+
+          tools: [
+            {
+              type: "web_search",
+              search_context_size: "low",
+              user_location: {
+                type: "approximate",
+                country: "SE",
+                timezone: "Europe/Stockholm"
+              }
             }
-          }
-        ],
+          ],
 
-        include: [
-          "web_search_call.action.sources"
-        ],
+          tool_choice: "auto",
 
-        tool_choice: "auto",
-
-        input: `
-Du är chefredaktör för Kafferasten.se.
+          input: `
+Du är researchredaktör för Kafferasten.se.
 
 Svensk tid just nu:
 ${nowInSweden}
 
-UPPDRAG:
-Sök på webben efter några få aktuella svenska nyheter eller nyheter
-som är tydligt relevanta för människor i Sverige.
+Ditt enda jobb är att hitta EN riktigt bra aktuell snackis
+för en svensk arbetsplats.
 
-Välj sedan EN enda vinnare som är bäst att prata om vid en svensk
-arbetsplats på fikarasten.
+Sök inte brett i onödan.
+Titta på några få kandidater och välj snabbt den bästa.
 
-NYHETEN SKA:
-- helst vara aktuell de senaste 24 timmarna
-- maximalt vara 72 timmar gammal
-- vara lätt att förstå utan förkunskaper
-- väcka nyfikenhet, igenkänning eller åsikter
-- gärna få någon att säga "Har ni hört...?"
-- vara kul, intressant, oväntad, lättsam eller lagom skvallrig
-
-PRIORITERA:
+Prioritera:
 - nöje
 - TV och streaming
 - populärkultur
@@ -81,11 +75,11 @@ PRIORITERA:
 - vardagsfenomen
 - teknik
 - konsumentnyheter
-- udda eller roliga riktiga nyheter
+- udda eller roliga nyheter
 - bred sport
-- snackisar som många svenskar kan ha en åsikt om
+- sådant som får folk att säga "Har ni hört?"
 
-UNDVIK:
+Undvik:
 - krig
 - dödsfall
 - tragedier
@@ -94,203 +88,285 @@ UNDVIK:
 - tung partipolitik
 - allvarliga sjukdomar
 - rena börsnyheter
-- gamla nyheter som framställs som nya
+
+AKTUALITET:
+Helst senaste 24 timmarna.
+Maximalt 72 timmar gammalt.
 
 KÄLLKRAV:
-- nyheten måste vara verklig
-- fakta ska verifieras med webbsökningen
-- välj helst ett ämne som stöds av minst två trovärdiga källor
-- använd faktiska artiklar, inte bara en mediesajt som startsida
-- hitta aldrig på citat, siffror, personer eller händelser
-- om ämnet inte går att verifiera: välj en annan nyhet
+Välj bara ett ämne som kan verifieras.
+Använd 2 eller 3 relevanta trovärdiga källor om möjligt.
+Citera endast källor som faktiskt stöder den VALDA nyheten.
+Använd inte Reddit som huvudkälla.
+Använd helst redaktionella medier, officiella källor eller etablerade branschkällor.
 
-TON:
-- enkelt
-- kort
-- modernt
-- fikavänligt
-- inte stel nyhetsbyråtext
-`,
+Skriv sedan en MYCKET KORT researchrapport:
 
-        text: {
-          format: {
-            type: "json_schema",
-            name: "kafferasten_article",
-            strict: true,
+VINNARE:
+[ämnet]
 
-            schema: {
-              type: "object",
-              additionalProperties: false,
+FAKTA:
+- 3 till 5 verifierade fakta
 
-              properties: {
-                title: {
-                  type: "string"
-                },
+VARFÖR FIKA:
+- en kort mening
 
-                category: {
-                  type: "string",
-                  enum: [
-                    "Nöje",
-                    "TV & streaming",
-                    "Arbetsliv",
-                    "Teknik",
-                    "Sport",
-                    "Vardag",
-                    "Udda"
-                  ]
-                },
+Använd källhänvisningar i svaret.
+`
+        })
+      }
+    );
 
-                summary: {
-                  type: "string"
-                },
+    const researchData = await researchResponse.json();
 
-                paragraphs: {
-                  type: "array",
-                  minItems: 2,
-                  maxItems: 3,
-                  items: {
-                    type: "string"
-                  }
-                },
-
-                whyTalkAboutIt: {
-                  type: "array",
-                  minItems: 2,
-                  maxItems: 3,
-                  items: {
-                    type: "string"
-                  }
-                },
-
-                pollQuestion: {
-                  type: "string"
-                },
-
-                pollOptions: {
-                  type: "array",
-                  minItems: 2,
-                  maxItems: 2,
-                  items: {
-                    type: "string"
-                  }
-                }
-              },
-
-              required: [
-                "title",
-                "category",
-                "summary",
-                "paragraphs",
-                "whyTalkAboutIt",
-                "pollQuestion",
-                "pollOptions"
-              ]
-            }
-          }
-        }
-      })
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      return new Response(
-        JSON.stringify(
-          {
-            success: false,
-            statusFromOpenAI: response.status,
-            error: data.error || data
-          },
-          null,
-          2
-        ),
-        {
-          status: 200,
-          headers: {
-            "Content-Type": "application/json; charset=utf-8"
-          }
-        }
-      );
+    if (!researchResponse.ok) {
+      return jsonResponse({
+        success: false,
+        stage: "research",
+        statusFromOpenAI: researchResponse.status,
+        error: researchData.error || researchData
+      });
     }
 
-    const message = data.output?.find(
+    const researchMessage = researchData.output?.find(
       item => item.type === "message"
     );
 
-    const outputText = message?.content?.find(
+    const researchTextPart = researchMessage?.content?.find(
+      item => item.type === "output_text"
+    );
+
+    const researchText = researchTextPart?.text || "";
+
+    // Vi tar bara de källor som modellen faktiskt citerade
+    // i den valda researchrapporten.
+    const citedSources =
+      researchTextPart?.annotations
+        ?.filter(annotation => annotation.type === "url_citation")
+        ?.map(annotation => ({
+          title: annotation.title || "Källa",
+          url: annotation.url
+        }))
+        ?.filter(
+          (source, index, array) =>
+            source.url &&
+            index === array.findIndex(item => item.url === source.url)
+        ) || [];
+
+    // Hård säkerhetsregel:
+    // ingen färdig artikel utan minst två källor.
+    if (citedSources.length < 2) {
+      return jsonResponse({
+        success: false,
+        stage: "research",
+        error: "Researchen hittade färre än två relevanta källor.",
+        researchText,
+        sources: citedSources,
+        researchUsage: researchData.usage || null
+      });
+    }
+
+    // Max tre källor vidare till skrivfasen.
+    const selectedSources = citedSources.slice(0, 3);
+
+    // =========================================================
+    // STEG 2: SKRIV ARTIKEL
+    // Ingen webbsökning här. Bara researchen ovan.
+    // =========================================================
+
+    const writingResponse = await fetch(
+      "https://api.openai.com/v1/responses",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${OPENAI_API_KEY}`
+        },
+
+        body: JSON.stringify({
+          model: "gpt-5.6-luna",
+
+          reasoning: {
+            effort: "none"
+          },
+
+          input: `
+Du är skribent på Kafferasten.se.
+
+Skriv EN färdig fikavänlig artikel enbart utifrån researchen nedan.
+
+RESEARCH:
+${researchText}
+
+KÄLLOR:
+${selectedSources
+  .map((source, index) => `${index + 1}. ${source.title} – ${source.url}`)
+  .join("\n")}
+
+REGLER:
+- använd bara fakta som finns i researchen
+- hitta aldrig på citat, siffror eller detaljer
+- skriv enkelt så att en 20-åring förstår
+- lättsam och nyfiken ton
+- inte kvällstidningsöverdriven
+- rubriken ska vara kort och lockande
+- 2 eller 3 korta brödtextstycken
+- gör ämnet lätt att börja prata om på jobbet
+- pollfrågan ska ha exakt två tydliga svarsalternativ
+`,
+
+          text: {
+            format: {
+              type: "json_schema",
+              name: "kafferasten_article",
+              strict: true,
+
+              schema: {
+                type: "object",
+                additionalProperties: false,
+
+                properties: {
+                  title: {
+                    type: "string"
+                  },
+
+                  category: {
+                    type: "string",
+                    enum: [
+                      "Nöje",
+                      "TV & streaming",
+                      "Arbetsliv",
+                      "Teknik",
+                      "Sport",
+                      "Vardag",
+                      "Udda"
+                    ]
+                  },
+
+                  summary: {
+                    type: "string"
+                  },
+
+                  paragraphs: {
+                    type: "array",
+                    minItems: 2,
+                    maxItems: 3,
+                    items: {
+                      type: "string"
+                    }
+                  },
+
+                  whyTalkAboutIt: {
+                    type: "array",
+                    minItems: 2,
+                    maxItems: 3,
+                    items: {
+                      type: "string"
+                    }
+                  },
+
+                  pollQuestion: {
+                    type: "string"
+                  },
+
+                  pollOptions: {
+                    type: "array",
+                    minItems: 2,
+                    maxItems: 2,
+                    items: {
+                      type: "string"
+                    }
+                  }
+                },
+
+                required: [
+                  "title",
+                  "category",
+                  "summary",
+                  "paragraphs",
+                  "whyTalkAboutIt",
+                  "pollQuestion",
+                  "pollOptions"
+                ]
+              }
+            }
+          }
+        })
+      }
+    );
+
+    const writingData = await writingResponse.json();
+
+    if (!writingResponse.ok) {
+      return jsonResponse({
+        success: false,
+        stage: "writing",
+        statusFromOpenAI: writingResponse.status,
+        error: writingData.error || writingData,
+        sources: selectedSources
+      });
+    }
+
+    const writingMessage = writingData.output?.find(
+      item => item.type === "message"
+    );
+
+    const writingTextPart = writingMessage?.content?.find(
       item => item.type === "output_text"
     );
 
     let article = null;
 
     try {
-      article = JSON.parse(outputText?.text || "");
-    } catch (_) {
-      article = null;
+      article = JSON.parse(writingTextPart?.text || "");
+    } catch {
+      return jsonResponse({
+        success: false,
+        stage: "writing",
+        error: "Den färdiga artikeln kunde inte läsas som JSON.",
+        rawText: writingTextPart?.text || null,
+        sources: selectedSources
+      });
     }
 
-    const collectedSources = [];
+    return jsonResponse({
+      success: true,
+      generatedAt: nowInSweden,
 
-    for (const item of data.output || []) {
-      if (item.type === "web_search_call") {
-        const webSources = item.action?.sources || [];
+      article,
 
-        for (const source of webSources) {
-          if (source.url) {
-            collectedSources.push({
-              title: source.title || source.url,
-              url: source.url
-            });
-          }
-        }
+      sources: selectedSources,
+
+      usage: {
+        research: researchData.usage || null,
+        writing: writingData.usage || null,
+        totalTokens:
+          (researchData.usage?.total_tokens || 0) +
+          (writingData.usage?.total_tokens || 0)
       }
-    }
-
-    const uniqueSources = collectedSources.filter(
-      (source, index, array) =>
-        index === array.findIndex(
-          item => item.url === source.url
-        )
-    );
-
-    return new Response(
-      JSON.stringify(
-        {
-          success: true,
-          generatedAt: nowInSweden,
-          article,
-          sources: uniqueSources,
-          usage: data.usage || null
-        },
-        null,
-        2
-      ),
-      {
-        status: 200,
-        headers: {
-          "Content-Type": "application/json; charset=utf-8",
-          "Cache-Control": "no-store"
-        }
-      }
-    );
+    });
 
   } catch (error) {
-    return new Response(
-      JSON.stringify(
-        {
-          success: false,
-          error: "Testredaktionen kraschade",
-          details: error.message
-        },
-        null,
-        2
-      ),
+    return jsonResponse(
       {
-        status: 500,
-        headers: {
-          "Content-Type": "application/json; charset=utf-8"
-        }
-      }
+        success: false,
+        error: "Testredaktionen kraschade",
+        details: error.message
+      },
+      500
     );
   }
 };
+
+function jsonResponse(data, status = 200) {
+  return new Response(
+    JSON.stringify(data, null, 2),
+    {
+      status,
+      headers: {
+        "Content-Type": "application/json; charset=utf-8",
+        "Cache-Control": "no-store"
+      }
+    }
+  );
+}
