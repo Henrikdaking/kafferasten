@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Kafferasten.se – Dagens snackis till fikat</title>
 
     <style>
@@ -20,17 +19,12 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
-                Roboto, Helvetica, Arial, sans-serif;
-
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background-color: var(--bg-color);
-            background-image:
-                radial-gradient(#E2D7CD 0.75px, transparent 0.75px);
+            background-image: radial-gradient(#E2D7CD 0.75px, transparent 0.75px);
             background-size: 16px 16px;
-
             color: var(--text-color);
             line-height: 1.6;
-
             margin: 0;
             padding: 0;
         }
@@ -66,12 +60,10 @@
             background-color: var(--highlight-bg);
             border-bottom: 1px solid var(--border-color);
             color: var(--primary-color);
-
             text-align: center;
             padding: 0.85rem 1rem;
             font-size: 0.95rem;
             font-weight: 500;
-
             display: flex;
             align-items: center;
             justify-content: center;
@@ -82,10 +74,8 @@
         .status-badge {
             background: #28a745;
             color: white;
-
             padding: 0.2rem 0.6rem;
             border-radius: 12px;
-
             font-size: 0.8rem;
             font-weight: bold;
         }
@@ -94,7 +84,6 @@
             max-width: 1040px;
             margin: 2rem auto;
             padding: 0 1rem;
-
             display: grid;
             grid-template-columns: 2fr 1fr;
             gap: 2rem;
@@ -110,36 +99,27 @@
             background: var(--card-bg);
             border: 1px solid var(--border-color);
             border-radius: 16px;
-
             padding: 1.8rem;
             margin-bottom: 1.5rem;
-
-            box-shadow:
-                0 4px 12px rgba(45, 26, 23, 0.04);
+            box-shadow: 0 4px 12px rgba(45, 26, 23, 0.04);
         }
 
         .tag {
             display: inline-block;
-
             background: var(--accent-color);
             color: white;
-
             padding: 0.25rem 0.75rem;
             border-radius: 20px;
-
             font-size: 0.75rem;
             font-weight: 700;
-
             text-transform: uppercase;
             letter-spacing: 0.5px;
-
             margin-bottom: 1rem;
         }
 
         h2 {
             color: var(--primary-color);
             margin-top: 0;
-
             font-size: 1.9rem;
             line-height: 1.25;
         }
@@ -152,9 +132,7 @@
         .article-hero-img {
             width: 100%;
             height: 260px;
-
             object-fit: cover;
-
             border-radius: 12px;
             margin-bottom: 1.2rem;
         }
@@ -162,17 +140,14 @@
         .summary-box {
             background-color: var(--bg-color);
             border-left: 4px solid var(--accent-color);
-
             padding: 1.2rem;
             margin: 1.2rem 0;
-
             border-radius: 0 12px 12px 0;
         }
 
         .summary-box strong {
             color: var(--primary-color);
             display: block;
-
             margin-bottom: 0.3rem;
             font-size: 1.05rem;
         }
@@ -186,7 +161,6 @@
         .why-box {
             background: var(--highlight-bg);
             padding: 1.2rem;
-
             border-radius: 12px;
             margin: 1.5rem 0;
         }
@@ -205,7 +179,6 @@
             display: flex;
             gap: 0.6rem;
             flex-wrap: wrap;
-
             margin-top: 0.8rem;
         }
 
@@ -213,15 +186,11 @@
             background: var(--bg-color);
             border: 1px solid var(--border-color);
             color: var(--text-color);
-
             padding: 0.65rem 1.2rem;
             border-radius: 10px;
-
             cursor: pointer;
-
             font-weight: 600;
             font-size: 0.9rem;
-
             transition: all 0.2s ease;
         }
 
@@ -253,17 +222,12 @@
 
         .poll-option {
             display: block;
-
             background: var(--bg-color);
-
             padding: 0.85rem 1rem;
             border-radius: 10px;
             margin-bottom: 0.6rem;
-
             cursor: pointer;
-
-            border:
-                1px solid var(--border-color);
+            border: 1px solid var(--border-color);
         }
 
         .poll-option:hover {
@@ -272,28 +236,20 @@
 
         .poll-results {
             display: none;
-
             margin-top: 1rem;
             background: var(--bg-color);
-
             padding: 1.2rem;
             border-radius: 10px;
         }
 
         .comment-input {
             width: 100%;
-
             padding: 0.8rem;
-
-            border:
-                1px solid var(--border-color);
-
+            border: 1px solid var(--border-color);
             border-radius: 10px;
             margin-bottom: 0.8rem;
-
             font-family: inherit;
             box-sizing: border-box;
-
             background: var(--bg-color);
         }
 
@@ -304,30 +260,23 @@
 
         .comment-item {
             background: var(--bg-color);
-
             padding: 0.8rem 1rem;
             border-radius: 10px;
-
             margin-bottom: 0.6rem;
-
-            border:
-                1px solid var(--border-color);
+            border: 1px solid var(--border-color);
         }
 
         .comment-item strong {
             color: var(--primary-color);
             display: block;
-
             font-size: 0.85rem;
         }
 
         .fika-img {
             width: 100%;
             height: 200px;
-
             object-fit: cover;
             border-radius: 10px;
-
             margin-bottom: 1rem;
         }
 
@@ -336,17 +285,85 @@
             font-size: 0.9rem;
         }
 
+        .archive-grid {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .archive-item {
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .archive-item summary {
+            list-style: none;
+            cursor: pointer;
+            padding: 1.2rem;
+        }
+
+        .archive-item summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .archive-item summary:hover {
+            background: var(--highlight-bg);
+        }
+
+        .archive-meta {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 0.35rem;
+        }
+
+        .archive-title {
+            display: block;
+            color: var(--primary-color);
+            font-size: 1.15rem;
+            font-weight: 750;
+            line-height: 1.3;
+            margin-bottom: 0.4rem;
+        }
+
+        .archive-summary {
+            margin: 0;
+            color: var(--text-color);
+            font-size: 0.95rem;
+        }
+
+        .archive-open {
+            display: inline-block;
+            margin-top: 0.7rem;
+            color: var(--accent-color);
+            font-size: 0.9rem;
+            font-weight: 700;
+        }
+
+        .archive-content {
+            padding: 0 1.2rem 1.2rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .archive-content p {
+            font-size: 0.95rem;
+        }
+
+        .archive-sources {
+            margin-top: 1rem;
+            font-size: 0.85rem;
+        }
+
+        .archive-sources a {
+            color: var(--accent-color);
+        }
+
         footer {
             text-align: center;
-
             padding: 2.5rem 1rem;
-
             color: var(--text-muted);
             font-size: 0.9rem;
-
-            border-top:
-                1px solid var(--border-color);
-
+            border-top: 1px solid var(--border-color);
             margin-top: 3rem;
         }
     </style>
@@ -355,54 +372,32 @@
 <body>
 
 <header>
-    <h1>
-        <a href="/">
-            ☕ Kafferasten.se
-        </a>
-    </h1>
-
-    <p>
-        Dagens snackisar och samtalsämnen till fikarasten
-    </p>
+    <h1><a href="/">☕ Kafferasten.se</a></h1>
+    <p>Dagens snackisar och samtalsämnen till fikarasten</p>
 </header>
 
-
 <div class="schedule-banner">
-
     <span>
-        ⏰
-        <strong>RYKANDE FÄRSKT:</strong>
-        <span id="fika-time-text">
-            Hämtar senaste snackisen...
-        </span>
+        ⏰ <strong>RYKANDE FÄRSKT:</strong>
+        <span id="fika-time-text">Hämtar senaste snackisen...</span>
     </span>
 
-    <span class="status-badge">
-        ☕ Nybryggt
-    </span>
-
+    <span class="status-badge">☕ Nybryggt</span>
 </div>
-
 
 <div class="container">
 
 <main>
 
-    <!-- DAGENS SNACKIS -->
-
     <article class="card">
 
-        <span
-            class="tag"
-            id="fika-badge">
+        <span class="tag" id="fika-badge">
             ☕ DAGENS SNACKIS
         </span>
 
         <h2 id="article-title">
             Brygger dagens snackis...
         </h2>
-
-        <!-- Tills vi bygger riktig bildhämtning använder vi en neutral fikabild -->
 
         <img
             id="article-img"
@@ -414,142 +409,83 @@
         <div
             class="summary-box"
             id="summary-box"
-            style="display:none;">
-
-            <strong>
-                ⚡ Snabböversikt
-            </strong>
-
+            style="display:none;"
+        >
+            <strong>⚡ Snabböversikt</strong>
             <span id="article-summary"></span>
-
         </div>
-
 
         <div
             class="fresh-info"
             id="fresh-info">
         </div>
 
-
         <div
             class="article-content"
-            id="article-text">
-
-            <p>
-                Hämtar senaste snackisen från redaktionen...
-            </p>
-
+            id="article-text"
+        >
+            <p>Hämtar senaste snackisen från redaktionen...</p>
         </div>
-
 
         <div
             class="why-box"
             id="why-box"
-            style="display:none;">
-
-            <strong>
-                ☕ Därför passar den på fikat
-            </strong>
-
+            style="display:none;"
+        >
+            <strong>☕ Därför passar den på fikat</strong>
             <ul id="why-list"></ul>
-
         </div>
 
+        <hr style="border:0; border-top:1px solid var(--border-color); margin:1.5rem 0;">
 
-        <hr
-            style="
-            border:0;
-            border-top:1px solid var(--border-color);
-            margin:1.5rem 0;
-            "
-        >
-
-
-        <strong>
-            Blev det ett bra samtalsämne på rasten?
-        </strong>
+        <strong>Blev det ett bra samtalsämne på rasten?</strong>
 
         <div class="btn-group">
-
-            <button
-                class="btn"
-                onclick="voteThumb('main-up')">
-
-                👍 Ja, bra snack!
-                (<span id="count-main-up">0</span>)
-
+            <button class="btn" onclick="voteThumb('main-up')">
+                👍 Ja, bra snack! (<span id="count-main-up">0</span>)
             </button>
 
-
-            <button
-                class="btn"
-                onclick="voteThumb('main-down')">
-
-                👎 Nja, segt ämne
-                (<span id="count-main-down">0</span>)
-
+            <button class="btn" onclick="voteThumb('main-down')">
+                👎 Nja, segt ämne (<span id="count-main-down">0</span>)
             </button>
-
         </div>
 
-
         <div style="margin-top:1.5rem;">
-
-            <strong>
-                Dela med kollegan:
-            </strong>
+            <strong>Dela med kollegan:</strong>
 
             <div class="btn-group">
-
                 <button
                     class="btn"
-                    onclick="copyLink()">
-
+                    onclick="copyLink()"
+                >
                     🔗 Kopiera länk
-
                 </button>
-
             </div>
-
         </div>
 
-
         <div style="margin-top:1.5rem;">
-
-            <strong>
-                Källor
-            </strong>
+            <strong>Källor</strong>
 
             <ul
                 class="sources-list"
-                id="article-sources">
-
-                <li>
-                    Hämtar källor...
-                </li>
-
+                id="article-sources"
+            >
+                <li>Hämtar källor...</li>
             </ul>
-
         </div>
 
     </article>
 
 
-
-    <!-- POLL -->
-
     <section class="card">
 
-        <h3>
-            💬 Dagens fikafråga
-        </h3>
+        <h3>💬 Dagens fikafråga</h3>
 
         <p>
             <strong id="poll-question">
                 Hämtar fråga...
             </strong>
         </p>
-
 
         <div id="poll-form">
 
@@ -563,37 +499,23 @@
                     color:white;
                     border:none;
                     margin-top:0.8rem;
-                ">
-
+                "
+            >
                 Skicka din röst
-
             </button>
 
         </div>
 
-
         <div
             id="poll-results"
-            class="poll-results">
-
+            class="poll-results"
+        >
             ☕ Tack för din röst!
-
         </div>
 
+        <hr style="border:0; border-top:1px solid var(--border-color); margin:1.8rem 0 1.2rem;">
 
-        <hr
-            style="
-                border:0;
-                border-top:1px solid var(--border-color);
-                margin:1.8rem 0 1.2rem;
-            "
-        >
-
-
-        <h4>
-            💭 Vad sägs i ert fikarum?
-        </h4>
-
+        <h4>💭 Vad sägs i ert fikarum?</h4>
 
         <input
             type="text"
@@ -602,14 +524,12 @@
             class="comment-input"
         >
 
-
         <textarea
             id="comment-text"
             placeholder="Skriv en kommentar..."
             rows="3"
-            class="comment-input">
-        </textarea>
-
+            class="comment-input"
+        ></textarea>
 
         <button
             onclick="addComment()"
@@ -617,47 +537,46 @@
             style="
                 background:var(--primary-color);
                 color:white;
-            ">
-
+            "
+        >
             Skicka kommentar
-
         </button>
-
 
         <div
             id="comments-list"
-            style="margin-top:1.2rem;">
-        </div>
+            style="margin-top:1.2rem;"
+        ></div>
 
     </section>
 
 
-    <!-- ARKIV -->
-
     <section class="card">
 
-        <h3>
-            📜 Tidigare snackisar
-        </h3>
+        <h3>📜 Tidigare snackisar</h3>
 
-        <p class="coming-soon">
-            Arkivet kopplas in i nästa steg.
-            Alla nya snackisar sparas redan automatiskt.
+        <p style="color:var(--text-muted); font-size:0.9rem;">
+            Missade du fikat? Här är de senaste snackisarna.
         </p>
+
+        <div
+            id="archive-list"
+            class="archive-grid"
+        >
+            <p class="coming-soon">
+                Hämtar tidigare snackisar...
+            </p>
+        </div>
 
     </section>
 
 </main>
 
 
-
 <aside>
 
     <div class="card">
 
-        <h3>
-            🥐 Dagens fikatips
-        </h3>
+        <h3>🥐 Dagens fikatips</h3>
 
         <img
             src="https://images.unsplash.com/photo-1555507036-ab1f4038808a?auto=format&fit=crop&w=600&q=80"
@@ -666,9 +585,7 @@
         >
 
         <p>
-            <strong>
-                Klassisk kanelbulle
-            </strong>
+            <strong>Klassisk kanelbulle</strong>
         </p>
 
         <p>
@@ -681,17 +598,13 @@
 
     <div class="card">
 
-        <h3>
-            💡 Fikarast-fakta
-        </h3>
+        <h3>💡 Fikarast-fakta</h3>
 
         <p style="font-size:0.9rem;">
-
             Ordet <strong>fika</strong>
             brukar kopplas till gammal svensk
             backslang där stavelserna i
             "kaffi" kastades om.
-
         </p>
 
     </div>
@@ -702,28 +615,19 @@
 
 
 <footer>
-
     <p>
-        Kafferasten.se –
-        något att prata om när kaffet är klart.
-        ☕
+        Kafferasten.se – något att prata om när kaffet är klart. ☕
     </p>
-
 </footer>
-
 
 
 <script>
 
     const votes = {};
+    window.currentLatestId = null;
 
-
-    // --------------------------------------------------
-    // Lite städning av AI-text
-    // --------------------------------------------------
 
     function cleanText(text) {
-
         if (!text) return "";
 
         return String(text)
@@ -733,22 +637,13 @@
     }
 
 
-    // --------------------------------------------------
-    // Hämta sparad senaste artikel
-    // --------------------------------------------------
-
     async function loadLatestNews() {
 
         const badge =
-            document.getElementById(
-                "fika-badge"
-            );
+            document.getElementById("fika-badge");
 
         const timeText =
-            document.getElementById(
-                "fika-time-text"
-            );
-
+            document.getElementById("fika-time-text");
 
         try {
 
@@ -757,17 +652,14 @@
                     "/.netlify/functions/latest-news"
                 );
 
-
             if (!response.ok) {
                 throw new Error(
                     "Kunde inte hämta senaste snackisen."
                 );
             }
 
-
             const result =
                 await response.json();
-
 
             if (
                 !result.success ||
@@ -778,98 +670,59 @@
                 );
             }
 
-
             const latest =
                 result.latest;
 
             const article =
                 latest.article;
 
+            window.currentLatestId =
+                latest.id;
 
-            // -------------------------
-            // Badge
-            // -------------------------
 
             if (badge) {
-
                 badge.textContent =
                     "☕ " +
                     cleanText(
                         article.category ||
                         "Dagens snackis"
                     );
-
             }
 
 
-            // -------------------------
-            // Banner
-            // -------------------------
-
             if (timeText) {
-
                 timeText.textContent =
                     "Senast uppdaterad " +
                     formatPublishedTime(
                         latest.createdAt
                     );
-
             }
 
 
-            // -------------------------
-            // Rubrik
-            // -------------------------
-
             document
-                .getElementById(
-                    "article-title"
-                )
+                .getElementById("article-title")
                 .textContent =
-                    cleanText(
-                        article.title
-                    );
+                    cleanText(article.title);
 
-
-            // -------------------------
-            // Sammanfattning
-            // -------------------------
 
             if (article.summary) {
 
                 document
-                    .getElementById(
-                        "summary-box"
-                    )
+                    .getElementById("summary-box")
                     .style.display =
                         "block";
 
-
                 document
-                    .getElementById(
-                        "article-summary"
-                    )
+                    .getElementById("article-summary")
                     .textContent =
-                        cleanText(
-                            article.summary
-                        );
-
+                        cleanText(article.summary);
             }
 
 
-            // -------------------------
-            // Färsk trigger
-            // -------------------------
-
             const freshInfo =
-                document.getElementById(
-                    "fresh-info"
-                );
+                document.getElementById("fresh-info");
 
-
-            if (
-                latest.verifiedTrigger
-            ) {
+            if (latest.verifiedTrigger) {
 
                 freshInfo.textContent =
                     "🔥 Det nya: " +
@@ -878,22 +731,13 @@
                             .verifiedTrigger
                             .description
                     );
-
             }
 
 
-            // -------------------------
-            // Brödtext
-            // -------------------------
-
             const textBox =
-                document.getElementById(
-                    "article-text"
-                );
-
+                document.getElementById("article-text");
 
             textBox.innerHTML = "";
-
 
             for (
                 const paragraph
@@ -901,24 +745,14 @@
             ) {
 
                 const p =
-                    document
-                        .createElement("p");
-
+                    document.createElement("p");
 
                 p.textContent =
-                    cleanText(
-                        paragraph
-                    );
-
+                    cleanText(paragraph);
 
                 textBox.appendChild(p);
-
             }
 
-
-            // -------------------------
-            // Därför snackar vi om det
-            // -------------------------
 
             if (
                 article.whyTalkAboutIt &&
@@ -926,21 +760,14 @@
             ) {
 
                 document
-                    .getElementById(
-                        "why-box"
-                    )
+                    .getElementById("why-box")
                     .style.display =
                         "block";
 
-
                 const list =
-                    document.getElementById(
-                        "why-list"
-                    );
-
+                    document.getElementById("why-list");
 
                 list.innerHTML = "";
-
 
                 for (
                     const reason
@@ -948,29 +775,18 @@
                 ) {
 
                     const li =
-                        document
-                            .createElement("li");
-
+                        document.createElement("li");
 
                     li.textContent =
                         cleanText(reason);
 
-
                     list.appendChild(li);
-
                 }
-
             }
 
 
-            // -------------------------
-            // Poll
-            // -------------------------
-
             document
-                .getElementById(
-                    "poll-question"
-                )
+                .getElementById("poll-question")
                 .textContent =
                     cleanText(
                         article.pollQuestion
@@ -982,9 +798,7 @@
                     "poll-options-container"
                 );
 
-
             pollBox.innerHTML = "";
-
 
             (
                 article.pollOptions || []
@@ -993,22 +807,17 @@
                 (option, index) => {
 
                     const label =
-                        document
-                            .createElement(
-                                "label"
-                            );
-
+                        document.createElement(
+                            "label"
+                        );
 
                     label.className =
                         "poll-option";
 
-
                     const radio =
-                        document
-                            .createElement(
-                                "input"
-                            );
-
+                        document.createElement(
+                            "input"
+                        );
 
                     radio.type =
                         "radio";
@@ -1019,61 +828,41 @@
                     radio.value =
                         String(index + 1);
 
-
-                    label.appendChild(
-                        radio
-                    );
-
+                    label.appendChild(radio);
 
                     label.append(
                         " " +
                         cleanText(option)
                     );
 
-
                     pollBox.appendChild(
                         label
                     );
-
                 }
             );
 
-
-            // -------------------------
-            // Källor
-            // -------------------------
 
             const sourceList =
                 document.getElementById(
                     "article-sources"
                 );
 
-
             sourceList.innerHTML = "";
-
 
             for (
                 const source
                 of latest.sources || []
             ) {
 
-                if (
-                    !source ||
-                    !source.url
-                ) {
+                if (!source?.url) {
                     continue;
                 }
 
-
                 const li =
-                    document
-                        .createElement("li");
-
+                    document.createElement("li");
 
                 const link =
-                    document
-                        .createElement("a");
-
+                    document.createElement("a");
 
                 link.href =
                     source.url;
@@ -1084,74 +873,309 @@
                 link.rel =
                     "noopener noreferrer";
 
-
                 link.textContent =
                     "🔗 " +
                     cleanText(
                         source.title ||
-                        new URL(
-                            source.url
-                        ).hostname
+                        new URL(source.url).hostname
                     );
 
-
                 li.appendChild(link);
-
                 sourceList.appendChild(li);
-
             }
 
 
             if (
-                sourceList.children.length
-                === 0
+                sourceList.children.length === 0
             ) {
 
                 sourceList.innerHTML =
                     "<li>Källor saknas.</li>";
-
             }
 
 
         } catch (error) {
 
-            console.error(
-                error
-            );
-
+            console.error(error);
 
             document
-                .getElementById(
-                    "article-title"
-                )
+                .getElementById("article-title")
                 .textContent =
                     "Kaffet är klart – snackisen dröjer lite";
 
-
             document
-                .getElementById(
-                    "article-text"
-                )
+                .getElementById("article-text")
                 .innerHTML =
                     "<p>Redaktionen kunde inte hämta den senaste snackisen just nu. Testa att ladda om sidan om en liten stund.</p>";
 
-
             document
-                .getElementById(
-                    "article-sources"
-                )
+                .getElementById("article-sources")
                 .innerHTML =
                     "<li>Inga källor kunde hämtas.</li>";
-
         }
-
     }
 
 
+    async function loadArchive() {
 
-    // --------------------------------------------------
-    // Tid
-    // --------------------------------------------------
+        const archiveList =
+            document.getElementById(
+                "archive-list"
+            );
+
+        try {
+
+            const response =
+                await fetch(
+                    "/.netlify/functions/archive-news"
+                );
+
+            if (!response.ok) {
+                throw new Error(
+                    "Kunde inte hämta arkivet."
+                );
+            }
+
+            const result =
+                await response.json();
+
+            if (
+                !result.success ||
+                !Array.isArray(result.articles)
+            ) {
+                throw new Error(
+                    "Arkivet hade fel format."
+                );
+            }
+
+            archiveList.innerHTML = "";
+
+            const articles =
+                result.articles
+                    .filter(item =>
+                        item &&
+                        item.article &&
+                        item.id !==
+                            window.currentLatestId
+                    )
+                    .slice(0, 5);
+
+
+            if (!articles.length) {
+
+                archiveList.innerHTML =
+                    "<p class='coming-soon'>Här dyker tidigare snackisar upp efter nästa publicering.</p>";
+
+                return;
+            }
+
+
+            for (const item of articles) {
+
+                const article =
+                    item.article;
+
+                const details =
+                    document.createElement(
+                        "details"
+                    );
+
+                details.className =
+                    "archive-item";
+
+
+                const summary =
+                    document.createElement(
+                        "summary"
+                    );
+
+
+                const meta =
+                    document.createElement(
+                        "div"
+                    );
+
+                meta.className =
+                    "archive-meta";
+
+                meta.textContent =
+                    [
+                        cleanText(
+                            article.category
+                        ),
+                        formatArchiveDate(
+                            item.createdAt
+                        )
+                    ]
+                    .filter(Boolean)
+                    .join(" · ");
+
+
+                const title =
+                    document.createElement(
+                        "span"
+                    );
+
+                title.className =
+                    "archive-title";
+
+                title.textContent =
+                    cleanText(
+                        article.title
+                    );
+
+
+                const intro =
+                    document.createElement(
+                        "p"
+                    );
+
+                intro.className =
+                    "archive-summary";
+
+                intro.textContent =
+                    cleanText(
+                        article.summary
+                    );
+
+
+                const open =
+                    document.createElement(
+                        "span"
+                    );
+
+                open.className =
+                    "archive-open";
+
+                open.textContent =
+                    "Läs snackisen ↓";
+
+
+                summary.appendChild(meta);
+                summary.appendChild(title);
+                summary.appendChild(intro);
+                summary.appendChild(open);
+
+                details.appendChild(summary);
+
+
+                const content =
+                    document.createElement(
+                        "div"
+                    );
+
+                content.className =
+                    "archive-content";
+
+
+                for (
+                    const paragraph
+                    of article.paragraphs || []
+                ) {
+
+                    const p =
+                        document.createElement(
+                            "p"
+                        );
+
+                    p.textContent =
+                        cleanText(
+                            paragraph
+                        );
+
+                    content.appendChild(p);
+                }
+
+
+                if (
+                    Array.isArray(item.sources) &&
+                    item.sources.length
+                ) {
+
+                    const sources =
+                        document.createElement(
+                            "div"
+                        );
+
+                    sources.className =
+                        "archive-sources";
+
+
+                    const strong =
+                        document.createElement(
+                            "strong"
+                        );
+
+                    strong.textContent =
+                        "Källor:";
+
+                    sources.appendChild(
+                        strong
+                    );
+
+
+                    const ul =
+                        document.createElement(
+                            "ul"
+                        );
+
+
+                    for (
+                        const source
+                        of item.sources
+                    ) {
+
+                        if (!source?.url) {
+                            continue;
+                        }
+
+                        const li =
+                            document.createElement(
+                                "li"
+                            );
+
+                        const a =
+                            document.createElement(
+                                "a"
+                            );
+
+                        a.href =
+                            source.url;
+
+                        a.target =
+                            "_blank";
+
+                        a.rel =
+                            "noopener noreferrer";
+
+                        a.textContent =
+                            cleanText(
+                                source.title ||
+                                source.url
+                            );
+
+                        li.appendChild(a);
+                        ul.appendChild(li);
+                    }
+
+                    sources.appendChild(ul);
+                    content.appendChild(sources);
+                }
+
+                details.appendChild(content);
+                archiveList.appendChild(details);
+            }
+
+
+        } catch (error) {
+
+            console.error(error);
+
+            archiveList.innerHTML =
+                "<p class='coming-soon'>Arkivet kunde inte hämtas just nu.</p>";
+        }
+    }
+
 
     function formatPublishedTime(
         isoDate
@@ -1161,7 +1185,6 @@
             return "";
         }
 
-
         try {
 
             return new Intl.DateTimeFormat(
@@ -1169,16 +1192,12 @@
                 {
                     timeZone:
                         "Europe/Stockholm",
-
                     day:
                         "numeric",
-
                     month:
                         "long",
-
                     hour:
                         "2-digit",
-
                     minute:
                         "2-digit"
                 }
@@ -1187,20 +1206,44 @@
                 new Date(isoDate)
             );
 
+        } catch {
+
+            return "";
+        }
+    }
+
+
+    function formatArchiveDate(
+        isoDate
+    ) {
+
+        if (!isoDate) {
+            return "";
+        }
+
+        try {
+
+            return new Intl.DateTimeFormat(
+                "sv-SE",
+                {
+                    timeZone:
+                        "Europe/Stockholm",
+                    day:
+                        "numeric",
+                    month:
+                        "long"
+                }
+            )
+            .format(
+                new Date(isoDate)
+            );
 
         } catch {
 
             return "";
-
         }
-
     }
 
-
-
-    // --------------------------------------------------
-    // Tumme upp / ner
-    // --------------------------------------------------
 
     function voteThumb(id) {
 
@@ -1208,15 +1251,12 @@
             return;
         }
 
-
         votes[id] = true;
-
 
         const element =
             document.getElementById(
                 "count-" + id
             );
-
 
         if (element) {
 
@@ -1224,16 +1264,9 @@
                 Number(
                     element.textContent
                 ) + 1;
-
         }
-
     }
 
-
-
-    // --------------------------------------------------
-    // Kopiera länk
-    // --------------------------------------------------
 
     async function copyLink() {
 
@@ -1245,27 +1278,18 @@
                     window.location.href
                 );
 
-
             alert(
                 "Länken är kopierad!"
             );
-
 
         } catch {
 
             alert(
                 "Kunde inte kopiera länken."
             );
-
         }
-
     }
 
-
-
-    // --------------------------------------------------
-    // Poll
-    // --------------------------------------------------
 
     function submitPoll() {
 
@@ -1273,7 +1297,6 @@
             document.querySelector(
                 'input[name="poll"]:checked'
             );
-
 
         if (!selected) {
 
@@ -1284,7 +1307,6 @@
             return;
         }
 
-
         document
             .getElementById(
                 "poll-form"
@@ -1292,24 +1314,14 @@
             .style.display =
                 "none";
 
-
         document
             .getElementById(
                 "poll-results"
             )
             .style.display =
                 "block";
-
     }
 
-
-
-    // --------------------------------------------------
-    // Kommentar
-    //
-    // OBS: än så länge sparas kommentarer endast
-    // lokalt på sidan. Vi kopplar Blobs senare.
-    // --------------------------------------------------
 
     function addComment() {
 
@@ -1318,21 +1330,17 @@
                 "comment-name"
             );
 
-
         const textInput =
             document.getElementById(
                 "comment-text"
             );
 
-
         const name =
             nameInput.value.trim() ||
             "Anonym kollega";
 
-
         const text =
             textInput.value.trim();
-
 
         if (!text) {
 
@@ -1343,37 +1351,30 @@
             return;
         }
 
-
         const list =
             document.getElementById(
                 "comments-list"
             );
-
 
         const commentDiv =
             document.createElement(
                 "div"
             );
 
-
         commentDiv.className =
             "comment-item";
-
 
         const strong =
             document.createElement(
                 "strong"
             );
 
-
         strong.textContent =
             name + ":";
-
 
         commentDiv.appendChild(
             strong
         );
-
 
         commentDiv.append(
             document.createTextNode(
@@ -1381,27 +1382,26 @@
             )
         );
 
-
         list.prepend(
             commentDiv
         );
-
 
         nameInput.value =
             "";
 
         textInput.value =
             "";
-
     }
 
 
+    async function startKafferasten() {
 
-    // --------------------------------------------------
-    // START
-    // --------------------------------------------------
+        await loadLatestNews();
+        await loadArchive();
+    }
 
-    loadLatestNews();
+
+    startKafferasten();
 
 </script>
 
