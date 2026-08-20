@@ -4,10 +4,7 @@ export default async () => {
   if (!GEMINI_API_KEY) {
     return new Response(
       JSON.stringify({ error: "GEMINI_API_KEY saknas" }),
-      {
-        status: 500,
-        headers: { "Content-Type": "application/json" }
-      }
+      { status: 500, headers: { "Content-Type": "application/json" } }
     );
   }
 
@@ -25,9 +22,38 @@ export default async () => {
             {
               parts: [
                 {
-                  text: "Svara exakt med texten: Hej från Kafferasten"
+                  text: `
+Använd Google Search.
+
+Hitta EN aktuell svensk nyhet från de senaste 24 timmarna
+som passar bra att prata om på en kafferast.
+
+Prioritera:
+- nöje
+- TV och streaming
+- arbetsliv
+- teknik
+- märkliga eller roliga nyheter
+- sport om ämnet är brett och lätt att diskutera
+
+Undvik:
+- krig
+- tragedier
+- grova brott
+- tung partipolitik
+
+Svara kort på svenska med:
+1. Rubrik
+2. Två meningars sammanfattning
+3. Varför den passar vid fikabordet
+`
                 }
               ]
+            }
+          ],
+          tools: [
+            {
+              google_search: {}
             }
           ]
         })
@@ -36,12 +62,32 @@ export default async () => {
 
     const data = await response.json();
 
+    const candidate = data.candidates?.[0];
+
+    const text =
+      candidate?.content?.parts
+        ?.filter(part => part.text)
+        ?.map(part => part.text)
+        ?.join("\n") || null;
+
+    const groundingChunks =
+      candidate?.groundingMetadata?.groundingChunks || [];
+
+    const sources = groundingChunks
+      .filter(chunk => chunk.web?.uri)
+      .map(chunk => ({
+        title: chunk.web.title || "Källa",
+        url: chunk.web.uri
+      }));
+
     return new Response(
       JSON.stringify(
         {
           statusFromGemini: response.status,
           ok: response.ok,
-          data
+          text,
+          sources,
+          rawGroundingMetadata: candidate?.groundingMetadata || null
         },
         null,
         2
@@ -49,10 +95,11 @@ export default async () => {
       {
         status: 200,
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json; charset=utf-8"
         }
       }
     );
+
   } catch (error) {
     return new Response(
       JSON.stringify(
