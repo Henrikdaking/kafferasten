@@ -24,11 +24,12 @@ export default async () => {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${OPENAI_API_KEY}`
       },
+
       body: JSON.stringify({
         model: "gpt-5.6-luna",
 
         reasoning: {
-          effort: "low"
+          effort: "none"
         },
 
         tools: [
@@ -43,55 +44,128 @@ export default async () => {
           }
         ],
 
-        input: `
-Du är redaktionen för Kafferasten.se.
+        tool_choice: "auto",
 
-TID I SVERIGE:
+        input: `
+Du är chefredaktör för Kafferasten.se.
+
+Svensk tid just nu:
 ${nowInSweden}
 
-UPPDRAG:
-Sök på webben och hitta flera aktuella svenska nyheter.
-Välj sedan EN vinnare som är bäst att prata om på en svensk arbetsplats
-vid fikarasten klockan 09 eller 15.
+Hitta några få aktuella nyheter från Sverige eller nyheter som är
+tydligt relevanta för svenskar.
 
-NYHETEN SKA:
-- helst vara från de senaste 24 timmarna
-- vara lätt att förstå utan förkunskaper
-- väcka åsikter, igenkänning eller nyfikenhet
-- vara positiv, underhållande, oväntad eller lagom skvallrig
-- kännas som något kollegor faktiskt skulle säga "har ni hört...?" om
+Välj sedan EN enda vinnare som är bäst att prata om vid en svensk fikarast.
 
-PRIORITERA:
-- nöje, TV, streaming och populärkultur
-- arbetsliv och vardagsfenomen
-- teknik och konsumentnyheter
-- märkliga eller roliga riktiga nyheter
+Prioritera:
+- nöje
+- TV och streaming
+- populärkultur
+- arbetsliv
+- vardagsfenomen
+- teknik
+- konsumentnyheter
+- udda eller roliga riktiga nyheter
 - bred sport
-- svenska snackisar
-- fenomen som många svenskar kan ha en åsikt om
+- saker som får folk att säga "har ni hört?"
 
-UNDVIK:
+Nyheten ska helst vara publicerad eller aktuell de senaste 24 timmarna.
+Gå maximalt 72 timmar tillbaka.
+
+Undvik:
 - krig
-- dödsfall
 - tragedier
+- dödsfall
 - grova brott
 - katastrofer
 - tung partipolitik
 - allvarliga sjukdomar
 - rena börsnyheter
-- gamla nyheter som presenteras som nya
 
-KÄLLKRAV:
-- nyheten måste vara verklig
-- använd minst två trovärdiga källor om möjligt
-- länkar ska gå till den faktiska artikeln, inte startsidan
-- hitta aldrig på citat, personer, siffror eller händelser
-- om uppgifterna inte går att verifiera: välj en annan nyhet
+Viktigt:
+- välj inte en nyhet bara för att den är stor
+- välj den som har bäst fikapotential
+- verifiera fakta via webben
+- hitta aldrig på uppgifter
+- använd riktiga artiklar som källor
+- håll texten kort och lättläst
+`,
 
-TON:
-Skriv enkelt, snabbt och fikavänligt.
-Inte som en traditionell nyhetsbyrå.
-`
+        text: {
+          format: {
+            type: "json_schema",
+            name: "kafferasten_article",
+            strict: true,
+            schema: {
+              type: "object",
+              additionalProperties: false,
+
+              properties: {
+                title: {
+                  type: "string"
+                },
+
+                category: {
+                  type: "string",
+                  enum: [
+                    "Nöje",
+                    "TV & streaming",
+                    "Arbetsliv",
+                    "Teknik",
+                    "Sport",
+                    "Vardag",
+                    "Udda"
+                  ]
+                },
+
+                summary: {
+                  type: "string"
+                },
+
+                paragraphs: {
+                  type: "array",
+                  minItems: 2,
+                  maxItems: 3,
+                  items: {
+                    type: "string"
+                  }
+                },
+
+                whyTalkAboutIt: {
+                  type: "array",
+                  minItems: 2,
+                  maxItems: 3,
+                  items: {
+                    type: "string"
+                  }
+                },
+
+                pollQuestion: {
+                  type: "string"
+                },
+
+                pollOptions: {
+                  type: "array",
+                  minItems: 2,
+                  maxItems: 2,
+                  items: {
+                    type: "string"
+                  }
+                }
+              },
+
+              required: [
+                "title",
+                "category",
+                "summary",
+                "paragraphs",
+                "whyTalkAboutIt",
+                "pollQuestion",
+                "pollOptions"
+              ]
+            }
+          }
+        }
       })
     });
 
@@ -110,18 +184,28 @@ Inte som en traditionell nyhetsbyrå.
         ),
         {
           status: 200,
-          headers: { "Content-Type": "application/json; charset=utf-8" }
+          headers: {
+            "Content-Type": "application/json; charset=utf-8"
+          }
         }
       );
     }
 
-    const message = data.output?.find(item => item.type === "message");
+    const message = data.output?.find(
+      item => item.type === "message"
+    );
 
     const outputText = message?.content?.find(
       item => item.type === "output_text"
     );
 
-    const rawText = outputText?.text || "";
+    let article = null;
+
+    try {
+      article = JSON.parse(outputText?.text || "");
+    } catch (_) {
+      article = null;
+    }
 
     const sources =
       outputText?.annotations
@@ -132,30 +216,17 @@ Inte som en traditionell nyhetsbyrå.
         }))
         ?.filter(
           (source, index, array) =>
-            index === array.findIndex(item => item.url === source.url)
+            index === array.findIndex(
+              item => item.url === source.url
+            )
         ) || [];
-
-    // Be OpenAI-svaret att bli JSON-liknande data på ett enkelt sätt.
-    // Om modellen inte returnerar ren JSON visar vi råtexten så vi kan felsöka.
-    let article = null;
-
-    try {
-      const jsonMatch = rawText.match(/\{[\s\S]*\}/);
-
-      if (jsonMatch) {
-        article = JSON.parse(jsonMatch[0]);
-      }
-    } catch (_) {
-      article = null;
-    }
 
     return new Response(
       JSON.stringify(
         {
           success: true,
           generatedAt: nowInSweden,
-          article: article,
-          rawText: article ? null : rawText,
+          article,
           sources,
           usage: data.usage || null
         },
