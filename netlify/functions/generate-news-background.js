@@ -963,7 +963,3 @@ function jsonResponse(
     }
   );
 }
-
-export const config = {
-  background: true
-};
