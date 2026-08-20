@@ -6,7 +6,9 @@ export default async () => {
       JSON.stringify({ error: "OPENAI_API_KEY saknas i Netlify" }),
       {
         status: 500,
-        headers: { "Content-Type": "application/json; charset=utf-8" }
+        headers: {
+          "Content-Type": "application/json; charset=utf-8"
+        }
       }
     );
   }
@@ -44,6 +46,10 @@ export default async () => {
           }
         ],
 
+        include: [
+          "web_search_call.action.sources"
+        ],
+
         tool_choice: "auto",
 
         input: `
@@ -52,12 +58,22 @@ Du är chefredaktör för Kafferasten.se.
 Svensk tid just nu:
 ${nowInSweden}
 
-Hitta några få aktuella nyheter från Sverige eller nyheter som är
-tydligt relevanta för svenskar.
+UPPDRAG:
+Sök på webben efter några få aktuella svenska nyheter eller nyheter
+som är tydligt relevanta för människor i Sverige.
 
-Välj sedan EN enda vinnare som är bäst att prata om vid en svensk fikarast.
+Välj sedan EN enda vinnare som är bäst att prata om vid en svensk
+arbetsplats på fikarasten.
 
-Prioritera:
+NYHETEN SKA:
+- helst vara aktuell de senaste 24 timmarna
+- maximalt vara 72 timmar gammal
+- vara lätt att förstå utan förkunskaper
+- väcka nyfikenhet, igenkänning eller åsikter
+- gärna få någon att säga "Har ni hört...?"
+- vara kul, intressant, oväntad, lättsam eller lagom skvallrig
+
+PRIORITERA:
 - nöje
 - TV och streaming
 - populärkultur
@@ -67,28 +83,33 @@ Prioritera:
 - konsumentnyheter
 - udda eller roliga riktiga nyheter
 - bred sport
-- saker som får folk att säga "har ni hört?"
+- snackisar som många svenskar kan ha en åsikt om
 
-Nyheten ska helst vara publicerad eller aktuell de senaste 24 timmarna.
-Gå maximalt 72 timmar tillbaka.
-
-Undvik:
+UNDVIK:
 - krig
-- tragedier
 - dödsfall
+- tragedier
 - grova brott
 - katastrofer
 - tung partipolitik
 - allvarliga sjukdomar
 - rena börsnyheter
+- gamla nyheter som framställs som nya
 
-Viktigt:
-- välj inte en nyhet bara för att den är stor
-- välj den som har bäst fikapotential
-- verifiera fakta via webben
-- hitta aldrig på uppgifter
-- använd riktiga artiklar som källor
-- håll texten kort och lättläst
+KÄLLKRAV:
+- nyheten måste vara verklig
+- fakta ska verifieras med webbsökningen
+- välj helst ett ämne som stöds av minst två trovärdiga källor
+- använd faktiska artiklar, inte bara en mediesajt som startsida
+- hitta aldrig på citat, siffror, personer eller händelser
+- om ämnet inte går att verifiera: välj en annan nyhet
+
+TON:
+- enkelt
+- kort
+- modernt
+- fikavänligt
+- inte stel nyhetsbyråtext
 `,
 
         text: {
@@ -96,6 +117,7 @@ Viktigt:
             type: "json_schema",
             name: "kafferasten_article",
             strict: true,
+
             schema: {
               type: "object",
               additionalProperties: false,
@@ -207,19 +229,29 @@ Viktigt:
       article = null;
     }
 
-    const sources =
-      outputText?.annotations
-        ?.filter(annotation => annotation.type === "url_citation")
-        ?.map(annotation => ({
-          title: annotation.title || "Källa",
-          url: annotation.url
-        }))
-        ?.filter(
-          (source, index, array) =>
-            index === array.findIndex(
-              item => item.url === source.url
-            )
-        ) || [];
+    const collectedSources = [];
+
+    for (const item of data.output || []) {
+      if (item.type === "web_search_call") {
+        const webSources = item.action?.sources || [];
+
+        for (const source of webSources) {
+          if (source.url) {
+            collectedSources.push({
+              title: source.title || source.url,
+              url: source.url
+            });
+          }
+        }
+      }
+    }
+
+    const uniqueSources = collectedSources.filter(
+      (source, index, array) =>
+        index === array.findIndex(
+          item => item.url === source.url
+        )
+    );
 
     return new Response(
       JSON.stringify(
@@ -227,7 +259,7 @@ Viktigt:
           success: true,
           generatedAt: nowInSweden,
           article,
-          sources,
+          sources: uniqueSources,
           usage: data.usage || null
         },
         null,
