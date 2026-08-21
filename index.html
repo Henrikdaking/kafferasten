@@ -1,8 +1,10 @@
 <!DOCTYPE html>
 <html lang="sv">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Kafferasten.se – Dagens snackis till fikat</title>
 
     <style>
@@ -454,10 +456,7 @@
             <strong>Dela med kollegan:</strong>
 
             <div class="btn-group">
-                <button
-                    class="btn"
-                    onclick="copyLink()"
-                >
+                <button class="btn" onclick="copyLink()">
                     🔗 Kopiera länk
                 </button>
             </div>
@@ -466,16 +465,12 @@
         <div style="margin-top:1.5rem;">
             <strong>Källor</strong>
 
-            <ul
-                class="sources-list"
-                id="article-sources"
-            >
+            <ul class="sources-list" id="article-sources">
                 <li>Hämtar källor...</li>
             </ul>
         </div>
 
     </article>
-
 
     <section class="card">
 
@@ -506,10 +501,7 @@
 
         </div>
 
-        <div
-            id="poll-results"
-            class="poll-results"
-        >
+        <div id="poll-results" class="poll-results">
             ☕ Tack för din röst!
         </div>
 
@@ -542,13 +534,9 @@
             Skicka kommentar
         </button>
 
-        <div
-            id="comments-list"
-            style="margin-top:1.2rem;"
-        ></div>
+        <div id="comments-list" style="margin-top:1.2rem;"></div>
 
     </section>
-
 
     <section class="card">
 
@@ -558,10 +546,7 @@
             Missade du fikat? Här är de senaste snackisarna.
         </p>
 
-        <div
-            id="archive-list"
-            class="archive-grid"
-        >
+        <div id="archive-list" class="archive-grid">
             <p class="coming-soon">
                 Hämtar tidigare snackisar...
             </p>
@@ -584,9 +569,7 @@
             class="fika-img"
         >
 
-        <p>
-            <strong>Klassisk kanelbulle</strong>
-        </p>
+        <p><strong>Klassisk kanelbulle</strong></p>
 
         <p>
             Kanelbulle och kaffe.
@@ -594,7 +577,6 @@
         </p>
 
     </div>
-
 
     <div class="card">
 
@@ -628,7 +610,10 @@
 
 
     function cleanText(text) {
-        if (!text) return "";
+
+        if (!text) {
+            return "";
+        }
 
         return String(text)
             .replace(/\*\*/g, "")
@@ -637,50 +622,138 @@
     }
 
 
-    async function loadLatestNews() {
+    function safeArray(value) {
 
-        const badge =
-            document.getElementById("fika-badge");
+        return Array.isArray(value)
+            ? value
+            : [];
+    }
 
-        const timeText =
-            document.getElementById("fika-time-text");
+
+    function safeUrl(url) {
+
+        if (!url) {
+            return null;
+        }
 
         try {
 
+            return new URL(url);
+
+        } catch {
+
+            console.warn(
+                "Ogiltig käll-URL hoppades över:",
+                url
+            );
+
+            return null;
+        }
+    }
+
+
+    async function loadLatestNews() {
+
+        const badge =
+            document.getElementById(
+                "fika-badge"
+            );
+
+        const timeText =
+            document.getElementById(
+                "fika-time-text"
+            );
+
+        try {
+
+            /*
+             * Viktigt:
+             * cache:no-store + tidsstämpel gör att sidan
+             * alltid frågar efter aktuell latest från Netlify.
+             */
             const response =
                 await fetch(
-                    "/.netlify/functions/latest-news"
+                    "/.netlify/functions/latest-news?t=" +
+                    Date.now(),
+                    {
+                        cache: "no-store",
+                        headers: {
+                            "Accept":
+                                "application/json"
+                        }
+                    }
                 );
 
+
             if (!response.ok) {
+
+                const errorText =
+                    await response.text();
+
+                console.error(
+                    "latest-news HTTP-fel:",
+                    response.status,
+                    errorText
+                );
+
                 throw new Error(
-                    "Kunde inte hämta senaste snackisen."
+                    "latest-news svarade " +
+                    response.status
                 );
             }
+
 
             const result =
                 await response.json();
 
+
+            console.log(
+                "latest-news:",
+                result
+            );
+
+
             if (
-                !result.success ||
+                !result ||
+                result.success !== true ||
                 !result.latest
             ) {
+
                 throw new Error(
-                    "Ingen sparad snackis hittades."
+                    "latest-news saknar latest."
                 );
             }
+
 
             const latest =
                 result.latest;
 
+
+            if (
+                !latest.article ||
+                typeof latest.article !== "object"
+            ) {
+
+                throw new Error(
+                    "Latest saknar article."
+                );
+            }
+
+
             const article =
                 latest.article;
 
-            window.currentLatestId =
-                latest.id;
 
+            window.currentLatestId =
+                latest.id || null;
+
+
+            /*
+             * RUBRIK OCH KATEGORI
+             */
 
             if (badge) {
+
                 badge.textContent =
                     "☕ " +
                     cleanText(
@@ -690,7 +763,23 @@
             }
 
 
+            document
+                .getElementById(
+                    "article-title"
+                )
+                .textContent =
+                    cleanText(
+                        article.title ||
+                        "Dagens snackis"
+                    );
+
+
+            /*
+             * PUBLICERINGSTID
+             */
+
             if (timeText) {
+
                 timeText.textContent =
                     "Senast uppdaterad " +
                     formatPublishedTime(
@@ -699,30 +788,52 @@
             }
 
 
-            document
-                .getElementById("article-title")
-                .textContent =
-                    cleanText(article.title);
+            /*
+             * SAMMANFATTNING
+             */
+
+            const summaryBox =
+                document.getElementById(
+                    "summary-box"
+                );
+
+            const articleSummary =
+                document.getElementById(
+                    "article-summary"
+                );
 
 
             if (article.summary) {
 
-                document
-                    .getElementById("summary-box")
-                    .style.display =
-                        "block";
+                summaryBox.style.display =
+                    "block";
 
-                document
-                    .getElementById("article-summary")
-                    .textContent =
-                        cleanText(article.summary);
+                articleSummary.textContent =
+                    cleanText(
+                        article.summary
+                    );
+
+            } else {
+
+                summaryBox.style.display =
+                    "none";
             }
 
 
-            const freshInfo =
-                document.getElementById("fresh-info");
+            /*
+             * FÄRSK NYHETSTRIGGER
+             */
 
-            if (latest.verifiedTrigger) {
+            const freshInfo =
+                document.getElementById(
+                    "fresh-info"
+                );
+
+
+            if (
+                latest.verifiedTrigger &&
+                latest.verifiedTrigger.description
+            ) {
 
                 freshInfo.textContent =
                     "🔥 Det nya: " +
@@ -731,66 +842,151 @@
                             .verifiedTrigger
                             .description
                     );
+
+            } else {
+
+                freshInfo.textContent =
+                    "";
             }
 
+
+            /*
+             * ARTIKELTEXT
+             */
 
             const textBox =
-                document.getElementById("article-text");
+                document.getElementById(
+                    "article-text"
+                );
 
-            textBox.innerHTML = "";
 
-            for (
-                const paragraph
-                of article.paragraphs || []
-            ) {
+            textBox.innerHTML =
+                "";
+
+
+            const paragraphs =
+                safeArray(
+                    article.paragraphs
+                );
+
+
+            if (paragraphs.length) {
+
+                for (
+                    const paragraph
+                    of paragraphs
+                ) {
+
+                    const p =
+                        document.createElement(
+                            "p"
+                        );
+
+                    p.textContent =
+                        cleanText(
+                            paragraph
+                        );
+
+                    textBox.appendChild(
+                        p
+                    );
+                }
+
+            } else if (article.summary) {
 
                 const p =
-                    document.createElement("p");
+                    document.createElement(
+                        "p"
+                    );
 
                 p.textContent =
-                    cleanText(paragraph);
+                    cleanText(
+                        article.summary
+                    );
 
-                textBox.appendChild(p);
+                textBox.appendChild(
+                    p
+                );
+
+            } else {
+
+                textBox.innerHTML =
+                    "<p>Artikeln saknar brödtext.</p>";
             }
 
 
-            if (
-                article.whyTalkAboutIt &&
-                article.whyTalkAboutIt.length
-            ) {
+            /*
+             * VARFÖR PRATA OM DET?
+             */
 
-                document
-                    .getElementById("why-box")
-                    .style.display =
-                        "block";
+            const whyBox =
+                document.getElementById(
+                    "why-box"
+                );
 
-                const list =
-                    document.getElementById("why-list");
+            const whyList =
+                document.getElementById(
+                    "why-list"
+                );
 
-                list.innerHTML = "";
+            const reasons =
+                safeArray(
+                    article.whyTalkAboutIt
+                );
+
+
+            whyList.innerHTML =
+                "";
+
+
+            if (reasons.length) {
+
+                whyBox.style.display =
+                    "block";
+
 
                 for (
                     const reason
-                    of article.whyTalkAboutIt
+                    of reasons
                 ) {
 
                     const li =
-                        document.createElement("li");
+                        document.createElement(
+                            "li"
+                        );
 
                     li.textContent =
-                        cleanText(reason);
+                        cleanText(
+                            reason
+                        );
 
-                    list.appendChild(li);
+                    whyList.appendChild(
+                        li
+                    );
                 }
+
+            } else {
+
+                whyBox.style.display =
+                    "none";
             }
 
 
-            document
-                .getElementById("poll-question")
-                .textContent =
-                    cleanText(
-                        article.pollQuestion
-                    );
+            /*
+             * FIKAFRÅGA
+             */
+
+            const pollQuestion =
+                document.getElementById(
+                    "poll-question"
+                );
+
+
+            pollQuestion.textContent =
+                cleanText(
+                    article.pollQuestion ||
+                    "Vad tycker du om dagens snackis?"
+                );
 
 
             const pollBox =
@@ -798,12 +994,30 @@
                     "poll-options-container"
                 );
 
-            pollBox.innerHTML = "";
 
-            (
-                article.pollOptions || []
-            )
-            .forEach(
+            pollBox.innerHTML =
+                "";
+
+
+            let pollOptions =
+                safeArray(
+                    article.pollOptions
+                );
+
+
+            if (
+                pollOptions.length < 2
+            ) {
+
+                pollOptions =
+                    [
+                        "Ja",
+                        "Nej"
+                    ];
+            }
+
+
+            pollOptions.forEach(
                 (option, index) => {
 
                     const label =
@@ -813,6 +1027,7 @@
 
                     label.className =
                         "poll-option";
+
 
                     const radio =
                         document.createElement(
@@ -826,14 +1041,22 @@
                         "poll";
 
                     radio.value =
-                        String(index + 1);
+                        String(
+                            index + 1
+                        );
 
-                    label.appendChild(radio);
+
+                    label.appendChild(
+                        radio
+                    );
 
                     label.append(
                         " " +
-                        cleanText(option)
+                        cleanText(
+                            option
+                        )
                     );
+
 
                     pollBox.appendChild(
                         label
@@ -842,30 +1065,65 @@
             );
 
 
+            /*
+             * KÄLLOR
+             *
+             * Viktig förändring:
+             * En trasig URL får INTE längre krascha
+             * hela artikelvisningen.
+             */
+
             const sourceList =
                 document.getElementById(
                     "article-sources"
                 );
 
-            sourceList.innerHTML = "";
+
+            sourceList.innerHTML =
+                "";
+
+
+            const sources =
+                safeArray(
+                    latest.sources
+                );
+
 
             for (
                 const source
-                of latest.sources || []
+                of sources
             ) {
 
-                if (!source?.url) {
+                if (!source) {
                     continue;
                 }
 
+
+                const parsedUrl =
+                    safeUrl(
+                        source.url
+                    );
+
+
+                if (!parsedUrl) {
+                    continue;
+                }
+
+
                 const li =
-                    document.createElement("li");
+                    document.createElement(
+                        "li"
+                    );
+
 
                 const link =
-                    document.createElement("a");
+                    document.createElement(
+                        "a"
+                    );
+
 
                 link.href =
-                    source.url;
+                    parsedUrl.href;
 
                 link.target =
                     "_blank";
@@ -873,15 +1131,22 @@
                 link.rel =
                     "noopener noreferrer";
 
+
                 link.textContent =
                     "🔗 " +
                     cleanText(
                         source.title ||
-                        new URL(source.url).hostname
+                        parsedUrl.hostname
                     );
 
-                li.appendChild(link);
-                sourceList.appendChild(li);
+
+                li.appendChild(
+                    link
+                );
+
+                sourceList.appendChild(
+                    li
+                );
             }
 
 
@@ -894,24 +1159,49 @@
             }
 
 
+            console.log(
+                "Dagens snackis renderad:",
+                article.title
+            );
+
+
         } catch (error) {
 
-            console.error(error);
+            console.error(
+                "Kunde inte visa latest:",
+                error
+            );
+
 
             document
-                .getElementById("article-title")
+                .getElementById(
+                    "article-title"
+                )
                 .textContent =
                     "Kaffet är klart – snackisen dröjer lite";
 
+
             document
-                .getElementById("article-text")
+                .getElementById(
+                    "article-text"
+                )
                 .innerHTML =
                     "<p>Redaktionen kunde inte hämta den senaste snackisen just nu. Testa att ladda om sidan om en liten stund.</p>";
 
+
             document
-                .getElementById("article-sources")
+                .getElementById(
+                    "article-sources"
+                )
                 .innerHTML =
                     "<li>Inga källor kunde hämtas.</li>";
+
+
+            if (timeText) {
+
+                timeText.textContent =
+                    "Kunde inte läsa senaste snackisen";
+            }
         }
     }
 
@@ -923,42 +1213,62 @@
                 "archive-list"
             );
 
+
         try {
 
             const response =
                 await fetch(
-                    "/.netlify/functions/archive-news"
+                    "/.netlify/functions/archive-news?t=" +
+                    Date.now(),
+                    {
+                        cache:
+                            "no-store"
+                    }
                 );
 
+
             if (!response.ok) {
+
                 throw new Error(
                     "Kunde inte hämta arkivet."
                 );
             }
 
+
             const result =
                 await response.json();
 
+
             if (
                 !result.success ||
-                !Array.isArray(result.articles)
+                !Array.isArray(
+                    result.articles
+                )
             ) {
+
                 throw new Error(
                     "Arkivet hade fel format."
                 );
             }
 
-            archiveList.innerHTML = "";
+
+            archiveList.innerHTML =
+                "";
+
 
             const articles =
                 result.articles
-                    .filter(item =>
-                        item &&
-                        item.article &&
-                        item.id !==
-                            window.currentLatestId
+                    .filter(
+                        item =>
+                            item &&
+                            item.article &&
+                            item.id !==
+                                window.currentLatestId
                     )
-                    .slice(0, 5);
+                    .slice(
+                        0,
+                        5
+                    );
 
 
             if (!articles.length) {
@@ -970,10 +1280,14 @@
             }
 
 
-            for (const item of articles) {
+            for (
+                const item
+                of articles
+            ) {
 
                 const article =
                     item.article;
+
 
                 const details =
                     document.createElement(
@@ -998,11 +1312,13 @@
                 meta.className =
                     "archive-meta";
 
+
                 meta.textContent =
                     [
                         cleanText(
                             article.category
                         ),
+
                         formatArchiveDate(
                             item.createdAt
                         )
@@ -1051,12 +1367,26 @@
                     "Läs snackisen ↓";
 
 
-                summary.appendChild(meta);
-                summary.appendChild(title);
-                summary.appendChild(intro);
-                summary.appendChild(open);
+                summary.appendChild(
+                    meta
+                );
 
-                details.appendChild(summary);
+                summary.appendChild(
+                    title
+                );
+
+                summary.appendChild(
+                    intro
+                );
+
+                summary.appendChild(
+                    open
+                );
+
+
+                details.appendChild(
+                    summary
+                );
 
 
                 const content =
@@ -1070,7 +1400,9 @@
 
                 for (
                     const paragraph
-                    of article.paragraphs || []
+                    of safeArray(
+                        article.paragraphs
+                    )
                 ) {
 
                     const p =
@@ -1083,21 +1415,25 @@
                             paragraph
                         );
 
-                    content.appendChild(p);
+                    content.appendChild(
+                        p
+                    );
                 }
 
 
                 if (
-                    Array.isArray(item.sources) &&
+                    Array.isArray(
+                        item.sources
+                    ) &&
                     item.sources.length
                 ) {
 
-                    const sources =
+                    const sourcesDiv =
                         document.createElement(
                             "div"
                         );
 
-                    sources.className =
+                    sourcesDiv.className =
                         "archive-sources";
 
 
@@ -1109,7 +1445,8 @@
                     strong.textContent =
                         "Källor:";
 
-                    sources.appendChild(
+
+                    sourcesDiv.appendChild(
                         strong
                     );
 
@@ -1125,22 +1462,31 @@
                         of item.sources
                     ) {
 
-                        if (!source?.url) {
+                        const parsedUrl =
+                            safeUrl(
+                                source?.url
+                            );
+
+
+                        if (!parsedUrl) {
                             continue;
                         }
+
 
                         const li =
                             document.createElement(
                                 "li"
                             );
 
+
                         const a =
                             document.createElement(
                                 "a"
                             );
 
+
                         a.href =
-                            source.url;
+                            parsedUrl.href;
 
                         a.target =
                             "_blank";
@@ -1148,28 +1494,57 @@
                         a.rel =
                             "noopener noreferrer";
 
+
                         a.textContent =
                             cleanText(
                                 source.title ||
-                                source.url
+                                parsedUrl.hostname
                             );
 
-                        li.appendChild(a);
-                        ul.appendChild(li);
+
+                        li.appendChild(
+                            a
+                        );
+
+                        ul.appendChild(
+                            li
+                        );
                     }
 
-                    sources.appendChild(ul);
-                    content.appendChild(sources);
+
+                    if (
+                        ul.children.length
+                    ) {
+
+                        sourcesDiv.appendChild(
+                            ul
+                        );
+
+                        content.appendChild(
+                            sourcesDiv
+                        );
+                    }
                 }
 
-                details.appendChild(content);
-                archiveList.appendChild(details);
+
+                details.appendChild(
+                    content
+                );
+
+
+                archiveList.appendChild(
+                    details
+                );
             }
 
 
         } catch (error) {
 
-            console.error(error);
+            console.error(
+                "Arkivfel:",
+                error
+            );
+
 
             archiveList.innerHTML =
                 "<p class='coming-soon'>Arkivet kunde inte hämtas just nu.</p>";
@@ -1185,6 +1560,7 @@
             return "";
         }
 
+
         try {
 
             return new Intl.DateTimeFormat(
@@ -1192,19 +1568,26 @@
                 {
                     timeZone:
                         "Europe/Stockholm",
+
                     day:
                         "numeric",
+
                     month:
                         "long",
+
                     hour:
                         "2-digit",
+
                     minute:
                         "2-digit"
                 }
             )
             .format(
-                new Date(isoDate)
+                new Date(
+                    isoDate
+                )
             );
+
 
         } catch {
 
@@ -1221,6 +1604,7 @@
             return "";
         }
 
+
         try {
 
             return new Intl.DateTimeFormat(
@@ -1228,15 +1612,20 @@
                 {
                     timeZone:
                         "Europe/Stockholm",
+
                     day:
                         "numeric",
+
                     month:
                         "long"
                 }
             )
             .format(
-                new Date(isoDate)
+                new Date(
+                    isoDate
+                )
             );
+
 
         } catch {
 
@@ -1247,16 +1636,23 @@
 
     function voteThumb(id) {
 
-        if (votes[id]) {
+        if (
+            votes[id]
+        ) {
+
             return;
         }
 
-        votes[id] = true;
+
+        votes[id] =
+            true;
+
 
         const element =
             document.getElementById(
                 "count-" + id
             );
+
 
         if (element) {
 
@@ -1278,9 +1674,11 @@
                     window.location.href
                 );
 
+
             alert(
                 "Länken är kopierad!"
             );
+
 
         } catch {
 
@@ -1298,6 +1696,7 @@
                 'input[name="poll"]:checked'
             );
 
+
         if (!selected) {
 
             alert(
@@ -1307,12 +1706,14 @@
             return;
         }
 
+
         document
             .getElementById(
                 "poll-form"
             )
             .style.display =
                 "none";
+
 
         document
             .getElementById(
@@ -1330,17 +1731,21 @@
                 "comment-name"
             );
 
+
         const textInput =
             document.getElementById(
                 "comment-text"
             );
 
+
         const name =
             nameInput.value.trim() ||
             "Anonym kollega";
 
+
         const text =
             textInput.value.trim();
+
 
         if (!text) {
 
@@ -1351,30 +1756,37 @@
             return;
         }
 
+
         const list =
             document.getElementById(
                 "comments-list"
             );
+
 
         const commentDiv =
             document.createElement(
                 "div"
             );
 
+
         commentDiv.className =
             "comment-item";
+
 
         const strong =
             document.createElement(
                 "strong"
             );
 
+
         strong.textContent =
             name + ":";
+
 
         commentDiv.appendChild(
             strong
         );
+
 
         commentDiv.append(
             document.createTextNode(
@@ -1382,12 +1794,15 @@
             )
         );
 
+
         list.prepend(
             commentDiv
         );
 
+
         nameInput.value =
             "";
+
 
         textInput.value =
             "";
@@ -1396,7 +1811,16 @@
 
     async function startKafferasten() {
 
+        /*
+         * Latest först.
+         *
+         * Då känner arkivet till vilket ID
+         * som just nu ligger som huvudartikel
+         * och kan filtrera bort den.
+         */
+
         await loadLatestNews();
+
         await loadArchive();
     }
 
