@@ -35,10 +35,8 @@ export default async () => {
     store,
     {
       runId,
-      status:
-        "running",
-      stage:
-        "start",
+      status: "running",
+      stage: "start",
       message:
         "Background-funktionen har startat.",
       startedAt:
@@ -56,15 +54,12 @@ export default async () => {
   // =====================================================
 
   if (!OPENAI_API_KEY) {
-
     await saveGenerationStatus(
       store,
       {
         runId,
-        status:
-          "error",
-        stage:
-          "api-key",
+        status: "error",
+        stage: "api-key",
         message:
           "OPENAI_API_KEY saknas i Netlify.",
         startedAt:
@@ -78,8 +73,7 @@ export default async () => {
 
     return jsonResponse(
       {
-        success:
-          false,
+        success: false,
         error:
           "OPENAI_API_KEY saknas i Netlify"
       },
@@ -95,15 +89,12 @@ export default async () => {
   let generationLock;
 
   try {
-
     await saveGenerationStatus(
       store,
       {
         runId,
-        status:
-          "running",
-        stage:
-          "lock-check",
+        status: "running",
+        stage: "lock-check",
         message:
           "Kontrollerar om en annan generering redan kör.",
         startedAt:
@@ -115,7 +106,6 @@ export default async () => {
       }
     );
 
-
     generationLock =
       await acquireGenerationLock(
         store,
@@ -123,19 +113,13 @@ export default async () => {
         runId
       );
 
-
-    if (
-      !generationLock.acquired
-    ) {
-
+    if (!generationLock.acquired) {
       await saveGenerationStatus(
         store,
         {
           runId,
-          status:
-            "blocked",
-          stage:
-            "lock",
+          status: "blocked",
+          stage: "lock",
           message:
             "Körningen stoppades eftersom en annan generering redan verkar pågå.",
           startedAt:
@@ -155,12 +139,9 @@ export default async () => {
 
       return jsonResponse(
         {
-          success:
-            false,
-          skipped:
-            true,
-          stage:
-            "lock",
+          success: false,
+          skipped: true,
+          stage: "lock",
           error:
             "En annan nyhetsgenerering pågår redan.",
           lockStartedAt:
@@ -171,15 +152,12 @@ export default async () => {
       );
     }
 
-
     await saveGenerationStatus(
       store,
       {
         runId,
-        status:
-          "running",
-        stage:
-          "lock-acquired",
+        status: "running",
+        stage: "lock-acquired",
         message:
           "Körlåset är taget. Bara denna körning får fortsätta.",
         startedAt:
@@ -192,15 +170,12 @@ export default async () => {
     );
 
   } catch (error) {
-
     await saveGenerationStatus(
       store,
       {
         runId,
-        status:
-          "error",
-        stage:
-          "lock-error",
+        status: "error",
+        stage: "lock-error",
         message:
           "Kunde inte skapa körlåset.",
         details:
@@ -216,10 +191,8 @@ export default async () => {
 
     return jsonResponse(
       {
-        success:
-          false,
-        stage:
-          "lock",
+        success: false,
+        stage: "lock",
         error:
           "Kunde inte skapa körlås.",
         details:
@@ -240,10 +213,8 @@ export default async () => {
       store,
       {
         runId,
-        status:
-          "running",
-        stage:
-          "history-start",
+        status: "running",
+        stage: "history-start",
         message:
           "Läser tidigare publicerade snackisar.",
         startedAt:
@@ -255,26 +226,20 @@ export default async () => {
       }
     );
 
-
     const recentHistory =
       await loadRecentHistory({
         store,
         now,
-        days:
-          14,
-        limit:
-          20
+        days: 14,
+        limit: 20
       });
-
 
     await saveGenerationStatus(
       store,
       {
         runId,
-        status:
-          "running",
-        stage:
-          "history-loaded",
+        status: "running",
+        stage: "history-loaded",
         message:
           `Redaktionellt minne laddat. ${recentHistory.length} tidigare artiklar hittades.`,
         historyCount:
@@ -288,36 +253,25 @@ export default async () => {
       }
     );
 
-
     const recentTopicsForPrompt =
       formatRecentTopicsForPrompt(
         recentHistory
       );
 
-
     const totalUsage = {
-      research1:
-        null,
-      verification1:
-        null,
+      research1: null,
+      verification1: null,
 
-      research2:
-        null,
-      verification2:
-        null,
+      research2: null,
+      verification2: null,
 
-      research3:
-        null,
-      verification3:
-        null,
+      research3: null,
+      verification3: null,
 
-      writing:
-        null
+      writing: null
     };
 
-
-    let rejectedTopic =
-      "";
+    let rejectedTopic = "";
 
 
     // =====================================================
@@ -338,8 +292,7 @@ export default async () => {
         store,
         {
           runId,
-          status:
-            "running",
+          status: "running",
           stage:
             `research-${candidateAttempt}`,
           message:
@@ -356,7 +309,6 @@ export default async () => {
         }
       );
 
-
       const research =
         await callOpenAI({
           apiKey:
@@ -371,8 +323,7 @@ export default async () => {
                 "none"
             },
 
-            max_tool_calls:
-              3,
+            max_tool_calls: 3,
 
             tools: [
               {
@@ -468,6 +419,11 @@ Undvik:
 
 Använd inte Reddit som källa.
 
+Försök hitta minst två oberoende trovärdiga källor.
+
+Om det bara finns en stark och trovärdig källa
+kan ämnet ändå föreslås.
+
 ${
   rejectedTopic
     ? `
@@ -506,13 +462,11 @@ Använd källhänvisningar.
 
 
       if (!research.ok) {
-
         await saveGenerationStatus(
           store,
           {
             runId,
-            status:
-              "error",
+            status: "error",
             stage:
               `research-${candidateAttempt}`,
             message:
@@ -535,8 +489,7 @@ Använd källhänvisningar.
 
         return jsonResponse(
           {
-            success:
-              false,
+            success: false,
             stage:
               `research-${candidateAttempt}`,
             error:
@@ -560,7 +513,6 @@ Använd källhänvisningar.
           research.data
         );
 
-
       const researchText =
         researchPart?.text ||
         "";
@@ -570,8 +522,7 @@ Använd källhänvisningar.
         store,
         {
           runId,
-          status:
-            "running",
+          status: "running",
           stage:
             `research-${candidateAttempt}-done`,
           message:
@@ -608,8 +559,7 @@ Använd källhänvisningar.
         store,
         {
           runId,
-          status:
-            "running",
+          status: "running",
           stage:
             `verification-${candidateAttempt}`,
           message:
@@ -644,8 +594,7 @@ Använd källhänvisningar.
                 "none"
             },
 
-            max_tool_calls:
-              3,
+            max_tool_calls: 3,
 
             tools: [
               {
@@ -683,15 +632,30 @@ Du ska:
 
 1. kontrollera att själva händelsen verkligen har inträffat
 2. fastställa datumet för triggern
-3. hitta minst två oberoende källor
+3. försöka hitta minst två oberoende trovärdiga källor
 4. säkerställa att själva händelsen är högst 72 timmar gammal
 5. skilja på artikelns publiceringsdatum och datumet då händelsen faktiskt inträffade
+
+VIKTIGT OM KÄLLOR:
+
+Två oberoende källor är önskvärt.
+
+Men om bara EN stark och trovärdig källa finns
+får händelsen ändå markeras som AKTUELL: JA,
+förutsatt att händelsen tydligt kan verifieras.
+
+En stark källa kan exempelvis vara:
+- etablerat nyhetsmedium
+- officiell organisation
+- officiell pressida
+- etablerat branschmedium
+- företagets eller programmets officiella sida
 
 Använd inte:
 - Reddit
 - forum
-- startsidor
 - rena sociala medier som verifieringskälla
+- tveksamma aggregatorsidor
 
 Prioritera:
 - etablerade medier
@@ -699,7 +663,8 @@ Prioritera:
 - officiella pressidor
 - etablerade branschmedier
 
-Två artiklar från samma organisation räknas inte som två oberoende källor.
+Två artiklar från samma organisation
+räknas inte som två oberoende källor.
 
 Svara exakt:
 
@@ -722,13 +687,11 @@ Använd källhänvisningar.
 
 
       if (!verification.ok) {
-
         await saveGenerationStatus(
           store,
           {
             runId,
-            status:
-              "error",
+            status: "error",
             stage:
               `verification-${candidateAttempt}`,
             message:
@@ -751,8 +714,7 @@ Använd källhänvisningar.
 
         return jsonResponse(
           {
-            success:
-              false,
+            success: false,
             stage:
               `verification-${candidateAttempt}`,
             error:
@@ -775,7 +737,6 @@ Använd källhänvisningar.
         getOutputTextPart(
           verification.data
         );
-
 
       const verificationText =
         verificationPart?.text ||
@@ -835,8 +796,7 @@ Använd källhänvisningar.
         store,
         {
           runId,
-          status:
-            "running",
+          status: "running",
           stage:
             `verification-${candidateAttempt}-done`,
           message:
@@ -873,11 +833,20 @@ Använd källhänvisningar.
       // =====================================================
       // KANDIDAT UNDERKÄND AV FAKTAKONTROLL
       // =====================================================
+      //
+      // NY REGEL:
+      //
+      // Tidigare krävde vi minst 2 oberoende
+      // källor här.
+      //
+      // Nu räcker 1 trovärdig källa.
+      // Två är fortfarande målet.
+      // =====================================================
 
       if (
         !saysCurrent ||
         !triggerIsFresh ||
-        independentSources.length < 2
+        independentSources.length < 1
       ) {
 
         rejectedTopic =
@@ -895,7 +864,7 @@ Använd källhänvisningar.
             stage:
               `candidate-${candidateAttempt}-rejected`,
             message:
-              "Kandidaten underkändes eftersom den inte klarade färskhets- och källkraven.",
+              "Kandidaten underkändes eftersom den inte klarade färskhets- eller källkraven.",
             candidateAttempt,
             saysCurrent,
             triggerDate:
@@ -926,14 +895,13 @@ Använd källhänvisningar.
 
         return jsonResponse(
           {
-            success:
-              false,
+            success: false,
 
             stage:
               "verification",
 
             error:
-              "Ingen kandidat klarade kraven på färsk trigger och två oberoende källor.",
+              "Ingen kandidat klarade kraven på färsk trigger och minst en trovärdig källa.",
 
             triggerDate,
 
@@ -989,8 +957,7 @@ Använd källhänvisningar.
         store,
         {
           runId,
-          status:
-            "running",
+          status: "running",
           stage:
             `duplicate-check-${candidateAttempt}`,
           message:
@@ -1020,13 +987,9 @@ Använd källhänvisningar.
         });
 
 
-      if (
-        duplicateCandidate
-      ) {
-
+      if (duplicateCandidate) {
         rejectedTopic =
           `Dubblett mot tidigare publicering: "${duplicateCandidate.title}". Välj ett helt annat ämne.`;
-
 
         await saveGenerationStatus(
           store,
@@ -1062,8 +1025,7 @@ Använd källhänvisningar.
 
         return jsonResponse(
           {
-            success:
-              false,
+            success: false,
             stage:
               "duplicate-check",
             error:
@@ -1084,10 +1046,8 @@ Använd källhänvisningar.
         store,
         {
           runId,
-          status:
-            "running",
-          stage:
-            "writing",
+          status: "running",
+          stage: "writing",
           message:
             "Kandidaten är godkänd. Skriver den färdiga artikeln.",
           candidateAttempt,
@@ -1095,6 +1055,8 @@ Använd källhänvisningar.
             verifiedTrigger.description,
           triggerDate:
             verifiedTrigger.date,
+          sourceCount:
+            selectedSources.length,
           startedAt:
             now.toISOString(),
           updatedAt:
@@ -1292,15 +1254,12 @@ REGLER:
 
 
       if (!writing.ok) {
-
         await saveGenerationStatus(
           store,
           {
             runId,
-            status:
-              "error",
-            stage:
-              "writing",
+            status: "error",
+            stage: "writing",
             message:
               "OpenAI kunde inte skriva artikeln.",
             openAIStatus:
@@ -1320,8 +1279,7 @@ REGLER:
 
         return jsonResponse(
           {
-            success:
-              false,
+            success: false,
             stage:
               "writing",
             error:
@@ -1348,7 +1306,6 @@ REGLER:
 
 
       try {
-
         article =
           JSON.parse(
             writingPart?.text ||
@@ -1356,13 +1313,11 @@ REGLER:
           );
 
       } catch (error) {
-
         await saveGenerationStatus(
           store,
           {
             runId,
-            status:
-              "error",
+            status: "error",
             stage:
               "writing-json",
             message:
@@ -1388,8 +1343,7 @@ REGLER:
 
         return jsonResponse(
           {
-            success:
-              false,
+            success: false,
             stage:
               "writing",
             error:
@@ -1413,8 +1367,7 @@ REGLER:
         store,
         {
           runId,
-          status:
-            "running",
+          status: "running",
           stage:
             "article-written",
           message:
@@ -1457,13 +1410,9 @@ REGLER:
         });
 
 
-      if (
-        duplicateArticle
-      ) {
-
+      if (duplicateArticle) {
         rejectedTopic =
           `Den färdiga artikeln blev för lik "${duplicateArticle.title}". Välj ett helt annat ämne.`;
-
 
         await saveGenerationStatus(
           store,
@@ -1502,8 +1451,7 @@ REGLER:
 
         return jsonResponse(
           {
-            success:
-              false,
+            success: false,
             stage:
               "duplicate-check-final",
             error:
@@ -1566,8 +1514,7 @@ REGLER:
         store,
         {
           runId,
-          status:
-            "running",
+          status: "running",
           stage:
             "publishing",
           message:
@@ -1602,10 +1549,7 @@ REGLER:
       // STEG 6 – ARKIVERA FÖREGÅENDE LATEST
       // =====================================================
 
-      if (
-        previousLatest?.id
-      ) {
-
+      if (previousLatest?.id) {
         await store.setJSON(
           `archive/${previousLatest.id}`,
           previousLatest
@@ -1616,8 +1560,7 @@ REGLER:
           store,
           {
             runId,
-            status:
-              "running",
+            status: "running",
             stage:
               "previous-archived",
             message:
@@ -1670,15 +1613,14 @@ REGLER:
 
       if (
         !confirmation ||
-        confirmation.id !== articleId
+        confirmation.id !==
+          articleId
       ) {
-
         await saveGenerationStatus(
           store,
           {
             runId,
-            status:
-              "error",
+            status: "error",
             stage:
               "publish-confirmation",
             message:
@@ -1702,8 +1644,7 @@ REGLER:
 
         return jsonResponse(
           {
-            success:
-              false,
+            success: false,
             stage:
               "publish-confirmation",
             error:
@@ -1722,8 +1663,7 @@ REGLER:
         store,
         {
           runId,
-          status:
-            "success",
+          status: "success",
           stage:
             "published",
           message:
@@ -1736,6 +1676,8 @@ REGLER:
           candidateAttempt,
           historyChecked:
             recentHistory.length,
+          sourcesUsed:
+            selectedSources.length,
           archivedPrevious:
             previousLatest?.id ||
             null,
@@ -1769,8 +1711,7 @@ REGLER:
 
       return jsonResponse(
         {
-          success:
-            true,
+          success: true,
 
           message:
             "Ny artikel skapad och publicerad!",
@@ -1788,6 +1729,9 @@ REGLER:
 
           historyChecked:
             recentHistory.length,
+
+          sourcesUsed:
+            selectedSources.length,
 
           usage: {
             ...totalUsage,
@@ -1807,8 +1751,7 @@ REGLER:
       store,
       {
         runId,
-        status:
-          "error",
+        status: "error",
         stage:
           "no-result",
         message:
@@ -1825,8 +1768,7 @@ REGLER:
 
     return jsonResponse(
       {
-        success:
-          false,
+        success: false,
         error:
           "Ingen artikel kunde skapas."
       },
@@ -1835,15 +1777,12 @@ REGLER:
 
 
   } catch (error) {
-
     await saveGenerationStatus(
       store,
       {
         runId,
-        status:
-          "error",
-        stage:
-          "crash",
+        status: "error",
+        stage: "crash",
         message:
           "Generate-news kraschade.",
         details:
@@ -1852,8 +1791,7 @@ REGLER:
           String(
             error.stack ||
             ""
-          )
-          .slice(
+          ).slice(
             0,
             2500
           ),
@@ -1869,8 +1807,7 @@ REGLER:
 
     return jsonResponse(
       {
-        success:
-          false,
+        success: false,
         error:
           "Generate-news kraschade",
         details:
@@ -1886,10 +1823,7 @@ REGLER:
     // SLÄPP KÖRLÅSET
     // =====================================================
 
-    if (
-      generationLock?.token
-    ) {
-
+    if (generationLock?.token) {
       await releaseGenerationLock(
         store,
         generationLock.token
@@ -1908,14 +1842,12 @@ async function saveGenerationStatus(
   data
 ) {
   try {
-
     await store.setJSON(
       "_diagnostics/generation-status",
       data
     );
 
   } catch (error) {
-
     console.error(
       "Kunde inte spara generation-status:",
       error
@@ -1959,10 +1891,7 @@ async function acquireGenerationLock(
     );
 
 
-  if (
-    existing?.startedAt
-  ) {
-
+  if (existing?.startedAt) {
     const started =
       new Date(
         existing.startedAt
@@ -1979,10 +1908,8 @@ async function acquireGenerationLock(
       age >= 0 &&
       age < staleAfterMs
     ) {
-
       return {
-        acquired:
-          false,
+        acquired: false,
         startedAt:
           existing.startedAt,
         runId:
@@ -2022,10 +1949,7 @@ async function acquireGenerationLock(
     );
 
 
-  if (
-    !result.modified
-  ) {
-
+  if (!result.modified) {
     const current =
       await store.get(
         key,
@@ -2039,8 +1963,7 @@ async function acquireGenerationLock(
 
 
     return {
-      acquired:
-        false,
+      acquired: false,
       startedAt:
         current?.startedAt ||
         null,
@@ -2052,8 +1975,7 @@ async function acquireGenerationLock(
 
 
   return {
-    acquired:
-      true,
+    acquired: true,
     token,
     runId,
     startedAt:
@@ -2072,7 +1994,6 @@ async function releaseGenerationLock(
 
 
   try {
-
     const current =
       await store.get(
         "_locks/generate-news",
@@ -2086,9 +2007,9 @@ async function releaseGenerationLock(
 
 
     if (
-      current?.token === token
+      current?.token ===
+      token
     ) {
-
       await store.delete(
         "_locks/generate-news"
       );
@@ -2096,7 +2017,6 @@ async function releaseGenerationLock(
 
 
   } catch (error) {
-
     console.error(
       "Kunde inte släppa körlåset:",
       error
@@ -2118,7 +2038,6 @@ async function loadRecentHistory({
   const result =
     [];
 
-
   const seenIds =
     new Set();
 
@@ -2139,10 +2058,7 @@ async function loadRecentHistory({
     );
 
 
-  if (
-    latest?.id
-  ) {
-
+  if (latest?.id) {
     result.push(
       latest
     );
@@ -2195,7 +2111,6 @@ async function loadRecentHistory({
 
 
     try {
-
       const item =
         await store.get(
           key,
@@ -2225,7 +2140,6 @@ async function loadRecentHistory({
           days
         )
       ) {
-
         result.push(
           item
         );
@@ -2237,7 +2151,6 @@ async function loadRecentHistory({
 
 
     } catch (error) {
-
       console.warn(
         "Kunde inte läsa arkivpost:",
         key,
@@ -2276,9 +2189,7 @@ async function loadRecentHistory({
 function formatRecentTopicsForPrompt(
   history
 ) {
-  if (
-    !history.length
-  ) {
+  if (!history.length) {
     return "";
   }
 
@@ -2351,9 +2262,7 @@ function findDuplicateMatch({
     );
 
 
-  if (
-    !candidate.size
-  ) {
+  if (!candidate.size) {
     return null;
   }
 
@@ -2386,9 +2295,7 @@ function findDuplicateMatch({
       );
 
 
-    if (
-      !previous.size
-    ) {
+    if (!previous.size) {
       continue;
     }
 
@@ -2450,10 +2357,7 @@ function findDuplicateMatch({
       hasRareExactToken;
 
 
-    if (
-      looksDuplicate
-    ) {
-
+    if (looksDuplicate) {
       return {
         id:
           item.id ||
@@ -2718,12 +2622,10 @@ async function callOpenAI({
 
 
   try {
-
     data =
       await response.json();
 
   } catch {
-
     data = {
       error:
         "OpenAI-svaret kunde inte läsas som JSON."
@@ -2810,7 +2712,6 @@ function filterAllowedSources(
     source => {
 
       try {
-
         const hostname =
           new URL(
             source.url
@@ -2834,7 +2735,6 @@ function filterAllowedSources(
 
 
       } catch {
-
         return false;
       }
     }
@@ -2869,7 +2769,6 @@ function getDomain(
   url
 ) {
   try {
-
     const hostname =
       new URL(
         url
@@ -2913,7 +2812,6 @@ function getDomain(
         lastTwo
       )
     ) {
-
       return parts
         .slice(
           -3
@@ -2935,7 +2833,6 @@ function getDomain(
 
 
   } catch {
-
     return null;
   }
 }
@@ -3040,7 +2937,6 @@ function isFreshDate(
   hours
 ) {
   try {
-
     const trigger =
       new Date(
         `${dateString}T23:59:59Z`
@@ -3074,7 +2970,6 @@ function isFreshDate(
 
 
   } catch {
-
     return false;
   }
 }
@@ -3173,7 +3068,6 @@ function simplifyError(
 
 
   try {
-
     return JSON.stringify(
       data.error ||
       data
@@ -3184,7 +3078,6 @@ function simplifyError(
 
 
   } catch {
-
     return "Okänt fel";
   }
 }
