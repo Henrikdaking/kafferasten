@@ -15,6 +15,11 @@
         content="#2D1A17"
     >
 
+    <meta
+        name="description"
+        content="Kafferasten.se serverar en ny snackis varje vardag inför 09-fikat och 15-rasten."
+    >
+
     <title>
         Kafferasten.se – Dagens snackis till fikat
     </title>
@@ -23,21 +28,44 @@
     <style>
 
         :root {
+
             --bg-color: #F8F4EE;
             --card-bg: #FFFFFF;
+
             --primary-color: #2D1A17;
+            --primary-soft: #49302B;
+
             --accent-color: #C86D3B;
             --accent-hover: #A85528;
+
             --text-color: #2C221E;
-            --text-muted: #6E5E56;
+            --text-muted: #74635B;
+
             --border-color: #E2D7CD;
+
             --highlight-bg: #EFE4D8;
             --soft-accent: #F5E7DD;
+
+            --green: #2E9D55;
+
+            --shadow:
+                0 10px 30px
+                rgba(
+                    45,
+                    26,
+                    23,
+                    0.055
+                );
         }
 
 
         * {
             box-sizing: border-box;
+        }
+
+
+        html {
+            scroll-behavior: smooth;
         }
 
 
@@ -57,8 +85,8 @@
 
             background-image:
                 radial-gradient(
-                    #E2D7CD 0.75px,
-                    transparent 0.75px
+                    #E2D7CD 0.7px,
+                    transparent 0.7px
                 );
 
             background-size:
@@ -68,36 +96,49 @@
                 var(--text-color);
 
             line-height:
-                1.6;
+                1.65;
 
             margin:
                 0;
         }
 
 
+        button,
+        input,
+        textarea {
+            font: inherit;
+        }
+
+
+        a {
+            -webkit-tap-highlight-color:
+                transparent;
+        }
+
+
+        /* ==================================================
+           HEADER
+        ================================================== */
+
+
         header {
 
-            position:
-                relative;
-
-            overflow:
-                hidden;
+            position: relative;
+            overflow: hidden;
 
             background:
                 linear-gradient(
                     145deg,
-                    #2D1A17 0%,
-                    #3A211D 100%
+                    #281714 0%,
+                    #3B211C 100%
                 );
 
-            color:
-                white;
+            color: white;
 
             padding:
-                2.25rem 1rem 2rem;
+                2.35rem 1rem 2.05rem;
 
-            text-align:
-                center;
+            text-align: center;
 
             border-bottom:
                 4px solid
@@ -105,97 +146,104 @@
         }
 
 
-        .brand {
+        header::after {
 
-            display:
-                inline-flex;
+            content: "";
 
-            align-items:
-                center;
+            position: absolute;
 
-            gap:
-                0.75rem;
+            width: 320px;
+            height: 320px;
 
-            text-decoration:
-                none;
+            border-radius: 50%;
 
-            color:
-                white;
-        }
-
-
-        .brand h1 {
-
-            margin:
-                0;
-
-            font-size:
-                2.5rem;
-
-            font-weight:
-                850;
-
-            letter-spacing:
-                -0.6px;
-        }
-
-
-        .coffee-mark {
-
-            position:
-                relative;
-
-            width:
-                42px;
-
-            height:
-                46px;
-
-            display:
-                inline-grid;
-
-            place-items:
-                end center;
-        }
-
-
-        .coffee-cup {
-
-            font-size:
-                2rem;
-
-            line-height:
-                1;
-        }
-
-
-        .steam {
-
-            position:
-                absolute;
-
-            width:
-                3px;
-
-            height:
-                17px;
-
-            border-radius:
-                50%;
+            right: -190px;
+            top: -210px;
 
             background:
                 rgba(
                     255,
                     255,
                     255,
-                    0.62
+                    0.035
+                );
+        }
+
+
+        .brand {
+
+            position: relative;
+            z-index: 1;
+
+            display: inline-flex;
+
+            align-items: center;
+
+            gap: 0.75rem;
+
+            text-decoration: none;
+
+            color: white;
+        }
+
+
+        .brand h1 {
+
+            margin: 0;
+
+            font-size: 2.55rem;
+
+            font-weight: 900;
+
+            letter-spacing: -1.2px;
+
+            line-height: 1;
+        }
+
+
+        .coffee-mark {
+
+            position: relative;
+
+            width: 42px;
+            height: 48px;
+
+            display: inline-grid;
+
+            place-items: end center;
+
+            flex: 0 0 auto;
+        }
+
+
+        .coffee-cup {
+
+            font-size: 2rem;
+
+            line-height: 1;
+        }
+
+
+        .steam {
+
+            position: absolute;
+
+            width: 3px;
+            height: 17px;
+
+            border-radius: 50%;
+
+            background:
+                rgba(
+                    255,
+                    255,
+                    255,
+                    0.64
                 );
 
-            top:
-                0;
+            top: 0;
 
-            opacity:
-                0;
+            opacity: 0;
 
             animation:
                 steam-rise
@@ -206,20 +254,27 @@
 
 
         .steam.s1 {
+
             left: 13px;
+
             animation-delay: 0s;
         }
 
 
         .steam.s2 {
+
             left: 21px;
+
             animation-delay: 0.7s;
+
             height: 20px;
         }
 
 
         .steam.s3 {
+
             left: 29px;
+
             animation-delay: 1.35s;
         }
 
@@ -227,23 +282,24 @@
         @keyframes steam-rise {
 
             0% {
+
                 transform:
                     translateY(8px)
                     scaleX(0.8);
 
-                opacity:
-                    0;
+                opacity: 0;
             }
+
 
             25% {
-                opacity:
-                    0.75;
+                opacity: 0.75;
             }
 
+
             70% {
-                opacity:
-                    0.35;
+                opacity: 0.35;
             }
+
 
             100% {
 
@@ -252,23 +308,29 @@
                     translateX(3px)
                     scaleX(1.35);
 
-                opacity:
-                    0;
+                opacity: 0;
             }
         }
 
 
         header p {
 
+            position: relative;
+            z-index: 1;
+
             margin:
-                0.55rem 0 0;
+                0.72rem 0 0;
 
             color:
-                #E2D7CD;
+                #E4D7CF;
 
-            font-size:
-                1.05rem;
+            font-size: 1rem;
         }
+
+
+        /* ==================================================
+           STATUSRAD
+        ================================================== */
 
 
         .schedule-banner {
@@ -285,46 +347,36 @@
                 1px solid
                 var(--border-color);
 
-            text-align:
-                center;
+            text-align: center;
 
             padding:
-                0.75rem 1rem;
+                0.72rem 1rem
+                0.7rem;
         }
 
 
         .schedule-line {
 
-            display:
-                flex;
+            display: flex;
 
-            justify-content:
-                center;
+            justify-content: center;
+            align-items: center;
 
-            align-items:
-                center;
+            gap: 0.72rem;
 
-            gap:
-                0.8rem;
+            flex-wrap: wrap;
 
-            flex-wrap:
-                wrap;
+            font-size: 0.9rem;
 
-            font-size:
-                0.92rem;
-
-            font-weight:
-                600;
+            font-weight: 650;
         }
 
 
         .brew-note {
 
-            margin-top:
-                0.2rem;
+            margin-top: 0.18rem;
 
-            font-size:
-                0.78rem;
+            font-size: 0.77rem;
 
             color:
                 var(--text-muted);
@@ -333,49 +385,61 @@
 
         .status-badge {
 
-            background:
-                #2E9D55;
+            display: inline-flex;
 
-            color:
-                white;
+            align-items: center;
+
+            gap: 0.3rem;
+
+            background:
+                var(--green);
+
+            color: white;
 
             padding:
-                0.18rem 0.6rem;
+                0.18rem 0.65rem;
 
-            border-radius:
-                999px;
+            border-radius: 999px;
 
-            font-size:
-                0.76rem;
+            font-size: 0.75rem;
 
-            font-weight:
-                800;
+            font-weight: 850;
+
+            box-shadow:
+                0 2px 8px
+                rgba(
+                    46,
+                    157,
+                    85,
+                    0.2
+                );
         }
+
+
+        /* ==================================================
+           LAYOUT
+        ================================================== */
 
 
         .container {
 
-            max-width:
-                1040px;
+            max-width: 1060px;
 
             margin:
-                1.6rem auto;
+                1.7rem auto;
 
             padding:
                 0 1rem;
 
-            display:
-                grid;
+            display: grid;
 
             grid-template-columns:
                 minmax(0, 2fr)
                 minmax(250px, 1fr);
 
-            gap:
-                1.5rem;
+            gap: 1.45rem;
 
-            align-items:
-                start;
+            align-items: start;
         }
 
 
@@ -393,57 +457,74 @@
                 1px solid
                 var(--border-color);
 
-            border-radius:
-                18px;
+            border-radius: 20px;
 
-            padding:
-                1.65rem;
+            padding: 1.7rem;
 
-            margin-bottom:
-                1.25rem;
+            margin-bottom: 1.25rem;
 
             box-shadow:
-                0 8px 24px
-                rgba(
-                    45,
-                    26,
-                    23,
-                    0.055
-                );
+                var(--shadow);
+        }
+
+
+        /* ==================================================
+           HUVUDARTIKEL
+        ================================================== */
+
+
+        .article-topline {
+
+            display: flex;
+
+            justify-content:
+                space-between;
+
+            align-items: center;
+
+            gap: 0.75rem;
+
+            margin-bottom:
+                0.82rem;
         }
 
 
         .tag {
 
-            display:
-                inline-flex;
+            display: inline-flex;
+
+            align-items: center;
 
             background:
                 var(--accent-color);
 
-            color:
-                white;
+            color: white;
 
             padding:
-                0.25rem 0.72rem;
+                0.28rem 0.75rem;
 
-            border-radius:
-                999px;
+            border-radius: 999px;
 
-            font-size:
-                0.73rem;
+            font-size: 0.72rem;
 
-            font-weight:
-                800;
+            font-weight: 850;
 
-            text-transform:
-                uppercase;
+            text-transform: uppercase;
 
-            letter-spacing:
-                0.45px;
+            letter-spacing: 0.42px;
+        }
 
-            margin-bottom:
-                0.85rem;
+
+        .read-time {
+
+            color:
+                var(--text-muted);
+
+            font-size: 0.76rem;
+
+            font-weight: 650;
+
+            white-space: nowrap;
         }
 
 
@@ -453,13 +534,22 @@
                 var(--primary-color);
 
             margin:
-                0 0 1.05rem;
+                0 0 1.15rem;
 
-            font-size:
-                1.9rem;
+            max-width: 720px;
 
-            line-height:
-                1.22;
+            font-family:
+                Georgia,
+                "Times New Roman",
+                serif;
+
+            font-size: 2.15rem;
+
+            line-height: 1.12;
+
+            letter-spacing: -0.7px;
+
+            font-weight: 800;
         }
 
 
@@ -470,25 +560,31 @@
 
             margin:
                 0 0 0.9rem;
+
+            font-size: 1.28rem;
+
+            line-height: 1.25;
+        }
+
+
+        .hero-wrap {
+
+            margin-bottom:
+                1.15rem;
         }
 
 
         .article-hero-img {
 
-            display:
-                block;
+            display: block;
 
-            width:
-                100%;
+            width: 100%;
 
-            height:
-                290px;
+            height: 310px;
 
-            object-fit:
-                cover;
+            object-fit: cover;
 
-            border-radius:
-                14px;
+            border-radius: 15px;
 
             background:
                 var(--highlight-bg);
@@ -498,45 +594,41 @@
         .photo-credit,
         .side-photo-credit {
 
-            display:
-                none;
+            display: none;
 
             color:
                 var(--text-muted);
 
-            text-align:
-                right;
+            text-align: right;
         }
 
 
         .photo-credit {
 
             margin:
-                0.42rem 0 0;
+                0.4rem 0 0;
 
-            font-size:
-                0.68rem;
+            font-size: 0.68rem;
         }
 
 
         .side-photo-credit {
 
             margin:
-                0.3rem 0 0.9rem;
+                0.28rem 0 0.75rem;
 
-            font-size:
-                0.61rem;
+            font-size: 0.61rem;
         }
 
 
         .photo-credit a,
         .side-photo-credit a {
 
-            color:
-                inherit;
+            color: inherit;
 
-            text-decoration:
-                underline;
+            text-decoration: underline;
+
+            text-underline-offset: 2px;
         }
 
 
@@ -546,7 +638,7 @@
                 linear-gradient(
                     135deg,
                     #FBF7F2,
-                    #F4ECE4
+                    #F3EAE1
                 );
 
             border-left:
@@ -554,36 +646,56 @@
                 var(--accent-color);
 
             padding:
-                1.05rem 1.15rem;
+                1.08rem 1.2rem;
 
             margin:
-                1.25rem 0 1.45rem;
+                1.3rem 0 1.55rem;
 
             border-radius:
-                0 14px 14px 0;
+                0 15px 15px 0;
+
+            font-size: 1rem;
         }
 
 
         .summary-box strong {
 
-            display:
-                block;
+            display: block;
 
-            margin-bottom:
-                0.3rem;
+            margin-bottom: 0.38rem;
 
-            font-size:
-                1.03rem;
+            color:
+                var(--primary-color);
+
+            font-size: 1rem;
+        }
+
+
+        .article-content {
+
+            max-width: 690px;
         }
 
 
         .article-content p {
 
-            font-size:
-                1.04rem;
+            font-family:
+                Georgia,
+                "Times New Roman",
+                serif;
+
+            font-size: 1.08rem;
+
+            line-height: 1.72;
 
             margin:
-                0 0 1.15rem;
+                0 0 1.3rem;
+        }
+
+
+        .article-content p:first-child::first-letter {
+
+            font-size: 1.15em;
         }
 
 
@@ -593,116 +705,129 @@
                 var(--highlight-bg);
 
             padding:
-                1.15rem 1.2rem;
+                1.2rem 1.25rem;
 
-            border-radius:
-                14px;
+            border-radius: 15px;
 
             margin:
-                1.4rem 0;
+                1.5rem 0;
+        }
+
+
+        .why-box strong {
+
+            color:
+                var(--primary-color);
         }
 
 
         .why-box ul {
 
             margin:
-                0.55rem 0 0;
+                0.6rem 0 0;
 
             padding-left:
                 1.35rem;
         }
 
 
-        .byline {
+        .why-box li {
 
-            display:
-                none;
+            margin-bottom:
+                0.35rem;
+        }
 
-            align-items:
-                center;
 
-            gap:
-                0.65rem;
+        /* ==================================================
+           SKRIBENT + KÄLLOR
+        ================================================== */
 
-            margin:
-                1.35rem 0 0;
 
-            padding-top:
-                1rem;
+        .article-meta-box {
+
+            margin-top:
+                1.55rem;
+
+            padding:
+                1rem 0;
 
             border-top:
+                1px solid
+                var(--border-color);
+
+            border-bottom:
                 1px solid
                 var(--border-color);
         }
 
 
+        .byline {
+
+            display: none;
+
+            align-items: center;
+
+            gap: 0.72rem;
+        }
+
+
         .byline-avatar {
 
-            width:
-                35px;
+            width: 39px;
+            height: 39px;
 
-            height:
-                35px;
+            display: grid;
 
-            display:
-                grid;
+            place-items: center;
 
-            place-items:
-                center;
-
-            border-radius:
-                50%;
+            border-radius: 50%;
 
             background:
                 var(--soft-accent);
+
+            font-size: 1.05rem;
         }
 
 
         .byline-copy {
 
-            font-size:
-                0.8rem;
+            font-size: 0.77rem;
 
             color:
                 var(--text-muted);
+
+            line-height: 1.25;
         }
 
 
         .byline-name {
 
-            display:
-                block;
+            display: block;
+
+            margin-top: 0.13rem;
 
             color:
                 var(--primary-color);
 
-            font-size:
-                0.95rem;
+            font-size: 0.97rem;
 
-            font-weight:
-                800;
+            font-weight: 850;
         }
 
 
         .source-row {
 
-            display:
-                none;
+            display: none;
 
-            align-items:
-                flex-start;
+            align-items: flex-start;
 
-            gap:
-                0.5rem;
+            gap: 0.45rem;
 
-            flex-wrap:
-                wrap;
+            flex-wrap: wrap;
 
-            margin:
-                0.85rem 0 0;
+            margin-top: 0.8rem;
 
-            padding:
-                0.8rem 0 0;
+            padding-top: 0.7rem;
 
             border-top:
                 1px dashed
@@ -711,21 +836,24 @@
             color:
                 var(--text-muted);
 
-            font-size:
-                0.78rem;
+            font-size: 0.75rem;
+        }
+
+
+        .source-row strong {
+
+            color:
+                var(--primary-color);
         }
 
 
         .source-links {
 
-            display:
-                inline-flex;
+            display: inline-flex;
 
-            flex-wrap:
-                wrap;
+            flex-wrap: wrap;
 
-            gap:
-                0.35rem;
+            gap: 0.34rem;
         }
 
 
@@ -734,11 +862,21 @@
             color:
                 var(--accent-color);
 
-            font-weight:
-                700;
+            font-weight: 750;
 
-            text-decoration:
-                none;
+            text-decoration: none;
+
+            transition:
+                color 0.18s ease;
+        }
+
+
+        .source-link:hover {
+
+            color:
+                var(--accent-hover);
+
+            text-decoration: underline;
         }
 
 
@@ -749,113 +887,367 @@
         }
 
 
-        .btn-group {
+        /* ==================================================
+           FEEDBACK
+        ================================================== */
 
-            display:
-                flex;
 
-            gap:
-                0.55rem;
-
-            flex-wrap:
-                wrap;
+        .feedback {
 
             margin-top:
-                0.75rem;
+                1.45rem;
+
+            padding:
+                1.25rem;
+
+            border-radius: 15px;
+
+            background:
+                #FBF8F4;
+
+            border:
+                1px solid
+                var(--border-color);
+        }
+
+
+        .feedback-title {
+
+            display: block;
+
+            margin-bottom:
+                0.72rem;
+
+            font-size: 0.98rem;
+
+            color:
+                var(--primary-color);
+        }
+
+
+        .btn-group {
+
+            display: flex;
+
+            gap: 0.55rem;
+
+            flex-wrap: wrap;
         }
 
 
         .btn {
 
-            background:
-                var(--bg-color);
+            appearance: none;
 
             border:
                 1px solid
                 var(--border-color);
+
+            background:
+                var(--bg-color);
 
             color:
                 var(--text-color);
 
             padding:
-                0.62rem 1rem;
+                0.68rem 1rem;
 
-            border-radius:
-                10px;
+            border-radius: 11px;
 
-            cursor:
-                pointer;
+            cursor: pointer;
 
-            font-weight:
-                650;
+            font-weight: 700;
+
+            transition:
+                transform 0.15s ease,
+                background 0.15s ease,
+                border-color 0.15s ease;
+        }
+
+
+        .btn:hover {
+
+            transform:
+                translateY(-1px);
+
+            background:
+                #FFF;
+        }
+
+
+        .btn-primary {
+
+            background:
+                var(--accent-color);
+
+            color: white;
+
+            border-color:
+                var(--accent-color);
+        }
+
+
+        .btn-primary:hover {
+
+            background:
+                var(--accent-hover);
+
+            border-color:
+                var(--accent-hover);
+        }
+
+
+        .share-row {
+
+            display: flex;
+
+            justify-content:
+                space-between;
+
+            align-items: center;
+
+            gap: 0.75rem;
+
+            margin-top:
+                1.1rem;
+
+            padding-top:
+                0.9rem;
+
+            border-top:
+                1px solid
+                var(--border-color);
+        }
+
+
+        .share-label {
+
+            margin: 0;
+
+            font-size: 0.83rem;
+
+            color:
+                var(--text-muted);
+        }
+
+
+        /* ==================================================
+           FIKAFRÅGA
+        ================================================== */
+
+
+        .conversation-card {
+
+            position: relative;
+
+            overflow: hidden;
+        }
+
+
+        .conversation-card::before {
+
+            content: "💬";
+
+            position: absolute;
+
+            right: 1.2rem;
+            top: 0.45rem;
+
+            font-size: 4.7rem;
+
+            opacity: 0.045;
+
+            pointer-events: none;
+        }
+
+
+        .section-kicker {
+
+            margin-bottom:
+                0.3rem;
+
+            color:
+                var(--accent-color);
+
+            font-size: 0.72rem;
+
+            text-transform: uppercase;
+
+            letter-spacing: 0.7px;
+
+            font-weight: 850;
+        }
+
+
+        .poll-question {
+
+            margin:
+                0 0 1rem;
+
+            max-width: 620px;
+
+            font-family:
+                Georgia,
+                "Times New Roman",
+                serif;
+
+            font-size: 1.27rem;
+
+            line-height: 1.35;
+
+            color:
+                var(--primary-color);
         }
 
 
         .poll-option {
 
-            display:
-                block;
+            display: flex;
+
+            align-items: flex-start;
+
+            gap: 0.6rem;
 
             background:
                 var(--bg-color);
 
             padding:
-                0.78rem 0.9rem;
+                0.8rem 0.9rem;
 
-            border-radius:
-                10px;
+            border-radius: 11px;
 
             margin-bottom:
-                0.55rem;
+                0.58rem;
 
             border:
                 1px solid
                 var(--border-color);
+
+            cursor: pointer;
+
+            transition:
+                border-color 0.15s ease,
+                background 0.15s ease;
+        }
+
+
+        .poll-option:hover {
+
+            background: white;
+
+            border-color:
+                #CDB9A9;
+        }
+
+
+        .poll-option input {
+
+            margin-top:
+                0.28rem;
+
+            accent-color:
+                var(--accent-color);
         }
 
 
         .poll-results {
 
-            display:
-                none;
+            display: none;
 
-            margin-top:
-                1rem;
+            margin-top: 1rem;
 
-            padding:
-                1rem;
+            padding: 1rem;
 
             background:
-                var(--bg-color);
+                var(--soft-accent);
 
-            border-radius:
-                10px;
+            border-radius: 11px;
+
+            font-weight: 700;
+        }
+
+
+        .comment-section {
+
+            margin-top:
+                1.5rem;
+
+            padding-top:
+                1.35rem;
+
+            border-top:
+                1px solid
+                var(--border-color);
+        }
+
+
+        .comment-section h4 {
+
+            margin:
+                0 0 0.65rem;
+
+            color:
+                var(--primary-color);
+
+            font-size: 1rem;
+        }
+
+
+        .comment-helper {
+
+            margin:
+                -0.2rem 0 0.8rem;
+
+            color:
+                var(--text-muted);
+
+            font-size: 0.8rem;
         }
 
 
         .comment-input {
 
-            width:
-                100%;
+            width: 100%;
 
             padding:
-                0.75rem;
+                0.78rem 0.85rem;
 
             border:
                 1px solid
                 var(--border-color);
 
-            border-radius:
-                10px;
+            border-radius: 11px;
 
-            margin-bottom:
-                0.75rem;
-
-            font-family:
-                inherit;
+            margin-bottom: 0.7rem;
 
             background:
-                var(--bg-color);
+                #FCF9F5;
+
+            color:
+                var(--text-color);
+
+            outline: none;
+
+            transition:
+                border-color 0.15s ease,
+                background 0.15s ease;
+        }
+
+
+        .comment-input:focus {
+
+            border-color:
+                var(--accent-color);
+
+            background: white;
+        }
+
+
+        textarea.comment-input {
+
+            resize: vertical;
+
+            min-height: 94px;
         }
 
 
@@ -867,38 +1259,53 @@
             padding:
                 0.75rem;
 
-            border-radius:
-                10px;
+            border-radius: 10px;
 
-            margin-top:
-                0.5rem;
+            margin-top: 0.6rem;
+
+            border:
+                1px solid
+                var(--border-color);
         }
 
 
         /* ==================================================
-           SIDOBILDER
+           SIDOKORT
         ================================================== */
+
+
+        .sidebar-card {
+
+            overflow: hidden;
+
+            transition:
+                transform 0.18s ease;
+        }
+
+
+        @media (hover:hover) {
+
+            .sidebar-card:hover {
+
+                transform:
+                    translateY(-2px);
+            }
+        }
 
 
         .side-visual {
 
-            height:
-                155px;
+            height: 160px;
 
-            position:
-                relative;
+            position: relative;
 
-            display:
-                grid;
+            display: grid;
 
-            place-items:
-                center;
+            place-items: center;
 
-            overflow:
-                hidden;
+            overflow: hidden;
 
-            border-radius:
-                13px;
+            border-radius: 14px;
 
             background:
                 linear-gradient(
@@ -911,244 +1318,673 @@
 
         .side-image {
 
-            display:
-                none;
+            display: none;
 
-            width:
-                100%;
+            width: 100%;
+            height: 100%;
 
-            height:
-                100%;
-
-            object-fit:
-                cover;
+            object-fit: cover;
         }
 
 
         .visual-emoji {
 
-            font-size:
-                4.6rem;
+            font-size: 4.6rem;
         }
 
 
         .side-kicker {
 
             margin:
-                0.9rem 0 0.3rem;
+                0.85rem 0 0.28rem;
 
             color:
                 var(--accent-color);
 
-            font-size:
-                0.72rem;
+            font-size: 0.7rem;
 
-            font-weight:
-                850;
+            font-weight: 850;
 
-            text-transform:
-                uppercase;
+            text-transform: uppercase;
+
+            letter-spacing: 0.45px;
         }
 
 
         .side-title {
 
             margin:
-                0 0 0.5rem;
+                0 0 0.45rem;
 
-            font-size:
-                1.03rem;
+            color:
+                var(--primary-color);
 
-            font-weight:
-                800;
+            font-family:
+                Georgia,
+                "Times New Roman",
+                serif;
+
+            font-size: 1.1rem;
+
+            line-height: 1.25;
+
+            font-weight: 800;
         }
 
 
         .side-text {
 
-            margin:
-                0;
+            margin: 0;
 
-            font-size:
-                0.9rem;
+            font-size: 0.88rem;
+
+            color:
+                #493B35;
+        }
+
+
+        /* ==================================================
+           ARKIV
+        ================================================== */
+
+
+        .archive-header {
+
+            display: flex;
+
+            justify-content:
+                space-between;
+
+            align-items:
+                flex-end;
+
+            gap: 1rem;
+
+            margin-bottom:
+                1rem;
+        }
+
+
+        .archive-header h3 {
+
+            margin: 0;
+        }
+
+
+        .archive-subtitle {
+
+            margin:
+                0.25rem 0 0;
+
+            color:
+                var(--text-muted);
+
+            font-size: 0.82rem;
         }
 
 
         .archive-grid {
 
-            display:
-                grid;
+            display: grid;
 
-            gap:
-                0.8rem;
+            gap: 0.78rem;
         }
 
 
         .archive-item {
 
+            position: relative;
+
             background:
-                var(--bg-color);
+                #FBF8F4;
 
             border:
                 1px solid
                 var(--border-color);
 
-            border-radius:
-                12px;
+            border-radius: 13px;
 
-            overflow:
-                hidden;
+            overflow: hidden;
+
+            transition:
+                transform 0.15s ease,
+                border-color 0.15s ease,
+                background 0.15s ease;
+        }
+
+
+        .archive-item:hover {
+
+            transform:
+                translateY(-1px);
+
+            border-color:
+                #D2BFAF;
+
+            background:
+                white;
         }
 
 
         .archive-item summary {
 
-            list-style:
-                none;
+            list-style: none;
 
-            cursor:
-                pointer;
+            cursor: pointer;
 
             padding:
-                1rem;
+                1rem 1.05rem;
+        }
+
+
+        .archive-item summary::-webkit-details-marker {
+            display: none;
         }
 
 
         .archive-meta {
 
-            font-size:
-                0.76rem;
+            font-size: 0.72rem;
 
             color:
-                var(--text-muted);
+                var(--accent-color);
+
+            font-weight: 750;
+
+            text-transform: uppercase;
+
+            letter-spacing: 0.35px;
         }
 
 
         .archive-title {
 
-            display:
-                block;
-
-            font-size:
-                1.08rem;
-
-            font-weight:
-                800;
+            display: block;
 
             margin:
-                0.3rem 0;
+                0.28rem 0 0.35rem;
+
+            color:
+                var(--primary-color);
+
+            font-family:
+                Georgia,
+                "Times New Roman",
+                serif;
+
+            font-size: 1.08rem;
+
+            line-height: 1.28;
+
+            font-weight: 800;
         }
 
 
         .archive-summary {
 
-            margin:
-                0;
+            margin: 0;
 
-            font-size:
-                0.9rem;
+            color:
+                #554640;
+
+            font-size: 0.86rem;
+
+            line-height: 1.5;
         }
 
 
         .archive-open {
 
-            display:
-                inline-block;
+            display: inline-block;
 
-            margin-top:
-                0.6rem;
+            margin-top: 0.58rem;
 
             color:
                 var(--accent-color);
 
-            font-weight:
-                800;
+            font-size: 0.8rem;
+
+            font-weight: 800;
+        }
+
+
+        details[open]
+        .archive-open {
+
+            display: none;
         }
 
 
         .archive-content {
 
             padding:
-                0 1rem 1rem;
+                0 1.05rem 1.05rem;
 
             border-top:
                 1px solid
                 var(--border-color);
+        }
+
+
+        .archive-content p {
+
+            font-family:
+                Georgia,
+                "Times New Roman",
+                serif;
+
+            font-size: 0.94rem;
+
+            line-height: 1.6;
         }
 
 
         .archive-byline {
 
+            margin-top: 0.8rem;
+
             color:
                 var(--text-muted);
 
-            font-size:
-                0.82rem;
+            font-size: 0.78rem;
 
-            font-style:
-                italic;
+            font-style: italic;
         }
+
+
+        /* ==================================================
+           FOOTER
+        ================================================== */
 
 
         footer {
 
-            text-align:
-                center;
+            text-align: center;
 
             padding:
-                2.3rem 1rem;
+                2.6rem 1rem;
 
             color:
                 var(--text-muted);
 
-            font-size:
-                0.86rem;
+            font-size: 0.83rem;
 
             border-top:
                 1px solid
                 var(--border-color);
         }
+
+
+        /* ==================================================
+           MOBIL
+        ================================================== */
 
 
         @media (
             max-width: 768px
         ) {
 
-            .container {
-                grid-template-columns: 1fr;
-                margin-top: 1rem;
-                gap: 0.1rem;
+            body {
+
+                background-size:
+                    14px 14px;
             }
 
 
             header {
+
                 padding:
-                    1.65rem 1rem 1.5rem;
+                    1.55rem 1rem
+                    1.4rem;
+            }
+
+
+            .brand {
+
+                gap:
+                    0.55rem;
             }
 
 
             .brand h1 {
-                font-size: 2rem;
+
+                font-size:
+                    1.95rem;
+
+                letter-spacing:
+                    -0.7px;
             }
 
 
-            h2 {
-                font-size: 1.62rem;
+            .coffee-mark {
+
+                width: 36px;
+                height: 43px;
+            }
+
+
+            .coffee-cup {
+
+                font-size:
+                    1.75rem;
+            }
+
+
+            header p {
+
+                margin-top:
+                    0.55rem;
+
+                font-size:
+                    0.86rem;
+            }
+
+
+            .schedule-banner {
+
+                padding:
+                    0.62rem 0.75rem;
+            }
+
+
+            .schedule-line {
+
+                gap:
+                    0.45rem;
+
+                font-size:
+                    0.77rem;
+            }
+
+
+            .brew-note {
+
+                margin-top:
+                    0.26rem;
+
+                font-size:
+                    0.69rem;
+            }
+
+
+            .container {
+
+                grid-template-columns:
+                    1fr;
+
+                margin:
+                    0.85rem auto 0;
+
+                padding:
+                    0 0.72rem;
+
+                gap:
+                    0.05rem;
             }
 
 
             .card {
-                padding: 1.2rem;
+
+                border-radius:
+                    17px;
+
+                padding:
+                    1.15rem;
+
+                margin-bottom:
+                    0.9rem;
+
+                box-shadow:
+                    0 6px 20px
+                    rgba(
+                        45,
+                        26,
+                        23,
+                        0.045
+                    );
+            }
+
+
+            .article-topline {
+
+                margin-bottom:
+                    0.72rem;
+            }
+
+
+            .tag {
+
+                padding:
+                    0.25rem 0.65rem;
+
+                font-size:
+                    0.67rem;
+            }
+
+
+            .read-time {
+
+                font-size:
+                    0.7rem;
+            }
+
+
+            h2 {
+
+                font-size:
+                    1.78rem;
+
+                line-height:
+                    1.12;
+
+                letter-spacing:
+                    -0.45px;
+
+                margin-bottom:
+                    0.95rem;
             }
 
 
             .article-hero-img {
-                height: 230px;
+
+                height:
+                    auto;
+
+                aspect-ratio:
+                    16 / 10;
+
+                border-radius:
+                    13px;
+            }
+
+
+            .summary-box {
+
+                margin:
+                    1rem 0 1.25rem;
+
+                padding:
+                    0.95rem 1rem;
+
+                font-size:
+                    0.95rem;
+            }
+
+
+            .article-content p {
+
+                font-size:
+                    1.025rem;
+
+                line-height:
+                    1.68;
+
+                margin-bottom:
+                    1.15rem;
+            }
+
+
+            .why-box {
+
+                margin:
+                    1.25rem 0;
+
+                padding:
+                    1rem;
+            }
+
+
+            .why-box li {
+
+                margin-bottom:
+                    0.43rem;
+            }
+
+
+            .article-meta-box {
+
+                margin-top:
+                    1.3rem;
+            }
+
+
+            .feedback {
+
+                padding:
+                    1rem;
+
+                margin-top:
+                    1.2rem;
+            }
+
+
+            .btn-group {
+
+                display: grid;
+
+                grid-template-columns:
+                    1fr 1fr;
+            }
+
+
+            .btn {
+
+                padding:
+                    0.68rem 0.7rem;
+
+                font-size:
+                    0.85rem;
+            }
+
+
+            .share-row {
+
+                align-items:
+                    center;
+            }
+
+
+            .poll-question {
+
+                font-size:
+                    1.16rem;
             }
 
 
             .side-visual {
-                height: 190px;
+
+                height: auto;
+
+                aspect-ratio:
+                    16 / 9;
+            }
+
+
+            .side-title {
+
+                font-size:
+                    1.07rem;
+            }
+
+
+            .sidebar-card {
+
+                margin-bottom:
+                    0.9rem;
+            }
+
+
+            .archive-item summary {
+
+                padding:
+                    0.9rem;
+            }
+
+
+            .archive-title {
+
+                font-size:
+                    1.02rem;
+            }
+
+
+            footer {
+
+                padding:
+                    2rem 1rem;
+            }
+        }
+
+
+        @media (
+            max-width: 390px
+        ) {
+
+            .brand h1 {
+
+                font-size:
+                    1.72rem;
+            }
+
+
+            h2 {
+
+                font-size:
+                    1.62rem;
+            }
+
+
+            .btn-group {
+
+                grid-template-columns:
+                    1fr;
+            }
+
+
+            .article-topline {
+
+                align-items:
+                    flex-start;
+            }
+        }
+
+
+        @media (
+            prefers-reduced-motion: reduce
+        ) {
+
+            *,
+            *::before,
+            *::after {
+
+                animation-duration:
+                    0.01ms !important;
+
+                animation-iteration-count:
+                    1 !important;
+
+                transition-duration:
+                    0.01ms !important;
             }
         }
 
@@ -1236,12 +2072,24 @@
     <article class="card">
 
 
-        <span
-            class="tag"
-            id="fika-badge"
-        >
-            ☕ DAGENS SNACKIS
-        </span>
+        <div class="article-topline">
+
+            <span
+                class="tag"
+                id="fika-badge"
+            >
+                ☕ DAGENS SNACKIS
+            </span>
+
+
+            <span
+                class="read-time"
+                id="read-time"
+            >
+                ☕ 1 minuts läsning
+            </span>
+
+        </div>
 
 
         <h2 id="article-title">
@@ -1249,7 +2097,7 @@
         </h2>
 
 
-        <div>
+        <div class="hero-wrap">
 
             <img
                 id="article-img"
@@ -1307,124 +2155,134 @@
         </div>
 
 
-        <div
-            class="byline"
-            id="article-byline"
-        >
+        <div class="article-meta-box">
+
 
             <div
-                class="byline-avatar"
-                id="article-byline-avatar"
+                class="byline"
+                id="article-byline"
             >
-                ✍️
+
+                <div
+                    class="byline-avatar"
+                    id="article-byline-avatar"
+                >
+                    ✍️
+                </div>
+
+
+                <div class="byline-copy">
+
+                    Dagens snackis är serverad av
+
+                    <span
+                        class="byline-name"
+                        id="article-byline-name"
+                    >
+                    </span>
+
+                </div>
+
             </div>
 
 
-            <div class="byline-copy">
+            <div
+                class="source-row"
+                id="source-row"
+            >
 
-                Dagens snackis är skriven av
+                <strong>
+                    🔎 Lästs in från:
+                </strong>
 
                 <span
-                    class="byline-name"
-                    id="article-byline-name"
+                    class="source-links"
+                    id="source-links"
                 >
                 </span>
 
             </div>
 
+
         </div>
 
 
-        <div
-            class="source-row"
-            id="source-row"
-        >
+        <div class="feedback">
 
-            <strong>
-                🔎 Källor:
+            <strong class="feedback-title">
+                Hur smakade dagens snackis?
             </strong>
 
-            <span
-                class="source-links"
-                id="source-links"
-            >
-            </span>
+
+            <div class="btn-group">
+
+                <button
+                    class="btn"
+                    onclick="voteThumb('main-up')"
+                >
+                    👍 Bra snack
+                    (
+                    <span id="count-main-up">
+                        0
+                    </span>
+                    )
+                </button>
+
+
+                <button
+                    class="btn"
+                    onclick="voteThumb('main-down')"
+                >
+                    🥱 Nja, segt ämne
+                    (
+                    <span id="count-main-down">
+                        0
+                    </span>
+                    )
+                </button>
+
+            </div>
+
+
+            <div class="share-row">
+
+                <p class="share-label">
+                    Någon mer som borde höra det här?
+                </p>
+
+
+                <button
+                    class="btn"
+                    onclick="copyLink()"
+                >
+                    🔗 Kopiera länk
+                </button>
+
+            </div>
 
         </div>
-
-
-        <hr
-            style="
-                border:0;
-                border-top:1px solid var(--border-color);
-                margin:1.4rem 0;
-            "
-        >
-
-
-        <strong>
-            Blev det ett bra samtalsämne på rasten?
-        </strong>
-
-
-        <div class="btn-group">
-
-            <button
-                class="btn"
-                onclick="voteThumb('main-up')"
-            >
-                👍 Ja, bra snack!
-                (
-                <span id="count-main-up">
-                    0
-                </span>
-                )
-            </button>
-
-
-            <button
-                class="btn"
-                onclick="voteThumb('main-down')"
-            >
-                👎 Nja, segt ämne
-                (
-                <span id="count-main-down">
-                    0
-                </span>
-                )
-            </button>
-
-        </div>
-
-
-        <p>
-            <strong>
-                Dela med kollegan:
-            </strong>
-        </p>
-
-
-        <button
-            class="btn"
-            onclick="copyLink()"
-        >
-            🔗 Kopiera länk
-        </button>
 
 
     </article>
 
 
-    <section class="card">
+    <section class="card conversation-card">
+
+
+        <div class="section-kicker">
+            Fikabordets stora fråga
+        </div>
+
 
         <h3>
             💬 Dagens fikafråga
         </h3>
 
 
-        <p>
-            <strong id="poll-question">
-            </strong>
+        <p
+            class="poll-question"
+            id="poll-question"
+        >
         </p>
 
 
@@ -1436,7 +2294,7 @@
 
             <button
                 onclick="submitPoll()"
-                class="btn"
+                class="btn btn-primary"
             >
                 Skicka din röst
             </button>
@@ -1448,42 +2306,48 @@
             id="poll-results"
             class="poll-results"
         >
-            ☕ Tack för din röst!
+            ☕ Rösten är inne. Nu återstår bara att övertyga resten av fikabordet.
         </div>
 
 
-        <hr>
+        <div class="comment-section">
+
+            <h4>
+                💭 Vad sägs i ert fikarum?
+            </h4>
 
 
-        <h4>
-            💭 Vad sägs i ert fikarum?
-        </h4>
+            <p class="comment-helper">
+                Har någon kollega redan en stark åsikt? Lämna den här.
+            </p>
 
 
-        <input
-            id="comment-name"
-            class="comment-input"
-            placeholder="Ditt namn / Avdelning (valfritt)"
-        >
+            <input
+                id="comment-name"
+                class="comment-input"
+                placeholder="Namn eller avdelning – frivilligt"
+            >
 
 
-        <textarea
-            id="comment-text"
-            class="comment-input"
-            rows="3"
-            placeholder="Skriv en kommentar..."
-        ></textarea>
+            <textarea
+                id="comment-text"
+                class="comment-input"
+                rows="3"
+                placeholder="Vad säger fikabordet?"
+            ></textarea>
 
 
-        <button
-            class="btn"
-            onclick="addComment()"
-        >
-            Skicka kommentar
-        </button>
+            <button
+                class="btn btn-primary"
+                onclick="addComment()"
+            >
+                Skicka kommentar
+            </button>
 
 
-        <div id="comments-list">
+            <div id="comments-list">
+            </div>
+
         </div>
 
     </section>
@@ -1491,9 +2355,23 @@
 
     <section class="card">
 
-        <h3>
-            📜 Tidigare snackisar
-        </h3>
+
+        <div class="archive-header">
+
+            <div>
+
+                <h3>
+                    📜 Tidigare snackisar
+                </h3>
+
+
+                <p class="archive-subtitle">
+                    Missade du fikat? Här ligger de senaste ämnena kvar.
+                </p>
+
+            </div>
+
+        </div>
 
 
         <div
@@ -1502,6 +2380,7 @@
         >
             Hämtar tidigare snackisar...
         </div>
+
 
     </section>
 
@@ -1527,6 +2406,7 @@
                 alt=""
                 loading="lazy"
             >
+
 
             <span
                 class="visual-emoji"
@@ -1583,6 +2463,7 @@
                 alt=""
                 loading="lazy"
             >
+
 
             <span
                 class="visual-emoji"
@@ -1645,8 +2526,9 @@ window.currentLatestId =
 
 
 /* =====================================================
-   FALLBACK FIKATIPS
+   FALLBACK – SIDOINNEHÅLL
 ===================================================== */
+
 
 const fikaTips = [
 
@@ -1786,21 +2668,20 @@ const fikaFacts = [
 ];
 
 
-function safeArray(
-    value
-) {
+function safeArray(value) {
 
-    return Array.isArray(
-        value
-    )
+    return Array.isArray(value)
         ? value
         : [];
 }
 
 
-function cleanReaderText(
-    text
-) {
+/* =====================================================
+   TEXTTVÄTT
+===================================================== */
+
+
+function cleanReaderText(text) {
 
     if (!text) {
         return "";
@@ -1849,12 +2730,82 @@ function cleanReaderText(
 
 
 /* =====================================================
+   LÄSTID
+===================================================== */
+
+
+function calculateReadTime(article) {
+
+    const text = [
+
+        article?.summary,
+
+        ...safeArray(
+            article?.paragraphs
+        ),
+
+        ...safeArray(
+            article?.whyTalkAboutIt
+        )
+
+    ]
+        .filter(Boolean)
+        .join(" ");
+
+
+    const words =
+        text
+            .trim()
+            .split(/\s+/)
+            .filter(Boolean)
+            .length;
+
+
+    /*
+    Ungefär 200 ord/minut.
+
+    Kafferasten är korta texter,
+    så vi visar alltid minst 1 minut.
+    */
+
+    return Math.max(
+        1,
+        Math.ceil(
+            words / 200
+        )
+    );
+}
+
+
+function renderReadTime(
+    article
+) {
+
+    const minutes =
+        calculateReadTime(
+            article
+        );
+
+
+    document
+        .getElementById(
+            "read-time"
+        )
+        .textContent =
+            `☕ ${minutes} ${
+                minutes === 1
+                    ? "minuts"
+                    : "minuters"
+            } läsning`;
+}
+
+
+/* =====================================================
    SIDOINNEHÅLL
 ===================================================== */
 
-function hashString(
-    value
-) {
+
+function hashString(value) {
 
     let hash = 0;
 
@@ -1873,11 +2824,15 @@ function hashString(
 
         hash =
             (
-                (hash << 5) -
+                (
+                    hash << 5
+                )
+                -
                 hash
             )
             +
             text.charCodeAt(i);
+
 
         hash |= 0;
     }
@@ -1887,9 +2842,7 @@ function hashString(
 }
 
 
-function fallbackSidebar(
-    seed
-) {
+function fallbackSidebar(seed) {
 
     const base =
         hashString(seed);
@@ -1906,7 +2859,10 @@ function fallbackSidebar(
         fact:
             fikaFacts[
                 (
-                    base * 7 + 3
+                    base *
+                    7
+                    +
+                    3
                 )
                 %
                 fikaFacts.length
@@ -1915,12 +2871,11 @@ function fallbackSidebar(
 }
 
 
-function renderSidebar(
-    latest
-) {
+function renderSidebar(latest) {
 
     const sidebar =
-        latest.sidebarContent ||
+        latest.sidebarContent
+        ||
         fallbackSidebar(
             latest.id ||
             latest.article?.title
@@ -1928,6 +2883,7 @@ function renderSidebar(
 
 
     renderSideCard({
+
         item:
             sidebar.tip,
 
@@ -1952,6 +2908,7 @@ function renderSidebar(
 
 
     renderSideCard({
+
         item:
             sidebar.fact,
 
@@ -2037,13 +2994,17 @@ function renderSideCard({
 
 
     if (
-        photo?.provider ===
-            "pexels" &&
-        photo?.smallUrl
+        photo?.provider === "pexels"
+        &&
+        (
+            photo?.smallUrl ||
+            photo?.url
+        )
     ) {
 
         image.src =
-            photo.smallUrl;
+            photo.smallUrl ||
+            photo.url;
 
 
         image.alt =
@@ -2086,8 +3047,9 @@ function renderSideCard({
 
 
 /* =====================================================
-   FOTO-CREDIT
+   FOTO
 ===================================================== */
+
 
 function renderPhotoCredit(
     element,
@@ -2098,8 +3060,8 @@ function renderPhotoCredit(
 
 
     if (
-        photo?.provider !==
-            "pexels" ||
+        photo?.provider !== "pexels"
+        ||
         !photo.photographerName
     ) {
 
@@ -2184,10 +3146,6 @@ function renderPhotoCredit(
 }
 
 
-/* =====================================================
-   HERO
-===================================================== */
-
 function renderHero(
     latest,
     article
@@ -2209,9 +3167,7 @@ function renderHero(
         latest.heroImage;
 
 
-    if (
-        hero?.url
-    ) {
+    if (hero?.url) {
 
         image.src =
             hero.url;
@@ -2236,6 +3192,7 @@ function renderHero(
 /* =====================================================
    KÄLLOR
 ===================================================== */
+
 
 const SOURCE_NAMES = {
 
@@ -2284,6 +3241,18 @@ const SOURCE_NAMES = {
     "nytimes.com":
         "The New York Times",
 
+    "washingtonpost.com":
+        "The Washington Post",
+
+    "cbsnews.com":
+        "CBS News",
+
+    "nbcnews.com":
+        "NBC News",
+
+    "abcnews.go.com":
+        "ABC News",
+
     "people.com":
         "People",
 
@@ -2301,9 +3270,7 @@ const SOURCE_NAMES = {
 };
 
 
-function safeHttpUrl(
-    value
-) {
+function safeHttpUrl(value) {
 
     try {
 
@@ -2312,7 +3279,8 @@ function safeHttpUrl(
 
 
         if (
-            url.protocol === "https:" ||
+            url.protocol === "https:"
+            ||
             url.protocol === "http:"
         ) {
 
@@ -2322,6 +3290,7 @@ function safeHttpUrl(
 
         return null;
 
+
     } catch {
 
         return null;
@@ -2329,9 +3298,7 @@ function safeHttpUrl(
 }
 
 
-function sourceDomain(
-    url
-) {
+function sourceDomain(url) {
 
     try {
 
@@ -2343,6 +3310,7 @@ function sourceDomain(
                 ""
             );
 
+
     } catch {
 
         return "";
@@ -2350,9 +3318,7 @@ function sourceDomain(
 }
 
 
-function sourceDisplayName(
-    source
-) {
+function sourceDisplayName(source) {
 
     const domain =
         sourceDomain(
@@ -2401,14 +3367,17 @@ function sourceDisplayName(
 
     const title =
         cleanReaderText(
-            source.title || ""
+            source.title ||
+            ""
         );
 
 
     if (
-        title &&
-        title !== "Källa" &&
-        title.length <= 45
+        title
+        &&
+        title !== "Källa"
+        &&
+        title.length <= 48
     ) {
 
         return title;
@@ -2420,9 +3389,7 @@ function sourceDisplayName(
 }
 
 
-function renderSources(
-    sources
-) {
+function renderSources(sources) {
 
     const row =
         document.getElementById(
@@ -2436,7 +3403,8 @@ function renderSources(
         );
 
 
-    links.innerHTML = "";
+    links.innerHTML =
+        "";
 
 
     const valid =
@@ -2444,6 +3412,7 @@ function renderSources(
 
             .map(
                 source => ({
+
                     ...source,
 
                     safeUrl:
@@ -2547,13 +3516,13 @@ function renderSources(
    SKRIBENT
 ===================================================== */
 
-function bylineEmoji(
-    byline
-) {
+
+function bylineEmoji(byline) {
 
     if (
         byline === "Camille"
     ) {
+
         return "✨";
     }
 
@@ -2561,6 +3530,7 @@ function bylineEmoji(
     if (
         byline === "Bettan"
     ) {
+
         return "☕";
     }
 
@@ -2573,16 +3543,19 @@ function bylineEmoji(
    SENASTE ARTIKEL
 ===================================================== */
 
+
 async function loadLatestNews() {
 
     try {
 
         const response =
             await fetch(
-                "/.netlify/functions/latest-news?t=" +
+                "/.netlify/functions/latest-news?t="
+                +
                 Date.now(),
                 {
-                    cache: "no-store"
+                    cache:
+                        "no-store"
                 }
             );
 
@@ -2654,6 +3627,11 @@ async function loadLatestNews() {
                 );
 
 
+        renderReadTime(
+            article
+        );
+
+
         renderHero(
             latest,
             article
@@ -2692,6 +3670,7 @@ async function loadLatestNews() {
                     cleanReaderText(
                         article.summary
                     );
+
 
         } else {
 
@@ -2796,6 +3775,7 @@ async function loadLatestNews() {
                 );
             }
 
+
         } else {
 
             whyBox.style.display =
@@ -2839,6 +3819,7 @@ async function loadLatestNews() {
 
             bylineBox.style.display =
                 "flex";
+
 
         } else {
 
@@ -2912,11 +3893,20 @@ async function loadLatestNews() {
                 );
 
 
-                label.append(
-                    " " +
+                const text =
+                    document.createElement(
+                        "span"
+                    );
+
+
+                text.textContent =
                     cleanReaderText(
                         option
-                    )
+                    );
+
+
+                label.appendChild(
+                    text
                 );
 
 
@@ -2948,6 +3938,7 @@ async function loadLatestNews() {
    ARKIV
 ===================================================== */
 
+
 async function loadArchive() {
 
     const archiveList =
@@ -2960,13 +3951,22 @@ async function loadArchive() {
 
         const response =
             await fetch(
-                "/.netlify/functions/archive-news?t=" +
+                "/.netlify/functions/archive-news?t="
+                +
                 Date.now(),
                 {
                     cache:
                         "no-store"
                 }
             );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Arkivet svarade inte."
+            );
+        }
 
 
         const result =
@@ -2981,17 +3981,30 @@ async function loadArchive() {
             safeArray(
                 result.articles
             )
+
                 .filter(
                     item =>
-                        item &&
-                        item.article &&
+                        item
+                        &&
+                        item.article
+                        &&
                         item.id !==
-                            window.currentLatestId
+                        window.currentLatestId
                 )
+
                 .slice(
                     0,
                     5
                 );
+
+
+        if (!articles.length) {
+
+            archiveList.textContent =
+                "Inga äldre snackisar ännu.";
+
+            return;
+        }
 
 
         for (
@@ -3120,6 +4133,17 @@ async function loadArchive() {
                 )
             ) {
 
+                const cleaned =
+                    cleanReaderText(
+                        paragraph
+                    );
+
+
+                if (!cleaned) {
+                    continue;
+                }
+
+
                 const p =
                     document.createElement(
                         "p"
@@ -3127,9 +4151,7 @@ async function loadArchive() {
 
 
                 p.textContent =
-                    cleanReaderText(
-                        paragraph
-                    );
+                    cleaned;
 
 
                 content.appendChild(
@@ -3159,8 +4181,10 @@ async function loadArchive() {
 
 
                 signature.textContent =
-                    "Skrivet av " +
-                    byline +
+                    "Serverad av "
+                    +
+                    byline
+                    +
                     " ☕";
 
 
@@ -3197,6 +4221,7 @@ async function loadArchive() {
 /* =====================================================
    DATUM
 ===================================================== */
+
 
 function formatPublishedTime(
     isoDate
@@ -3268,9 +4293,8 @@ function formatArchiveDate(
    INTERAKTION
 ===================================================== */
 
-function voteThumb(
-    id
-) {
+
+function voteThumb(id) {
 
     if (
         votes[id]
@@ -3285,7 +4309,8 @@ function voteThumb(
 
     const element =
         document.getElementById(
-            "count-" + id
+            "count-" +
+            id
         );
 
 
@@ -3310,8 +4335,9 @@ async function copyLink() {
 
 
         alert(
-            "Länken är kopierad!"
+            "Länken är kopierad – skicka den till fikagänget! ☕"
         );
+
 
     } catch {
 
@@ -3384,7 +4410,7 @@ function addComment() {
     if (!text) {
 
         alert(
-            "Skriv en kommentar först!"
+            "Skriv vad fikabordet säger först!"
         );
 
         return;
@@ -3401,10 +4427,25 @@ function addComment() {
         "comment-item";
 
 
-    div.textContent =
-        name +
+    const strong =
+        document.createElement(
+            "strong"
+        );
+
+
+    strong.textContent =
+        name;
+
+
+    div.appendChild(
+        strong
+    );
+
+
+    div.append(
         ": " +
-        text;
+        text
+    );
 
 
     document
@@ -3416,14 +4457,19 @@ function addComment() {
         );
 
 
-    nameInput.value = "";
-    textInput.value = "";
+    nameInput.value =
+        "";
+
+
+    textInput.value =
+        "";
 }
 
 
 /* =====================================================
    START
 ===================================================== */
+
 
 async function startKafferasten() {
 
