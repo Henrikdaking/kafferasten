@@ -1,76 +1,20 @@
 import { getStore } from "@netlify/blobs";
 
 export default async () => {
-  const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
-  const CRON_SECRET = process.env.KAFFERASTEN_CRON_SECRET;
+  const OPENAI_API_KEY =
+    process.env.OPENAI_API_KEY;
 
-  const store = getStore("kafferasten-news");
+  const store =
+    getStore("kafferasten-news");
 
-  const now = new Date();
+  const now =
+    new Date();
 
-  const runId = createRunId(now);
+  const runId =
+    createRunId(now);
 
   const nowInSweden =
     formatSwedishDateTime(now);
-
-
-  // =====================================================
-  // KOSTNADSSKYDD
-  // =====================================================
-  //
-  // Generatorn får bara startas av vår egen
-  // schedule-news eller ett manuellt anrop som
-  // skickar rätt hemlighet.
-  // =====================================================
-
-  if (!CRON_SECRET) {
-    await saveGenerationStatus(
-      store,
-      {
-        runId,
-        status: "error",
-        stage: "security-config",
-        message:
-          "KAFFERASTEN_CRON_SECRET saknas i Netlify.",
-        startedAt:
-          now.toISOString(),
-        updatedAt:
-          new Date().toISOString(),
-        swedishTime:
-          nowInSweden
-      }
-    );
-
-    return jsonResponse(
-      {
-        success: false,
-        error:
-          "KAFFERASTEN_CRON_SECRET saknas i Netlify"
-      },
-      500
-    );
-  }
-
-
-  const authorization =
-    request.headers.get(
-      "authorization"
-    ) || "";
-
-
-  if (
-    authorization !==
-    `Bearer ${CRON_SECRET}`
-  ) {
-    return jsonResponse(
-      {
-        success: false,
-        error:
-          "Inte behörig att starta nyhetsgenereringen."
-      },
-      401
-    );
-  }
 
 
   // =====================================================
@@ -130,9 +74,7 @@ export default async () => {
 
   let generationLock;
 
-
   try {
-
     await saveGenerationStatus(
       store,
       {
@@ -150,7 +92,6 @@ export default async () => {
       }
     );
 
-
     generationLock =
       await acquireGenerationLock(
         store,
@@ -158,10 +99,7 @@ export default async () => {
         runId
       );
 
-
-    if (
-      !generationLock.acquired
-    ) {
+    if (!generationLock.acquired) {
       await saveGenerationStatus(
         store,
         {
@@ -185,7 +123,6 @@ export default async () => {
         }
       );
 
-
       return jsonResponse(
         {
           success: false,
@@ -200,7 +137,6 @@ export default async () => {
         409
       );
     }
-
 
     await saveGenerationStatus(
       store,
@@ -219,9 +155,7 @@ export default async () => {
       }
     );
 
-
   } catch (error) {
-
     await saveGenerationStatus(
       store,
       {
@@ -240,7 +174,6 @@ export default async () => {
           nowInSweden
       }
     );
-
 
     return jsonResponse(
       {
@@ -279,7 +212,6 @@ export default async () => {
       }
     );
 
-
     const recentHistory =
       await loadRecentHistory({
         store,
@@ -288,12 +220,10 @@ export default async () => {
         limit: 20
       });
 
-
     const recentTopicsForPrompt =
       formatRecentTopicsForPrompt(
         recentHistory
       );
-
 
     await saveGenerationStatus(
       store,
@@ -314,20 +244,15 @@ export default async () => {
       }
     );
 
-
     const totalUsage = {
       research1: null,
       verification1: null,
-
       research2: null,
       verification2: null,
-
       research3: null,
       verification3: null,
-
       writing: null
     };
-
 
     let rejectedTopic = "";
 
@@ -367,7 +292,6 @@ export default async () => {
         }
       );
 
-
       const research =
         await callOpenAI({
           apiKey:
@@ -394,10 +318,8 @@ export default async () => {
                 user_location: {
                   type:
                     "approximate",
-
                   country:
                     "SE",
-
                   timezone:
                     "Europe/Stockholm"
                 }
@@ -536,7 +458,6 @@ Använd källhänvisningar.
 
 
       if (!research.ok) {
-
         await saveGenerationStatus(
           store,
           {
@@ -562,7 +483,6 @@ Använd källhänvisningar.
           }
         );
 
-
         return jsonResponse(
           {
             success: false,
@@ -583,17 +503,14 @@ Använd källhänvisningar.
         research.data.usage ||
         null;
 
-
       const researchPart =
         getOutputTextPart(
           research.data
         );
 
-
       const researchText =
         researchPart?.text ||
         "";
-
 
       const researchSources =
         filterAllowedSources(
@@ -614,7 +531,6 @@ Använd källhänvisningar.
             "TON"
           )
         );
-
 
       const byline =
         chooseByline(
@@ -679,10 +595,8 @@ Använd källhänvisningar.
                 user_location: {
                   type:
                     "approximate",
-
                   country:
                     "SE",
-
                   timezone:
                     "Europe/Stockholm"
                 }
@@ -752,7 +666,6 @@ Använd källhänvisningar.
 
 
       if (!verification.ok) {
-
         await saveGenerationStatus(
           store,
           {
@@ -778,7 +691,6 @@ Använd källhänvisningar.
           }
         );
 
-
         return jsonResponse(
           {
             success: false,
@@ -799,17 +711,14 @@ Använd källhänvisningar.
         verification.data.usage ||
         null;
 
-
       const verificationPart =
         getOutputTextPart(
           verification.data
         );
 
-
       const verificationText =
         verificationPart?.text ||
         "";
-
 
       const verificationSources =
         filterAllowedSources(
@@ -818,18 +727,15 @@ Använd källhänvisningar.
           )
         );
 
-
       const saysCurrent =
         /AKTUELL:\s*JA/i.test(
           verificationText
         );
 
-
       const triggerDate =
         extractTriggerDate(
           verificationText
         );
-
 
       const triggerDescription =
         extractField(
@@ -837,19 +743,16 @@ Använd källhänvisningar.
           "TRIGGER"
         );
 
-
       const allSources =
         dedupeSources([
           ...researchSources,
           ...verificationSources
         ]);
 
-
       const independentSources =
         getDistinctDomainSources(
           allSources
         );
-
 
       const triggerIsFresh =
         triggerDate &&
@@ -905,10 +808,8 @@ Använd källhänvisningar.
         !triggerIsFresh ||
         independentSources.length < 1
       ) {
-
         rejectedTopic =
           researchText;
-
 
         await saveGenerationStatus(
           store,
@@ -942,13 +843,11 @@ Använd källhänvisningar.
           }
         );
 
-
         if (
           candidateAttempt < 3
         ) {
           continue;
         }
-
 
         return jsonResponse(
           {
@@ -978,7 +877,6 @@ Använd källhänvisningar.
           0,
           3
         );
-
 
       const verifiedTrigger = {
         description:
@@ -1019,10 +917,8 @@ Använd källhänvisningar.
       if (
         duplicateCandidate
       ) {
-
         rejectedTopic =
           `Dubblett mot tidigare publicering: "${duplicateCandidate.title}". Välj ett helt annat ämne.`;
-
 
         await saveGenerationStatus(
           store,
@@ -1048,13 +944,11 @@ Använd källhänvisningar.
           }
         );
 
-
         if (
           candidateAttempt < 3
         ) {
           continue;
         }
-
 
         return jsonResponse(
           {
@@ -1240,7 +1134,6 @@ imageStyle:
                     false,
 
                   properties: {
-
                     title: {
                       type:
                         "string"
@@ -1279,13 +1172,10 @@ imageStyle:
                     paragraphs: {
                       type:
                         "array",
-
                       minItems:
                         2,
-
                       maxItems:
                         3,
-
                       items: {
                         type:
                           "string"
@@ -1295,13 +1185,10 @@ imageStyle:
                     whyTalkAboutIt: {
                       type:
                         "array",
-
                       minItems:
                         2,
-
                       maxItems:
                         3,
-
                       items: {
                         type:
                           "string"
@@ -1316,13 +1203,10 @@ imageStyle:
                     pollOptions: {
                       type:
                         "array",
-
                       minItems:
                         2,
-
                       maxItems:
                         2,
-
                       items: {
                         type:
                           "string"
@@ -1380,7 +1264,6 @@ imageStyle:
       if (
         !writing.ok
       ) {
-
         await saveGenerationStatus(
           store,
           {
@@ -1404,7 +1287,6 @@ imageStyle:
           }
         );
 
-
         return jsonResponse(
           {
             success: false,
@@ -1422,27 +1304,21 @@ imageStyle:
         writing.data.usage ||
         null;
 
-
       const writingPart =
         getOutputTextPart(
           writing.data
         );
 
-
       let article;
 
-
       try {
-
         article =
           JSON.parse(
             writingPart?.text ||
             ""
           );
 
-
       } catch (error) {
-
         await saveGenerationStatus(
           store,
           {
@@ -1470,7 +1346,6 @@ imageStyle:
               nowInSweden
           }
         );
-
 
         return jsonResponse(
           {
@@ -1525,10 +1400,8 @@ imageStyle:
       if (
         duplicateArticle
       ) {
-
         rejectedTopic =
           `Den färdiga artikeln blev för lik "${duplicateArticle.title}". Välj ett helt annat ämne.`;
-
 
         await saveGenerationStatus(
           store,
@@ -1557,13 +1430,11 @@ imageStyle:
           }
         );
 
-
         if (
           candidateAttempt < 3
         ) {
           continue;
         }
-
 
         return jsonResponse(
           {
@@ -1589,9 +1460,7 @@ imageStyle:
           new Date()
         );
 
-
       const savedNews = {
-
         id:
           articleId,
 
@@ -1659,7 +1528,6 @@ imageStyle:
       if (
         previousLatest?.id
       ) {
-
         await store.setJSON(
           `archive/${previousLatest.id}`,
           previousLatest
@@ -1690,7 +1558,6 @@ imageStyle:
         confirmation.id !==
           articleId
       ) {
-
         await saveGenerationStatus(
           store,
           {
@@ -1715,7 +1582,6 @@ imageStyle:
               nowInSweden
           }
         );
-
 
         return jsonResponse(
           {
@@ -1836,7 +1702,6 @@ imageStyle:
       }
     );
 
-
     return jsonResponse(
       {
         success: false,
@@ -1848,7 +1713,6 @@ imageStyle:
 
 
   } catch (error) {
-
     await saveGenerationStatus(
       store,
       {
@@ -1876,7 +1740,6 @@ imageStyle:
       }
     );
 
-
     return jsonResponse(
       {
         success: false,
@@ -1894,7 +1757,6 @@ imageStyle:
     if (
       generationLock?.token
     ) {
-
       await releaseGenerationLock(
         store,
         generationLock.token
@@ -1912,17 +1774,12 @@ async function saveGenerationStatus(
   store,
   data
 ) {
-
   try {
-
     await store.setJSON(
       "_diagnostics/generation-status",
       data
     );
-
-
   } catch (error) {
-
     console.error(
       "Kunde inte spara generation-status:",
       error
@@ -1940,16 +1797,13 @@ async function acquireGenerationLock(
   now,
   runId
 ) {
-
   const key =
     "_locks/generate-news";
-
 
   const staleAfterMs =
     20 *
     60 *
     1000;
-
 
   const existing =
     await store.get(
@@ -1960,21 +1814,17 @@ async function acquireGenerationLock(
       }
     );
 
-
   if (
     existing?.startedAt
   ) {
-
     const started =
       new Date(
         existing.startedAt
       );
 
-
     const age =
       now.getTime() -
       started.getTime();
-
 
     if (
       Number.isFinite(
@@ -1984,7 +1834,6 @@ async function acquireGenerationLock(
       age <
         staleAfterMs
     ) {
-
       return {
         acquired: false,
         startedAt:
@@ -1995,41 +1844,34 @@ async function acquireGenerationLock(
       };
     }
 
-
     await store.delete(
       key
     );
   }
-
 
   const token =
     `${now.getTime()}-${Math.random()
       .toString(36)
       .slice(2)}`;
 
-
   const result =
     await store.setJSON(
       key,
-
       {
         token,
         runId,
         startedAt:
           now.toISOString()
       },
-
       {
         onlyIfNew:
           true
       }
     );
 
-
   if (
     !result.modified
   ) {
-
     const current =
       await store.get(
         key,
@@ -2038,7 +1880,6 @@ async function acquireGenerationLock(
           consistency: "strong"
         }
       );
-
 
     return {
       acquired: false,
@@ -2050,7 +1891,6 @@ async function acquireGenerationLock(
         null
     };
   }
-
 
   return {
     acquired: true,
@@ -2066,38 +1906,30 @@ async function releaseGenerationLock(
   store,
   token
 ) {
-
   if (!token) {
     return;
   }
 
-
   try {
-
     const current =
       await store.get(
         "_locks/generate-news",
-
         {
           type: "json",
           consistency: "strong"
         }
       );
 
-
     if (
       current?.token ===
       token
     ) {
-
       await store.delete(
         "_locks/generate-news"
       );
     }
 
-
   } catch (error) {
-
     console.error(
       "Kunde inte släppa körlåset:",
       error
@@ -2116,14 +1948,11 @@ async function loadRecentHistory({
   days,
   limit
 }) {
-
   const result =
     [];
 
-
   const seenIds =
     new Set();
-
 
   const latest =
     await store.get(
@@ -2134,11 +1963,9 @@ async function loadRecentHistory({
       }
     );
 
-
   if (
     latest?.id
   ) {
-
     result.push(
       latest
     );
@@ -2148,13 +1975,11 @@ async function loadRecentHistory({
     );
   }
 
-
   const listing =
     await store.list({
       prefix:
         "archive/"
     });
-
 
   const archiveKeys =
     (
@@ -2172,12 +1997,10 @@ async function loadRecentHistory({
         50
       );
 
-
   for (
     const key
     of archiveKeys
   ) {
-
     if (
       result.length >=
       limit
@@ -2185,9 +2008,7 @@ async function loadRecentHistory({
       break;
     }
 
-
     try {
-
       const item =
         await store.get(
           key,
@@ -2196,7 +2017,6 @@ async function loadRecentHistory({
             consistency: "strong"
           }
         );
-
 
       if (
         !item?.id ||
@@ -2207,7 +2027,6 @@ async function loadRecentHistory({
         continue;
       }
 
-
       if (
         isWithinDays(
           item.createdAt,
@@ -2215,7 +2034,6 @@ async function loadRecentHistory({
           days
         )
       ) {
-
         result.push(
           item
         );
@@ -2225,9 +2043,7 @@ async function loadRecentHistory({
         );
       }
 
-
     } catch (error) {
-
       console.warn(
         "Kunde inte läsa arkivpost:",
         key,
@@ -2235,7 +2051,6 @@ async function loadRecentHistory({
       );
     }
   }
-
 
   return result
     .sort(
@@ -2266,13 +2081,11 @@ async function loadRecentHistory({
 function formatRecentTopicsForPrompt(
   history
 ) {
-
   if (
     !history.length
   ) {
     return "";
   }
-
 
   return history
     .slice(
@@ -2290,7 +2103,6 @@ function formatRecentTopicsForPrompt(
             ?.title ||
           "Okänd rubrik";
 
-
         const trigger =
           item.verifiedTrigger
             ?.description ||
@@ -2298,14 +2110,12 @@ function formatRecentTopicsForPrompt(
             ?.freshTrigger ||
           "";
 
-
         const date =
           item.verifiedTrigger
             ?.date ||
           item.article
             ?.triggerDate ||
           "";
-
 
         return (
           `${index + 1}. ${title}` +
@@ -2335,7 +2145,6 @@ function formatRecentTopicsForPrompt(
 function normalizeEditorialTone(
   value
 ) {
-
   const normalized =
     String(
       value ||
@@ -2343,7 +2152,6 @@ function normalizeEditorialTone(
     )
       .trim()
       .toUpperCase();
-
 
   if (
     normalized.includes(
@@ -2353,7 +2161,6 @@ function normalizeEditorialTone(
     return "UNGDOMLIG";
   }
 
-
   if (
     normalized.includes(
       "KLASSISK"
@@ -2362,7 +2169,6 @@ function normalizeEditorialTone(
     return "KLASSISK";
   }
 
-
   return "BRED";
 }
 
@@ -2370,14 +2176,12 @@ function normalizeEditorialTone(
 function chooseByline(
   editorialTone
 ) {
-
   if (
     editorialTone ===
     "UNGDOMLIG"
   ) {
     return "Camille";
   }
-
 
   return Math.random() <
     0.5
@@ -2389,12 +2193,10 @@ function chooseByline(
 function writerVoice(
   byline
 ) {
-
   if (
     byline ===
     "Camille"
   ) {
-
     return `
 Camille är snabb, samtida och popkulturellt nyfiken.
 Hon kan vara lekfull och pigg, men använder naturlig svenska.
@@ -2402,12 +2204,10 @@ Hon tvingar aldrig in ungdomsslang eller engelska uttryck.
 `;
   }
 
-
   if (
     byline ===
     "Bettan"
   ) {
-
     return `
 Bettan är varm, kvick och vardagsnära.
 Hon ser gärna den mänskliga eller småroliga detaljen
@@ -2415,7 +2215,6 @@ som gör att folk börjar prata.
 Hon blir aldrig hurtig eller tillgjord.
 `;
   }
-
 
   return `
 Kent på Kafferasten är nyfiken, torrt smårolig och lite klurig.
@@ -2433,12 +2232,10 @@ function findDuplicateMatch({
   candidateText,
   history
 }) {
-
   const candidate =
     buildTopicTokens(
       candidateText
     );
-
 
   if (
     !candidate.size
@@ -2446,12 +2243,10 @@ function findDuplicateMatch({
     return null;
   }
 
-
   for (
     const item
     of history
   ) {
-
     const previousText = [
       item.article
         ?.title,
@@ -2468,19 +2263,16 @@ function findDuplicateMatch({
       .filter(Boolean)
       .join("\n");
 
-
     const previous =
       buildTopicTokens(
         previousText
       );
-
 
     if (
       !previous.size
     ) {
       continue;
     }
-
 
     const intersection =
       [
@@ -2493,13 +2285,11 @@ function findDuplicateMatch({
             )
         );
 
-
     const union =
       new Set([
         ...candidate,
         ...previous
       ]);
-
 
     const jaccard =
       union.size
@@ -2507,14 +2297,12 @@ function findDuplicateMatch({
           union.size
         : 0;
 
-
     const containment =
       intersection.length /
       Math.min(
         candidate.size,
         previous.size
       );
-
 
     const hasRareExactToken =
       intersection.some(
@@ -2525,7 +2313,6 @@ function findDuplicateMatch({
           )
       );
 
-
     const looksDuplicate =
       (
         intersection.length >= 2 &&
@@ -2534,11 +2321,9 @@ function findDuplicateMatch({
       jaccard >= 0.28 ||
       hasRareExactToken;
 
-
     if (
       looksDuplicate
     ) {
-
       return {
         id:
           item.id ||
@@ -2572,7 +2357,6 @@ function findDuplicateMatch({
       };
     }
   }
-
 
   return null;
 }
@@ -2675,16 +2459,12 @@ const GENERIC_TOPIC_WORDS =
 function buildTopicTokens(
   text
 ) {
-
   return new Set(
-
     normalizeTopicText(
       text
     )
       .split(" ")
-
       .filter(Boolean)
-
       .filter(
         token =>
           token.length >= 3 &&
@@ -2702,32 +2482,26 @@ function buildTopicTokens(
 function normalizeTopicText(
   text
 ) {
-
   return String(
     text ||
     ""
   )
     .toLowerCase()
-
     .normalize(
       "NFD"
     )
-
     .replace(
       /[\u0300-\u036f]/g,
       ""
     )
-
     .replace(
       /[^a-z0-9åäö]+/gi,
       " "
     )
-
     .replace(
       /\s+/g,
       " "
     )
-
     .trim();
 }
 
@@ -2741,17 +2515,14 @@ function isWithinDays(
   now,
   days
 ) {
-
   if (!isoDate) {
     return true;
   }
-
 
   const date =
     new Date(
       isoDate
     );
-
 
   if (
     Number.isNaN(
@@ -2761,11 +2532,9 @@ function isWithinDays(
     return true;
   }
 
-
   const age =
     now.getTime() -
     date.getTime();
-
 
   return (
     age >= 0 &&
@@ -2787,11 +2556,9 @@ async function callOpenAI({
   apiKey,
   body
 }) {
-
   const response =
     await fetch(
       "https://api.openai.com/v1/responses",
-
       {
         method:
           "POST",
@@ -2811,24 +2578,18 @@ async function callOpenAI({
       }
     );
 
-
   let data;
 
-
   try {
-
     data =
       await response.json();
 
-
   } catch {
-
     data = {
       error:
         "OpenAI-svaret kunde inte läsas som JSON."
     };
   }
-
 
   return {
     ok:
@@ -2849,7 +2610,6 @@ async function callOpenAI({
 function getOutputTextPart(
   data
 ) {
-
   const message =
     data.output
       ?.find(
@@ -2857,7 +2617,6 @@ function getOutputTextPart(
           item.type ===
           "message"
       );
-
 
   return message
     ?.content
@@ -2876,17 +2635,14 @@ function getOutputTextPart(
 function extractCitedSources(
   textPart
 ) {
-
   return (
     textPart
       ?.annotations
-
       ?.filter(
         annotation =>
           annotation.type ===
           "url_citation"
       )
-
       ?.map(
         annotation => ({
           title:
@@ -2897,12 +2653,10 @@ function extractCitedSources(
             annotation.url
         })
       )
-
       ?.filter(
         source =>
           source.url
       ) ||
-
     []
   );
 }
@@ -2911,19 +2665,15 @@ function extractCitedSources(
 function filterAllowedSources(
   sources
 ) {
-
   return sources.filter(
     source => {
-
       try {
-
         const hostname =
           new URL(
             source.url
           )
             .hostname
             .toLowerCase();
-
 
         if (
           hostname ===
@@ -2932,16 +2682,12 @@ function filterAllowedSources(
             ".reddit.com"
           )
         ) {
-
           return false;
         }
 
-
         return true;
 
-
       } catch {
-
         return false;
       }
     }
@@ -2952,7 +2698,6 @@ function filterAllowedSources(
 function dedupeSources(
   sources
 ) {
-
   return sources.filter(
     (
       source,
@@ -2976,9 +2721,7 @@ function dedupeSources(
 function getDomain(
   url
 ) {
-
   try {
-
     const hostname =
       new URL(
         url
@@ -2990,12 +2733,10 @@ function getDomain(
           ""
         );
 
-
     const parts =
       hostname.split(
         "."
       );
-
 
     const twoPartSuffixes =
       [
@@ -3004,7 +2745,6 @@ function getDomain(
         "co.nz",
         "co.jp"
       ];
-
 
     const lastTwo =
       parts
@@ -3015,14 +2755,12 @@ function getDomain(
           "."
         );
 
-
     if (
       parts.length >= 3 &&
       twoPartSuffixes.includes(
         lastTwo
       )
     ) {
-
       return parts
         .slice(
           -3
@@ -3032,20 +2770,15 @@ function getDomain(
         );
     }
 
-
     if (
       parts.length >= 2
     ) {
-
       return lastTwo;
     }
 
-
     return hostname;
 
-
   } catch {
-
     return null;
   }
 }
@@ -3054,25 +2787,20 @@ function getDomain(
 function getDistinctDomainSources(
   sources
 ) {
-
   const seenDomains =
     new Set();
 
-
   const result =
     [];
-
 
   for (
     const source
     of sources
   ) {
-
     const domain =
       getDomain(
         source.url
       );
-
 
     if (
       !domain ||
@@ -3080,21 +2808,17 @@ function getDistinctDomainSources(
         domain
       )
     ) {
-
       continue;
     }
-
 
     seenDomains.add(
       domain
     );
 
-
     result.push(
       source
     );
   }
-
 
   return result;
 }
@@ -3107,12 +2831,10 @@ function getDistinctDomainSources(
 function extractTriggerDate(
   text
 ) {
-
   const match =
     text.match(
       /TRIGGERDATUM:\s*(\d{4}-\d{2}-\d{2})/i
     );
-
 
   return match
     ? match[1]
@@ -3124,19 +2846,16 @@ function extractField(
   text,
   fieldName
 ) {
-
   const regex =
     new RegExp(
       `${fieldName}:\\s*([^\\n]+)`,
       "i"
     );
 
-
   const match =
     text.match(
       regex
     );
-
 
   return match
     ? match[1].trim()
@@ -3153,19 +2872,15 @@ function isFreshDate(
   now,
   hours
 ) {
-
   try {
-
     const trigger =
       new Date(
         `${dateString}T23:59:59Z`
       );
 
-
     const difference =
       now.getTime() -
       trigger.getTime();
-
 
     const maxAge =
       hours *
@@ -3173,11 +2888,9 @@ function isFreshDate(
       60 *
       1000;
 
-
     return (
       difference <=
         maxAge &&
-
       difference >
         -(
           24 *
@@ -3187,9 +2900,7 @@ function isFreshDate(
         )
     );
 
-
   } catch {
-
     return false;
   }
 }
@@ -3202,11 +2913,9 @@ function isFreshDate(
 function createArticleId(
   date
 ) {
-
   const formatter =
     new Intl.DateTimeFormat(
       "sv-SE",
-
       {
         timeZone:
           "Europe/Stockholm",
@@ -3234,7 +2943,6 @@ function createArticleId(
       }
     );
 
-
   return formatter
     .format(
       date
@@ -3249,7 +2957,6 @@ function createArticleId(
 function createRunId(
   date
 ) {
-
   return (
     createArticleId(
       date
@@ -3270,10 +2977,8 @@ function createRunId(
 function formatSwedishDateTime(
   date
 ) {
-
   return new Intl.DateTimeFormat(
     "sv-SE",
-
     {
       timeZone:
         "Europe/Stockholm",
@@ -3298,26 +3003,21 @@ function formatSwedishDateTime(
 function simplifyError(
   data
 ) {
-
   if (!data) {
     return null;
   }
-
 
   if (
     typeof data ===
     "string"
   ) {
-
     return data.slice(
       0,
       1500
     );
   }
 
-
   try {
-
     return JSON.stringify(
       data.error ||
       data
@@ -3327,9 +3027,7 @@ function simplifyError(
         1500
       );
 
-
   } catch {
-
     return "Okänt fel";
   }
 }
@@ -3342,12 +3040,10 @@ function simplifyError(
 function calculateTotalTokens(
   usageObject
 ) {
-
   return Object.values(
     usageObject
   )
     .filter(Boolean)
-
     .reduce(
       (
         sum,
@@ -3358,7 +3054,6 @@ function calculateTotalTokens(
           usage.total_tokens ||
           0
         ),
-
       0
     );
 }
@@ -3372,14 +3067,12 @@ function jsonResponse(
   data,
   status = 200
 ) {
-
   return new Response(
     JSON.stringify(
       data,
       null,
       2
     ),
-
     {
       status,
 
