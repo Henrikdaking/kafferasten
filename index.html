@@ -684,18 +684,12 @@
                 "Times New Roman",
                 serif;
 
-            font-size: 1.08rem;
+            font-size: 1.06rem;
 
-            line-height: 1.72;
+            line-height: 1.7;
 
             margin:
-                0 0 1.3rem;
-        }
-
-
-        .article-content p:first-child::first-letter {
-
-            font-size: 1.15em;
+                0 0 1.25rem;
         }
 
 
@@ -865,18 +859,6 @@
             font-weight: 750;
 
             text-decoration: none;
-
-            transition:
-                color 0.18s ease;
-        }
-
-
-        .source-link:hover {
-
-            color:
-                var(--accent-hover);
-
-            text-decoration: underline;
         }
 
 
@@ -888,19 +870,19 @@
 
 
         /* ==================================================
-           FEEDBACK
+           FEEDBACK - KOMPAKTARE
         ================================================== */
 
 
         .feedback {
 
             margin-top:
-                1.45rem;
+                1.15rem;
 
             padding:
-                1.25rem;
+                1rem 1.05rem;
 
-            border-radius: 15px;
+            border-radius: 14px;
 
             background:
                 #FBF8F4;
@@ -916,9 +898,9 @@
             display: block;
 
             margin-bottom:
-                0.72rem;
+                0.55rem;
 
-            font-size: 0.98rem;
+            font-size: 0.94rem;
 
             color:
                 var(--primary-color);
@@ -929,7 +911,7 @@
 
             display: flex;
 
-            gap: 0.55rem;
+            gap: 0.45rem;
 
             flex-wrap: wrap;
         }
@@ -950,28 +932,13 @@
                 var(--text-color);
 
             padding:
-                0.68rem 1rem;
+                0.58rem 0.85rem;
 
-            border-radius: 11px;
+            border-radius: 10px;
 
             cursor: pointer;
 
             font-weight: 700;
-
-            transition:
-                transform 0.15s ease,
-                background 0.15s ease,
-                border-color 0.15s ease;
-        }
-
-
-        .btn:hover {
-
-            transform:
-                translateY(-1px);
-
-            background:
-                #FFF;
         }
 
 
@@ -987,16 +954,6 @@
         }
 
 
-        .btn-primary:hover {
-
-            background:
-                var(--accent-hover);
-
-            border-color:
-                var(--accent-hover);
-        }
-
-
         .share-row {
 
             display: flex;
@@ -1009,10 +966,10 @@
             gap: 0.75rem;
 
             margin-top:
-                1.1rem;
+                0.8rem;
 
             padding-top:
-                0.9rem;
+                0.72rem;
 
             border-top:
                 1px solid
@@ -1024,7 +981,7 @@
 
             margin: 0;
 
-            font-size: 0.83rem;
+            font-size: 0.79rem;
 
             color:
                 var(--text-muted);
@@ -1124,19 +1081,6 @@
                 var(--border-color);
 
             cursor: pointer;
-
-            transition:
-                border-color 0.15s ease,
-                background 0.15s ease;
-        }
-
-
-        .poll-option:hover {
-
-            background: white;
-
-            border-color:
-                #CDB9A9;
         }
 
 
@@ -1225,21 +1169,6 @@
 
             color:
                 var(--text-color);
-
-            outline: none;
-
-            transition:
-                border-color 0.15s ease,
-                background 0.15s ease;
-        }
-
-
-        .comment-input:focus {
-
-            border-color:
-                var(--accent-color);
-
-            background: white;
         }
 
 
@@ -1277,19 +1206,6 @@
         .sidebar-card {
 
             overflow: hidden;
-
-            transition:
-                transform 0.18s ease;
-        }
-
-
-        @media (hover:hover) {
-
-            .sidebar-card:hover {
-
-                transform:
-                    translateY(-2px);
-            }
         }
 
 
@@ -1384,21 +1300,11 @@
 
 
         /* ==================================================
-           ARKIV
+           ARKIV - KOMPAKT
         ================================================== */
 
 
         .archive-header {
-
-            display: flex;
-
-            justify-content:
-                space-between;
-
-            align-items:
-                flex-end;
-
-            gap: 1rem;
 
             margin-bottom:
                 1rem;
@@ -1433,8 +1339,6 @@
 
         .archive-item {
 
-            position: relative;
-
             background:
                 #FBF8F4;
 
@@ -1444,41 +1348,8 @@
 
             border-radius: 13px;
 
-            overflow: hidden;
-
-            transition:
-                transform 0.15s ease,
-                border-color 0.15s ease,
-                background 0.15s ease;
-        }
-
-
-        .archive-item:hover {
-
-            transform:
-                translateY(-1px);
-
-            border-color:
-                #D2BFAF;
-
-            background:
-                white;
-        }
-
-
-        .archive-item summary {
-
-            list-style: none;
-
-            cursor: pointer;
-
             padding:
                 1rem 1.05rem;
-        }
-
-
-        .archive-item summary::-webkit-details-marker {
-            display: none;
         }
 
 
@@ -1545,50 +1416,114 @@
             font-size: 0.8rem;
 
             font-weight: 800;
+
+            background: none;
+
+            border: 0;
+
+            padding: 0;
+
+            cursor: pointer;
         }
 
 
-        details[open]
-        .archive-open {
+        /* ==================================================
+           ARKIVLÄSARE
+        ================================================== */
+
+
+        .archive-reader {
 
             display: none;
-        }
 
-
-        .archive-content {
+            margin-top: 1rem;
 
             padding:
-                0 1.05rem 1.05rem;
+                1.2rem;
 
-            border-top:
+            background:
+                #FFFDFC;
+
+            border:
                 1px solid
                 var(--border-color);
+
+            border-radius: 14px;
         }
 
 
-        .archive-content p {
+        .archive-reader.is-open {
+            display: block;
+        }
+
+
+        .archive-reader h4 {
+
+            margin:
+                0 0 0.7rem;
 
             font-family:
                 Georgia,
                 "Times New Roman",
                 serif;
 
-            font-size: 0.94rem;
+            font-size: 1.25rem;
+
+            line-height: 1.25;
+
+            color:
+                var(--primary-color);
+        }
+
+
+        .archive-reader p {
+
+            font-family:
+                Georgia,
+                "Times New Roman",
+                serif;
+
+            font-size: 0.95rem;
 
             line-height: 1.6;
         }
 
 
-        .archive-byline {
+        .archive-reader-meta {
 
-            margin-top: 0.8rem;
+            margin-bottom:
+                0.45rem;
+
+            color:
+                var(--accent-color);
+
+            font-size: 0.72rem;
+
+            font-weight: 800;
+
+            text-transform: uppercase;
+        }
+
+
+        .archive-reader-byline {
+
+            margin-top:
+                0.8rem;
 
             color:
                 var(--text-muted);
 
-            font-size: 0.78rem;
+            font-size:
+                0.78rem;
 
             font-style: italic;
+        }
+
+
+        .archive-close {
+
+            margin-top:
+                0.8rem;
         }
 
 
@@ -1639,41 +1574,14 @@
             }
 
 
-            .brand {
-
-                gap:
-                    0.55rem;
-            }
-
-
             .brand h1 {
 
                 font-size:
                     1.95rem;
-
-                letter-spacing:
-                    -0.7px;
-            }
-
-
-            .coffee-mark {
-
-                width: 36px;
-                height: 43px;
-            }
-
-
-            .coffee-cup {
-
-                font-size:
-                    1.75rem;
             }
 
 
             header p {
-
-                margin-top:
-                    0.55rem;
 
                 font-size:
                     0.86rem;
@@ -1733,15 +1641,6 @@
 
                 margin-bottom:
                     0.9rem;
-
-                box-shadow:
-                    0 6px 20px
-                    rgba(
-                        45,
-                        26,
-                        23,
-                        0.045
-                    );
             }
 
 
@@ -1772,13 +1671,13 @@
             h2 {
 
                 font-size:
-                    1.78rem;
+                    1.72rem;
 
                 line-height:
                     1.12;
 
                 letter-spacing:
-                    -0.45px;
+                    -0.4px;
 
                 margin-bottom:
                     0.95rem;
@@ -1801,60 +1700,56 @@
             .summary-box {
 
                 margin:
-                    1rem 0 1.25rem;
+                    1rem 0 1.2rem;
 
                 padding:
-                    0.95rem 1rem;
+                    0.92rem 1rem;
 
                 font-size:
-                    0.95rem;
+                    0.92rem;
             }
 
 
             .article-content p {
 
                 font-size:
-                    1.025rem;
+                    0.97rem;
 
                 line-height:
-                    1.68;
+                    1.62;
 
                 margin-bottom:
-                    1.15rem;
+                    1.08rem;
             }
 
 
             .why-box {
 
                 margin:
-                    1.25rem 0;
+                    1.2rem 0;
 
                 padding:
-                    1rem;
-            }
-
-
-            .why-box li {
-
-                margin-bottom:
-                    0.43rem;
-            }
-
-
-            .article-meta-box {
-
-                margin-top:
-                    1.3rem;
+                    0.95rem 1rem;
             }
 
 
             .feedback {
 
                 padding:
-                    1rem;
+                    0.85rem;
 
                 margin-top:
-                    1.2rem;
+                    1rem;
+            }
+
+
+            .feedback-title {
+
+                margin-bottom:
+                    0.45rem;
+
+                font-size:
+                    0.9rem;
             }
 
 
@@ -1864,23 +1759,36 @@
 
                 grid-template-columns:
                     1fr 1fr;
+
+                gap:
+                    0.4rem;
             }
 
 
             .btn {
 
                 padding:
-                    0.68rem 0.7rem;
+                    0.56rem 0.6rem;
 
                 font-size:
-                    0.85rem;
+                    0.8rem;
             }
 
 
             .share-row {
 
-                align-items:
-                    center;
+                margin-top:
+                    0.65rem;
+
+                padding-top:
+                    0.62rem;
+            }
+
+
+            .share-label {
+
+                font-size:
+                    0.74rem;
             }
 
 
@@ -1900,21 +1808,7 @@
             }
 
 
-            .side-title {
-
-                font-size:
-                    1.07rem;
-            }
-
-
-            .sidebar-card {
-
-                margin-bottom:
-                    0.9rem;
-            }
-
-
-            .archive-item summary {
+            .archive-item {
 
                 padding:
                     0.9rem;
@@ -1925,6 +1819,23 @@
 
                 font-size:
                     1.02rem;
+            }
+
+
+            .archive-reader {
+
+                padding:
+                    1rem;
+            }
+
+
+            .archive-reader p {
+
+                font-size:
+                    0.91rem;
+
+                line-height:
+                    1.58;
             }
 
 
@@ -1950,7 +1861,7 @@
             h2 {
 
                 font-size:
-                    1.62rem;
+                    1.58rem;
             }
 
 
@@ -1965,26 +1876,6 @@
 
                 align-items:
                     flex-start;
-            }
-        }
-
-
-        @media (
-            prefers-reduced-motion: reduce
-        ) {
-
-            *,
-            *::before,
-            *::after {
-
-                animation-duration:
-                    0.01ms !important;
-
-                animation-iteration-count:
-                    1 !important;
-
-                transition-duration:
-                    0.01ms !important;
             }
         }
 
@@ -2233,7 +2124,7 @@
                     class="btn"
                     onclick="voteThumb('main-down')"
                 >
-                    🥱 Nja, segt ämne
+                    🥱 Segt ämne
                     (
                     <span id="count-main-down">
                         0
@@ -2247,7 +2138,7 @@
             <div class="share-row">
 
                 <p class="share-label">
-                    Någon mer som borde höra det här?
+                    Skicka vidare till fikagänget.
                 </p>
 
 
@@ -2358,18 +2249,14 @@
 
         <div class="archive-header">
 
-            <div>
-
-                <h3>
-                    📜 Tidigare snackisar
-                </h3>
+            <h3>
+                📜 Tidigare snackisar
+            </h3>
 
 
-                <p class="archive-subtitle">
-                    Missade du fikat? Här ligger de senaste ämnena kvar.
-                </p>
-
-            </div>
+            <p class="archive-subtitle">
+                Missade du fikat? Här ligger de senaste ämnena kvar.
+            </p>
 
         </div>
 
@@ -2379,6 +2266,43 @@
             class="archive-grid"
         >
             Hämtar tidigare snackisar...
+        </div>
+
+
+        <div
+            id="archive-reader"
+            class="archive-reader"
+        >
+
+            <div
+                id="archive-reader-meta"
+                class="archive-reader-meta"
+            >
+            </div>
+
+
+            <h4 id="archive-reader-title">
+            </h4>
+
+
+            <div id="archive-reader-content">
+            </div>
+
+
+            <div
+                id="archive-reader-byline"
+                class="archive-reader-byline"
+            >
+            </div>
+
+
+            <button
+                class="btn archive-close"
+                onclick="closeArchiveReader()"
+            >
+                ↑ Stäng snackisen
+            </button>
+
         </div>
 
 
@@ -2521,12 +2445,13 @@
 
 const votes = {};
 
-window.currentLatestId =
-    null;
+let archiveArticles = [];
+
+window.currentLatestId = null;
 
 
 /* =====================================================
-   FALLBACK – SIDOINNEHÅLL
+   FALLBACK-SIDOINNEHÅLL
 ===================================================== */
 
 
@@ -2561,7 +2486,7 @@ const fikaTips = [
         kicker: "Akutlösningen",
         title: "Två rutor choklad",
         text:
-            "Två bra rutor choklad till kaffet – och sedan låtsas vi att självdisciplin var planen hela tiden."
+            "Två bra rutor choklad till kaffet."
     },
 
     {
@@ -2676,11 +2601,6 @@ function safeArray(value) {
 }
 
 
-/* =====================================================
-   TEXTTVÄTT
-===================================================== */
-
-
 function cleanReaderText(text) {
 
     if (!text) {
@@ -2729,11 +2649,6 @@ function cleanReaderText(text) {
 }
 
 
-/* =====================================================
-   LÄSTID
-===================================================== */
-
-
 function calculateReadTime(article) {
 
     const text = [
@@ -2761,13 +2676,6 @@ function calculateReadTime(article) {
             .length;
 
 
-    /*
-    Ungefär 200 ord/minut.
-
-    Kafferasten är korta texter,
-    så vi visar alltid minst 1 minut.
-    */
-
     return Math.max(
         1,
         Math.ceil(
@@ -2777,14 +2685,10 @@ function calculateReadTime(article) {
 }
 
 
-function renderReadTime(
-    article
-) {
+function renderReadTime(article) {
 
     const minutes =
-        calculateReadTime(
-            article
-        );
+        calculateReadTime(article);
 
 
     document
@@ -2798,11 +2702,6 @@ function renderReadTime(
                     : "minuters"
             } läsning`;
 }
-
-
-/* =====================================================
-   SIDOINNEHÅLL
-===================================================== */
 
 
 function hashString(value) {
@@ -2824,15 +2723,11 @@ function hashString(value) {
 
         hash =
             (
-                (
-                    hash << 5
-                )
-                -
+                (hash << 5) -
                 hash
             )
             +
             text.charCodeAt(i);
-
 
         hash |= 0;
     }
@@ -2859,10 +2754,7 @@ function fallbackSidebar(seed) {
         fact:
             fikaFacts[
                 (
-                    base *
-                    7
-                    +
-                    3
+                    base * 7 + 3
                 )
                 %
                 fikaFacts.length
@@ -2883,52 +2775,24 @@ function renderSidebar(latest) {
 
 
     renderSideCard({
-
-        item:
-            sidebar.tip,
-
-        imageId:
-            "fika-tip-image",
-
-        emojiId:
-            "fika-tip-emoji",
-
-        creditId:
-            "fika-tip-credit",
-
-        kickerId:
-            "fika-tip-kicker",
-
-        titleId:
-            "fika-tip-title",
-
-        textId:
-            "fika-tip-text"
+        item: sidebar.tip,
+        imageId: "fika-tip-image",
+        emojiId: "fika-tip-emoji",
+        creditId: "fika-tip-credit",
+        kickerId: "fika-tip-kicker",
+        titleId: "fika-tip-title",
+        textId: "fika-tip-text"
     });
 
 
     renderSideCard({
-
-        item:
-            sidebar.fact,
-
-        imageId:
-            "fika-fact-image",
-
-        emojiId:
-            "fika-fact-emoji",
-
-        creditId:
-            "fika-fact-credit",
-
-        kickerId:
-            "fika-fact-kicker",
-
-        titleId:
-            "fika-fact-title",
-
-        textId:
-            "fika-fact-text"
+        item: sidebar.fact,
+        imageId: "fika-fact-image",
+        emojiId: "fika-fact-emoji",
+        creditId: "fika-fact-credit",
+        kickerId: "fika-fact-kicker",
+        titleId: "fika-fact-title",
+        textId: "fika-fact-text"
     });
 }
 
@@ -3046,9 +2910,32 @@ function renderSideCard({
 }
 
 
-/* =====================================================
-   FOTO
-===================================================== */
+function safeHttpUrl(value) {
+
+    try {
+
+        const url =
+            new URL(value);
+
+
+        if (
+            url.protocol === "https:"
+            ||
+            url.protocol === "http:"
+        ) {
+
+            return url.toString();
+        }
+
+
+        return null;
+
+
+    } catch {
+
+        return null;
+    }
+}
 
 
 function renderPhotoCredit(
@@ -3189,11 +3076,6 @@ function renderHero(
 }
 
 
-/* =====================================================
-   KÄLLOR
-===================================================== */
-
-
 const SOURCE_NAMES = {
 
     "svt.se":
@@ -3244,15 +3126,6 @@ const SOURCE_NAMES = {
     "washingtonpost.com":
         "The Washington Post",
 
-    "cbsnews.com":
-        "CBS News",
-
-    "nbcnews.com":
-        "NBC News",
-
-    "abcnews.go.com":
-        "ABC News",
-
     "people.com":
         "People",
 
@@ -3262,40 +3135,9 @@ const SOURCE_NAMES = {
     "billboard.com":
         "Billboard",
 
-    "hollywoodreporter.com":
-        "The Hollywood Reporter",
-
     "espn.com":
         "ESPN"
 };
-
-
-function safeHttpUrl(value) {
-
-    try {
-
-        const url =
-            new URL(value);
-
-
-        if (
-            url.protocol === "https:"
-            ||
-            url.protocol === "http:"
-        ) {
-
-            return url.toString();
-        }
-
-
-        return null;
-
-
-    } catch {
-
-        return null;
-    }
-}
 
 
 function sourceDomain(url) {
@@ -3412,7 +3254,6 @@ function renderSources(sources) {
 
             .map(
                 source => ({
-
                     ...source,
 
                     safeUrl:
@@ -3512,11 +3353,6 @@ function renderSources(sources) {
 }
 
 
-/* =====================================================
-   SKRIBENT
-===================================================== */
-
-
 function bylineEmoji(byline) {
 
     if (
@@ -3537,11 +3373,6 @@ function bylineEmoji(byline) {
 
     return "📰";
 }
-
-
-/* =====================================================
-   SENASTE ARTIKEL
-===================================================== */
 
 
 async function loadLatestNews() {
@@ -3599,7 +3430,8 @@ async function loadLatestNews() {
                 "fika-badge"
             )
             .textContent =
-                "☕ " +
+                "☕ "
+                +
                 cleanReaderText(
                     article.category ||
                     "Dagens snackis"
@@ -3611,7 +3443,8 @@ async function loadLatestNews() {
                 "fika-time-text"
             )
             .textContent =
-                "Senast uppdaterad " +
+                "Senast uppdaterad "
+                +
                 formatPublishedTime(
                     latest.createdAt
                 );
@@ -3934,11 +3767,6 @@ async function loadLatestNews() {
 }
 
 
-/* =====================================================
-   ARKIV
-===================================================== */
-
-
 async function loadArchive() {
 
     const archiveList =
@@ -3977,11 +3805,10 @@ async function loadArchive() {
             "";
 
 
-        const articles =
+        archiveArticles =
             safeArray(
                 result.articles
             )
-
                 .filter(
                     item =>
                         item
@@ -3991,14 +3818,15 @@ async function loadArchive() {
                         item.id !==
                         window.currentLatestId
                 )
-
                 .slice(
                     0,
                     5
                 );
 
 
-        if (!articles.length) {
+        if (
+            !archiveArticles.length
+        ) {
 
             archiveList.textContent =
                 "Inga äldre snackisar ännu.";
@@ -4007,202 +3835,123 @@ async function loadArchive() {
         }
 
 
-        for (
-            const item
-            of articles
-        ) {
+        archiveArticles.forEach(
+            (
+                item,
+                index
+            ) => {
 
-            const article =
-                item.article ||
-                {};
-
-
-            const details =
-                document.createElement(
-                    "details"
-                );
+                const article =
+                    item.article ||
+                    {};
 
 
-            details.className =
-                "archive-item";
-
-
-            const summary =
-                document.createElement(
-                    "summary"
-                );
-
-
-            const meta =
-                document.createElement(
-                    "div"
-                );
-
-
-            meta.className =
-                "archive-meta";
-
-
-            meta.textContent =
-                [
-                    cleanReaderText(
-                        article.category
-                    ),
-
-                    formatArchiveDate(
-                        item.createdAt
-                    )
-                ]
-                .filter(Boolean)
-                .join(" · ");
-
-
-            const title =
-                document.createElement(
-                    "span"
-                );
-
-
-            title.className =
-                "archive-title";
-
-
-            title.textContent =
-                cleanReaderText(
-                    article.title
-                );
-
-
-            const intro =
-                document.createElement(
-                    "p"
-                );
-
-
-            intro.className =
-                "archive-summary";
-
-
-            intro.textContent =
-                cleanReaderText(
-                    article.summary
-                );
-
-
-            const open =
-                document.createElement(
-                    "span"
-                );
-
-
-            open.className =
-                "archive-open";
-
-
-            open.textContent =
-                "Läs snackisen ↓";
-
-
-            summary.append(
-                meta,
-                title,
-                intro,
-                open
-            );
-
-
-            details.appendChild(
-                summary
-            );
-
-
-            const content =
-                document.createElement(
-                    "div"
-                );
-
-
-            content.className =
-                "archive-content";
-
-
-            for (
-                const paragraph
-                of safeArray(
-                    article.paragraphs
-                )
-            ) {
-
-                const cleaned =
-                    cleanReaderText(
-                        paragraph
-                    );
-
-
-                if (!cleaned) {
-                    continue;
-                }
-
-
-                const p =
-                    document.createElement(
-                        "p"
-                    );
-
-
-                p.textContent =
-                    cleaned;
-
-
-                content.appendChild(
-                    p
-                );
-            }
-
-
-            const byline =
-                cleanReaderText(
-                    item.byline ||
-                    article.byline ||
-                    ""
-                );
-
-
-            if (byline) {
-
-                const signature =
+                const card =
                     document.createElement(
                         "div"
                     );
 
 
-                signature.className =
-                    "archive-byline";
+                card.className =
+                    "archive-item";
 
 
-                signature.textContent =
-                    "Serverad av "
-                    +
-                    byline
-                    +
-                    " ☕";
+                const meta =
+                    document.createElement(
+                        "div"
+                    );
 
 
-                content.appendChild(
-                    signature
+                meta.className =
+                    "archive-meta";
+
+
+                meta.textContent =
+                    [
+                        cleanReaderText(
+                            article.category
+                        ),
+
+                        formatArchiveDate(
+                            item.createdAt
+                        )
+                    ]
+                    .filter(Boolean)
+                    .join(" · ");
+
+
+                const title =
+                    document.createElement(
+                        "span"
+                    );
+
+
+                title.className =
+                    "archive-title";
+
+
+                title.textContent =
+                    cleanReaderText(
+                        article.title
+                    );
+
+
+                const intro =
+                    document.createElement(
+                        "p"
+                    );
+
+
+                intro.className =
+                    "archive-summary";
+
+
+                intro.textContent =
+                    cleanReaderText(
+                        article.summary
+                    );
+
+
+                const open =
+                    document.createElement(
+                        "button"
+                    );
+
+
+                open.className =
+                    "archive-open";
+
+
+                open.type =
+                    "button";
+
+
+                open.textContent =
+                    "Läs snackisen ↓";
+
+
+                open.addEventListener(
+                    "click",
+                    () =>
+                        openArchiveReader(
+                            index
+                        )
+                );
+
+
+                card.append(
+                    meta,
+                    title,
+                    intro,
+                    open
+                );
+
+
+                archiveList.appendChild(
+                    card
                 );
             }
-
-
-            details.appendChild(
-                content
-            );
-
-
-            archiveList.appendChild(
-                details
-            );
-        }
+        );
 
 
     } catch (error) {
@@ -4218,9 +3967,149 @@ async function loadArchive() {
 }
 
 
-/* =====================================================
-   DATUM
-===================================================== */
+function openArchiveReader(
+    index
+) {
+
+    const item =
+        archiveArticles[
+            index
+        ];
+
+
+    if (!item) {
+        return;
+    }
+
+
+    const article =
+        item.article ||
+        {};
+
+
+    const reader =
+        document.getElementById(
+            "archive-reader"
+        );
+
+
+    const content =
+        document.getElementById(
+            "archive-reader-content"
+        );
+
+
+    content.innerHTML =
+        "";
+
+
+    document
+        .getElementById(
+            "archive-reader-meta"
+        )
+        .textContent =
+            [
+                cleanReaderText(
+                    article.category
+                ),
+
+                formatArchiveDate(
+                    item.createdAt
+                )
+            ]
+            .filter(Boolean)
+            .join(" · ");
+
+
+    document
+        .getElementById(
+            "archive-reader-title"
+        )
+        .textContent =
+            cleanReaderText(
+                article.title
+            );
+
+
+    for (
+        const paragraph
+        of safeArray(
+            article.paragraphs
+        )
+    ) {
+
+        const cleaned =
+            cleanReaderText(
+                paragraph
+            );
+
+
+        if (!cleaned) {
+            continue;
+        }
+
+
+        const p =
+            document.createElement(
+                "p"
+            );
+
+
+        p.textContent =
+            cleaned;
+
+
+        content.appendChild(
+            p
+        );
+    }
+
+
+    const byline =
+        cleanReaderText(
+            item.byline ||
+            article.byline ||
+            ""
+        );
+
+
+    document
+        .getElementById(
+            "archive-reader-byline"
+        )
+        .textContent =
+            byline
+                ? `Serverad av ${byline} ☕`
+                : "";
+
+
+    reader.classList.add(
+        "is-open"
+    );
+
+
+    reader.scrollIntoView({
+        behavior:
+            "smooth",
+
+        block:
+            "start"
+    });
+}
+
+
+function closeArchiveReader() {
+
+    const reader =
+        document.getElementById(
+            "archive-reader"
+        );
+
+
+    reader.classList.remove(
+        "is-open"
+    );
+}
 
 
 function formatPublishedTime(
@@ -4289,12 +4178,9 @@ function formatArchiveDate(
 }
 
 
-/* =====================================================
-   INTERAKTION
-===================================================== */
-
-
-function voteThumb(id) {
+function voteThumb(
+    id
+) {
 
     if (
         votes[id]
@@ -4443,7 +4329,8 @@ function addComment() {
 
 
     div.append(
-        ": " +
+        ": "
+        +
         text
     );
 
@@ -4464,11 +4351,6 @@ function addComment() {
     textInput.value =
         "";
 }
-
-
-/* =====================================================
-   START
-===================================================== */
 
 
 async function startKafferasten() {
