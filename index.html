@@ -75,11 +75,6 @@
         }
 
 
-        /* ==================================================
-        HEADER
-        ================================================== */
-
-
         header {
 
             position:
@@ -176,11 +171,6 @@
         }
 
 
-        /* ==================================================
-        RYKANDE KAFFEKOPP
-        ================================================== */
-
-
         .coffee-mark {
 
             position:
@@ -210,17 +200,6 @@
 
             line-height:
                 1;
-
-            filter:
-                drop-shadow(
-                    0 5px 8px
-                    rgba(
-                        0,
-                        0,
-                        0,
-                        0.2
-                    )
-                );
         }
 
 
@@ -290,18 +269,15 @@
                     0;
             }
 
-
             25% {
                 opacity:
                     0.75;
             }
 
-
             70% {
                 opacity:
                     0.35;
             }
-
 
             100% {
 
@@ -330,11 +306,6 @@
             font-weight:
                 350;
         }
-
-
-        /* ==================================================
-        UPPDATERINGSRAD
-        ================================================== */
 
 
         .schedule-banner {
@@ -422,11 +393,6 @@
         }
 
 
-        /* ==================================================
-        LAYOUT
-        ================================================== */
-
-
         .container {
 
             max-width:
@@ -442,14 +408,8 @@
                 grid;
 
             grid-template-columns:
-                minmax(
-                    0,
-                    2fr
-                )
-                minmax(
-                    250px,
-                    1fr
-                );
+                minmax(0, 2fr)
+                minmax(250px, 1fr);
 
             gap:
                 1.5rem;
@@ -491,11 +451,6 @@
                     0.055
                 );
         }
-
-
-        /* ==================================================
-        ARTIKEL
-        ================================================== */
 
 
         .tag {
@@ -605,7 +560,7 @@
                 none;
 
             margin:
-                0.4rem 0 0;
+                0.42rem 0 0;
 
             font-size:
                 0.68rem;
@@ -700,13 +655,6 @@
         }
 
 
-        .why-box strong {
-
-            color:
-                var(--primary-color);
-        }
-
-
         .why-box ul {
 
             margin:
@@ -722,11 +670,6 @@
             margin-bottom:
                 0.3rem;
         }
-
-
-        /* ==================================================
-        SIGNATUR
-        ================================================== */
 
 
         .byline {
@@ -806,11 +749,6 @@
         }
 
 
-        /* ==================================================
-        KNAPPAR
-        ================================================== */
-
-
         .btn-group {
 
             display:
@@ -853,29 +791,7 @@
 
             font-size:
                 0.88rem;
-
-            transition:
-                transform 0.15s ease,
-                background 0.15s ease;
         }
-
-
-        .btn:hover {
-
-            background:
-                var(--accent-color);
-
-            color:
-                white;
-
-            transform:
-                translateY(-1px);
-        }
-
-
-        /* ==================================================
-        POLL + KOMMENTARER
-        ================================================== */
 
 
         .poll-option {
@@ -949,54 +865,6 @@
         }
 
 
-        .comment-input:focus {
-
-            outline:
-                none;
-
-            border-color:
-                var(--accent-color);
-        }
-
-
-        .comment-item {
-
-            background:
-                var(--bg-color);
-
-            padding:
-                0.75rem 0.9rem;
-
-            border-radius:
-                10px;
-
-            margin-bottom:
-                0.55rem;
-
-            border:
-                1px solid
-                var(--border-color);
-        }
-
-
-        .comment-item strong {
-
-            color:
-                var(--primary-color);
-
-            display:
-                block;
-
-            font-size:
-                0.83rem;
-        }
-
-
-        /* ==================================================
-        SIDOKOLUMN – LÄTTA SMÅ ILLUSTRATIONER
-        ================================================== */
-
-
         .sidebar-card {
 
             overflow:
@@ -1028,16 +896,6 @@
                 1rem;
 
             background:
-                radial-gradient(
-                    circle at 22% 28%,
-                    rgba(
-                        255,
-                        255,
-                        255,
-                        0.72
-                    ),
-                    transparent 30%
-                ),
                 linear-gradient(
                     145deg,
                     #F6E5D6,
@@ -1046,84 +904,10 @@
         }
 
 
-        .side-visual::before,
-        .side-visual::after {
-
-            content:
-                "";
-
-            position:
-                absolute;
-
-            border-radius:
-                50%;
-
-            background:
-                rgba(
-                    255,
-                    255,
-                    255,
-                    0.26
-                );
-        }
-
-
-        .side-visual::before {
-
-            width:
-                120px;
-
-            height:
-                120px;
-
-            right:
-                -35px;
-
-            top:
-                -35px;
-        }
-
-
-        .side-visual::after {
-
-            width:
-                85px;
-
-            height:
-                85px;
-
-            left:
-                -20px;
-
-            bottom:
-                -35px;
-        }
-
-
         .visual-emoji {
-
-            position:
-                relative;
-
-            z-index:
-                1;
 
             font-size:
                 4.6rem;
-
-            filter:
-                drop-shadow(
-                    0 9px 8px
-                    rgba(
-                        45,
-                        26,
-                        23,
-                        0.16
-                    )
-                );
-
-            transform:
-                rotate(-3deg);
         }
 
 
@@ -1172,15 +956,7 @@
 
             font-size:
                 0.9rem;
-
-            color:
-                var(--text-color);
         }
-
-
-        /* ==================================================
-        ARKIV
-        ================================================== */
 
 
         .archive-grid {
@@ -1223,20 +999,6 @@
         }
 
 
-        .archive-item summary::-webkit-details-marker {
-
-            display:
-                none;
-        }
-
-
-        .archive-item summary:hover {
-
-            background:
-                var(--highlight-bg);
-        }
-
-
         .archive-meta {
 
             font-size:
@@ -1276,9 +1038,6 @@
 
             margin:
                 0;
-
-            color:
-                var(--text-color);
 
             font-size:
                 0.9rem;
@@ -1338,21 +1097,6 @@
         }
 
 
-        .coming-soon {
-
-            color:
-                var(--text-muted);
-
-            font-size:
-                0.9rem;
-        }
-
-
-        /* ==================================================
-        FOOTER
-        ================================================== */
-
-
         footer {
 
             text-align:
@@ -1374,39 +1118,6 @@
             margin-top:
                 2rem;
         }
-
-
-        /* ==================================================
-        TILLGÄNGLIGHET
-        ================================================== */
-
-
-        @media (
-            prefers-reduced-motion:
-            reduce
-        ) {
-
-            .steam {
-
-                animation:
-                    none;
-
-                opacity:
-                    0.35;
-            }
-
-
-            .btn {
-
-                transition:
-                    none;
-            }
-        }
-
-
-        /* ==================================================
-        MOBIL
-        ================================================== */
 
 
         @media (
@@ -1440,37 +1151,6 @@
             }
 
 
-            .coffee-mark {
-
-                width:
-                    35px;
-
-                height:
-                    40px;
-            }
-
-
-            .coffee-cup {
-
-                font-size:
-                    1.7rem;
-            }
-
-
-            header p {
-
-                font-size:
-                    0.94rem;
-            }
-
-
-            .brew-note {
-
-                font-size:
-                    0.73rem;
-            }
-
-
             h2 {
 
                 font-size:
@@ -1482,9 +1162,6 @@
 
                 padding:
                     1.2rem;
-
-                border-radius:
-                    15px;
             }
 
 
@@ -1492,20 +1169,6 @@
 
                 height:
                     230px;
-            }
-
-
-            .side-visual {
-
-                height:
-                    135px;
-            }
-
-
-            .visual-emoji {
-
-                font-size:
-                    4rem;
             }
         }
 
@@ -1522,7 +1185,6 @@
     <a
         class="brand"
         href="/"
-        aria-label="Kafferasten.se"
     >
 
         <span
@@ -1531,9 +1193,7 @@
         >
 
             <span class="steam s1"></span>
-
             <span class="steam s2"></span>
-
             <span class="steam s3"></span>
 
             <span class="coffee-cup">
@@ -1782,23 +1442,19 @@
 
     <section class="card">
 
-
         <h3>
             💬 Dagens fikafråga
         </h3>
 
 
         <p>
-
             <strong id="poll-question">
                 Hämtar fråga...
             </strong>
-
         </p>
 
 
         <div id="poll-form">
-
 
             <div id="poll-options-container">
             </div>
@@ -1816,7 +1472,6 @@
             >
                 Skicka din röst
             </button>
-
 
         </div>
 
@@ -1879,12 +1534,10 @@
         >
         </div>
 
-
     </section>
 
 
     <section class="card">
-
 
         <h3>
             📜 Tidigare snackisar
@@ -1906,13 +1559,8 @@
             id="archive-list"
             class="archive-grid"
         >
-
-            <p class="coming-soon">
-                Hämtar tidigare snackisar...
-            </p>
-
+            Hämtar tidigare snackisar...
         </div>
-
 
     </section>
 
@@ -1925,17 +1573,12 @@
 
     <div class="card sidebar-card">
 
-
         <h3>
             🥐 Dagens fikatips
         </h3>
 
 
-        <div
-            class="side-visual"
-            id="fika-tip-visual"
-            aria-hidden="true"
-        >
+        <div class="side-visual">
 
             <span
                 class="visual-emoji"
@@ -1967,28 +1610,19 @@
             class="side-text"
             id="fika-tip-text"
         >
-            Kanelbulle och kaffe.
-            Svårare än så behöver en svensk
-            fikarast faktiskt inte vara.
         </p>
-
 
     </div>
 
 
     <div class="card sidebar-card">
 
-
         <h3>
             💡 Fikarast-fakta
         </h3>
 
 
-        <div
-            class="side-visual"
-            id="fika-fact-visual"
-            aria-hidden="true"
-        >
+        <div class="side-visual">
 
             <span
                 class="visual-emoji"
@@ -2020,11 +1654,7 @@
             class="side-text"
             id="fika-fact-text"
         >
-            På svenska fungerar fika både som
-            substantiv och verb – man kan ta en fika
-            och man kan fika.
         </p>
-
 
     </div>
 
@@ -2037,10 +1667,7 @@
 
 <footer>
 
-    <p>
-        Kafferasten.se –
-        något att prata om när kaffet är klart. ☕
-    </p>
+    Kafferasten.se – något att prata om när kaffet är klart. ☕
 
 </footer>
 
@@ -2055,352 +1682,172 @@
         null;
 
 
-    // =====================================================
-    // FIKATIPS
-    // =====================================================
-
-
     const fikaTips = [
 
         {
-            emoji:
-                "🥐",
-
-            kicker:
-                "Lite kontinentalt",
-
-            title:
-                "Croissant utan krångel",
-
+            emoji: "🥐",
+            kicker: "Lite kontinentalt",
+            title: "Croissant utan krångel",
             text:
                 "En bra croissant och en kopp kaffe. Franskt i teorin, fullt rimligt i ett svenskt fikarum."
         },
 
-
         {
-            emoji:
-                "🍇",
-
-            kicker:
-                "När sötsuget kommer",
-
-            title:
-                "Kalla vindruvor",
-
+            emoji: "🍇",
+            kicker: "När sötsuget kommer",
+            title: "Kalla vindruvor",
             text:
                 "Lägg vindruvor i kylen och ta fram dem till kaffet. Friskt, sött och märkligt lätt att fortsätta plocka av."
         },
 
-
         {
-            emoji:
-                "🍪",
-
-            kicker:
-                "Två tuggor räcker",
-
-            title:
-                "Småkakan gör comeback",
-
+            emoji: "🍪",
+            kicker: "Två tuggor räcker",
+            title: "Småkakan gör comeback",
             text:
                 "En liten kaka till kaffet är underskattat. Bonuspoäng om den smular exakt lagom mycket över tangentbordet."
         },
 
-
         {
-            emoji:
-                "🍫",
-
-            kicker:
-                "Akutlösningen",
-
-            title:
-                "Två rutor choklad",
-
+            emoji: "🍫",
+            kicker: "Akutlösningen",
+            title: "Två rutor choklad",
             text:
                 "Inte en hel chokladkaka. Bara två bra rutor till kaffet – och sedan låtsas vi att självdisciplin var planen hela tiden."
         },
 
-
         {
-            emoji:
-                "🍎",
-
-            kicker:
-                "Enklast vinner",
-
-            title:
-                "Äpple och kaffe",
-
+            emoji: "🍎",
+            kicker: "Enklast vinner",
+            title: "Äpple och kaffe",
             text:
                 "Krispigt äpple till en rejäl kopp kaffe låter nästan för nyttigt för fika, men kombinationen fungerar oväntat bra."
         },
 
-
         {
-            emoji:
-                "🥪",
-
-            kicker:
-                "När fikat är hungrigt",
-
-            title:
-                "Den lilla mackan",
-
+            emoji: "🥪",
+            kicker: "När fikat är hungrigt",
+            title: "Den lilla mackan",
             text:
                 "En halv ost- eller skinkmacka gör underverk när det egentligen är lunchen du längtar efter."
         },
 
-
         {
-            emoji:
-                "🧁",
-
-            kicker:
-                "Klassiker med krydda",
-
-            title:
-                "Kardemummabulle",
-
+            emoji: "🧁",
+            kicker: "Klassiker med krydda",
+            title: "Kardemummabulle",
             text:
                 "När kanelbullen känns för självklar: kardemumma. Fortfarande fika, men med lite mer självförtroende."
         },
 
-
         {
-            emoji:
-                "🍰",
-
-            kicker:
-                "Fredagskänsla",
-
-            title:
-                "En liten bit morotskaka",
-
+            emoji: "🍰",
+            kicker: "Fredagskänsla",
+            title: "En liten bit morotskaka",
             text:
                 "Morot i namnet betyder inte sallad. Men det betyder att du kan ta en bit med gott samvete och väldigt gott kaffe."
         },
 
-
         {
-            emoji:
-                "🥜",
-
-            kicker:
-                "Knaster till kaffet",
-
-            title:
-                "En näve nötter",
-
+            emoji: "🥜",
+            kicker: "Knaster till kaffet",
+            title: "En näve nötter",
             text:
                 "Salt eller naturellt spelar mindre roll. Nötter ger kaffet lite motstånd och håller fikat enkelt."
         },
 
-
         {
-            emoji:
-                "🍌",
-
-            kicker:
-                "Skrivbordssäkert",
-
-            title:
-                "Banan på två minuter",
-
+            emoji: "🍌",
+            kicker: "Skrivbordssäkert",
+            title: "Banan på två minuter",
             text:
                 "Ingen tallrik, ingen smulrisk, ingen planering. Bananen är fikarummets mest underskattade reservspelare."
         }
     ];
 
 
-    // =====================================================
-    // FIKAFAKTA
-    // =====================================================
-
-
     const fikaFacts = [
 
         {
-            emoji:
-                "☕",
-
-            kicker:
-                "Språkhörnan",
-
-            title:
-                "Fika är både sak och handling",
-
+            emoji: "☕",
+            kicker: "Språkhörnan",
+            title: "Fika är både sak och handling",
             text:
                 "På svenska kan fika vara både substantiv och verb: vi tar en fika – och vi fikar."
         },
 
-
         {
-            emoji:
-                "🔄",
-
-            kicker:
-                "Ordet fika",
-
-            title:
-                "Kaffi blev fika",
-
+            emoji: "🔄",
+            kicker: "Ordet fika",
+            title: "Kaffi blev fika",
             text:
                 "En vanlig förklaring är att ordet fika växte fram ur äldre backslang där stavelserna i ”kaffi” kastades om."
         },
 
-
         {
-            emoji:
-                "🍒",
-
-            kicker:
-                "Från buske till kopp",
-
-            title:
-                "Kaffe börjar som en frukt",
-
+            emoji: "🍒",
+            kicker: "Från buske till kopp",
+            title: "Kaffe börjar som en frukt",
             text:
                 "Kaffebönan är egentligen fröet inuti kaffeväxtens frukt, som ofta kallas kaffekörsbär."
         },
 
-
         {
-            emoji:
-                "🌱",
-
-            kicker:
-                "Två stora namn",
-
-            title:
-                "Arabica och robusta",
-
+            emoji: "🌱",
+            kicker: "Två stora namn",
+            title: "Arabica och robusta",
             text:
                 "Arabica och robusta är de två kaffevarianter som dominerar den globala kaffemarknaden."
         },
 
-
         {
-            emoji:
-                "💧",
-
-            kicker:
-                "Kaffekemi",
-
-            title:
-                "Koffein följer med vattnet",
-
+            emoji: "💧",
+            kicker: "Kaffekemi",
+            title: "Koffein följer med vattnet",
             text:
                 "Koffein är vattenlösligt, vilket är en av anledningarna till att bryggtid och mängden vatten påverkar hur mycket som hamnar i koppen."
         },
 
-
         {
-            emoji:
-                "🌿",
-
-            kicker:
-                "Bakom kryddan",
-
-            title:
-                "Kanel är bark",
-
+            emoji: "🌿",
+            kicker: "Bakom kryddan",
+            title: "Kanel är bark",
             text:
                 "Kanel kommer från den torkade innerbarken på träd i släktet Cinnamomum. Fikakrydda med skogsbakgrund, alltså."
         },
 
-
         {
-            emoji:
-                "🥐",
-
-            kicker:
-                "Smörvetenskap",
-
-            title:
-                "Croissanten byggs i lager",
-
+            emoji: "🥐",
+            kicker: "Smörvetenskap",
+            title: "Croissanten byggs i lager",
             text:
                 "Croissantdeg kavlas och viks med smör i flera lager. Det är de lagren som ger den luftiga, frasiga strukturen."
         },
 
-
         {
-            emoji:
-                "🍫",
-
-            kicker:
-                "Före chokladen",
-
-            title:
-                "Kakao växer i stora frukter",
-
+            emoji: "🍫",
+            kicker: "Före chokladen",
+            title: "Kakao växer i stora frukter",
             text:
                 "Kakaobönor finns inuti stora kakaofrukter som växer direkt på kakaoträdet."
         },
 
-
         {
-            emoji:
-                "🫖",
-
-            kicker:
-                "Inte bara kaffe",
-
-            title:
-                "Fika kräver ingen kaffekopp",
-
+            emoji: "🫖",
+            kicker: "Inte bara kaffe",
+            title: "Fika kräver ingen kaffekopp",
             text:
                 "Fika handlar lika mycket om pausen och sällskapet som om drycken. Te, vatten eller inget alls fungerar också."
         },
 
-
         {
-            emoji:
-                "🧊",
-
-            kicker:
-                "Kall fakta",
-
-            title:
-                "Kallt kaffe är fortfarande kaffe",
-
+            emoji: "🧊",
+            kicker: "Kall fakta",
+            title: "Kallt kaffe är fortfarande kaffe",
             text:
                 "Cold brew görs genom att kaffe får dra länge i kallt eller rumstempererat vatten i stället för att bryggas varmt."
         }
     ];
-
-
-    // =====================================================
-    // TEXTTVÄTT
-    // =====================================================
-
-
-    function cleanText(
-        text
-    ) {
-
-        if (!text) {
-            return "";
-        }
-
-
-        return String(
-            text
-        )
-
-            .replace(
-                /\*\*/g,
-                ""
-            )
-
-            .replace(
-                /\*/g,
-                ""
-            )
-
-            .trim();
-    }
 
 
     function cleanReaderText(
@@ -2412,9 +1859,7 @@
         }
 
 
-        return cleanText(
-            text
-        )
+        return String(text)
 
             .replace(
                 /[\uE000-\uF8FF]/g,
@@ -2442,22 +1887,12 @@
             )
 
             .replace(
-                /\[\s*\]\s*\(\s*\)/g,
-                ""
-            )
-
-            .replace(
-                /\(\s*\[\s*\]\s*\)/g,
-                ""
-            )
-
-            .replace(
                 /[\[\]\(\)\{\}]{2,}/g,
                 ""
             )
 
             .replace(
-                /\s*([,.!?;:])/g,
+                /\s+([,.!?;:])/g,
                 "$1"
             )
 
@@ -2480,14 +1915,6 @@
             ? value
             : [];
     }
-
-
-    // =====================================================
-    // STABIL ROTATION AV FIKATIPS/FAKTA
-    //
-    // Samma artikel = samma tips.
-    // Ny artikel = nytt tips.
-    // =====================================================
 
 
     function hashString(
@@ -2514,16 +1941,13 @@
             hash =
                 (
                     (
-                        hash <<
-                        5
+                        hash << 5
                     )
                     -
                     hash
                 )
                 +
-                text.charCodeAt(
-                    i
-                );
+                text.charCodeAt(i);
 
 
             hash |=
@@ -2542,9 +1966,7 @@
     ) {
 
         const base =
-            hashString(
-                seed
-            );
+            hashString(seed);
 
 
         const tip =
@@ -2633,9 +2055,8 @@
 
 
     // =====================================================
-    // ARTIKELBILD
+    // PEXELS HERO + CREDIT
     // =====================================================
-
 
     function renderHero(
         latest,
@@ -2673,14 +2094,6 @@
                     article.imageAlt ||
                     "Bild till dagens snackis"
                 );
-
-        } else {
-
-            image.alt =
-                cleanReaderText(
-                    article.imageAlt ||
-                    "Kaffe och fikastämning"
-                );
         }
 
 
@@ -2693,13 +2106,11 @@
 
 
         if (
-            hero?.provider ===
-                "unsplash" &&
-            hero.photographerName &&
-            hero.photographerUrl
+            hero?.provider === "pexels" &&
+            hero.photographerName
         ) {
 
-            const text1 =
+            const intro =
                 document.createTextNode(
                     "Foto: "
                 );
@@ -2712,7 +2123,9 @@
 
 
             photographer.href =
-                hero.photographerUrl;
+                hero.photoUrl ||
+                hero.photographerUrl ||
+                "https://www.pexels.com/";
 
 
             photographer.target =
@@ -2727,40 +2140,40 @@
                 hero.photographerName;
 
 
-            const text2 =
+            const separator =
                 document.createTextNode(
                     " / "
                 );
 
 
-            const unsplash =
+            const pexels =
                 document.createElement(
                     "a"
                 );
 
 
-            unsplash.href =
-                hero.unsplashUrl ||
-                "https://unsplash.com/?utm_source=kafferasten&utm_medium=referral";
+            pexels.href =
+                hero.pexelsUrl ||
+                "https://www.pexels.com/";
 
 
-            unsplash.target =
+            pexels.target =
                 "_blank";
 
 
-            unsplash.rel =
+            pexels.rel =
                 "noopener noreferrer";
 
 
-            unsplash.textContent =
-                "Unsplash";
+            pexels.textContent =
+                "Pexels";
 
 
             credit.append(
-                text1,
+                intro,
                 photographer,
-                text2,
-                unsplash
+                separator,
+                pexels
             );
 
 
@@ -2768,11 +2181,6 @@
                 "block";
         }
     }
-
-
-    // =====================================================
-    // SKRIBENTIKON
-    // =====================================================
 
 
     function bylineEmoji(
@@ -2799,24 +2207,7 @@
     }
 
 
-    // =====================================================
-    // SENASTE ARTIKEL
-    // =====================================================
-
-
     async function loadLatestNews() {
-
-        const badge =
-            document.getElementById(
-                "fika-badge"
-            );
-
-
-        const timeText =
-            document.getElementById(
-                "fika-time-text"
-            );
-
 
         try {
 
@@ -2826,19 +2217,12 @@
                     Date.now(),
                     {
                         cache:
-                            "no-store",
-
-                        headers: {
-                            Accept:
-                                "application/json"
-                        }
+                            "no-store"
                     }
                 );
 
 
-            if (
-                !response.ok
-            ) {
+            if (!response.ok) {
 
                 throw new Error(
                     "Kunde inte hämta senaste snackisen."
@@ -2850,19 +2234,16 @@
                 await response.json();
 
 
-            if (
-                !result.success ||
-                !result.latest
-            ) {
-
-                throw new Error(
-                    "Ingen sparad snackis hittades."
-                );
-            }
-
-
             const latest =
                 result.latest;
+
+
+            if (!latest) {
+
+                throw new Error(
+                    "Ingen latest hittades."
+                );
+            }
 
 
             const article =
@@ -2875,44 +2256,27 @@
                 null;
 
 
-            // ===============================================
-            // KATEGORI
-            // ===============================================
-
-
-            if (
-                badge
-            ) {
-
-                badge.textContent =
+            document
+                .getElementById(
+                    "fika-badge"
+                )
+                .textContent =
                     "☕ " +
                     cleanReaderText(
                         article.category ||
                         "Dagens snackis"
                     );
-            }
 
 
-            // ===============================================
-            // PUBLICERINGSTID
-            // ===============================================
-
-
-            if (
-                timeText
-            ) {
-
-                timeText.textContent =
+            document
+                .getElementById(
+                    "fika-time-text"
+                )
+                .textContent =
                     "Senast uppdaterad " +
                     formatPublishedTime(
                         latest.createdAt
                     );
-            }
-
-
-            // ===============================================
-            // RUBRIK
-            // ===============================================
 
 
             document
@@ -2921,14 +2285,8 @@
                 )
                 .textContent =
                     cleanReaderText(
-                        article.title ||
-                        "Dagens snackis"
+                        article.title
                     );
-
-
-            // ===============================================
-            // BILD
-            // ===============================================
 
 
             renderHero(
@@ -2937,33 +2295,15 @@
             );
 
 
-            // ===============================================
-            // FIKATIPS + FAKTA
-            // ===============================================
-
-
             renderSidebar(
                 latest.id ||
-                article.title ||
-                new Date()
-                    .toDateString()
+                article.title
             );
-
-
-            // ===============================================
-            // SNABBÖVERSIKT
-            // ===============================================
 
 
             const summaryBox =
                 document.getElementById(
                     "summary-box"
-                );
-
-
-            const summaryText =
-                document.getElementById(
-                    "article-summary"
                 );
 
 
@@ -2975,10 +2315,14 @@
                     "block";
 
 
-                summaryText.textContent =
-                    cleanReaderText(
-                        article.summary
-                    );
+                document
+                    .getElementById(
+                        "article-summary"
+                    )
+                    .textContent =
+                        cleanReaderText(
+                            article.summary
+                        );
 
             } else {
 
@@ -2987,18 +2331,13 @@
             }
 
 
-            // ===============================================
-            // BRÖDTEXT
-            // ===============================================
-
-
-            const textBox =
+            const articleText =
                 document.getElementById(
                     "article-text"
                 );
 
 
-            textBox.innerHTML =
+            articleText.innerHTML =
                 "";
 
 
@@ -3009,19 +2348,6 @@
                 )
             ) {
 
-                const cleaned =
-                    cleanReaderText(
-                        paragraph
-                    );
-
-
-                if (
-                    !cleaned
-                ) {
-                    continue;
-                }
-
-
                 const p =
                     document.createElement(
                         "p"
@@ -3029,27 +2355,21 @@
 
 
                 p.textContent =
-                    cleaned;
+                    cleanReaderText(
+                        paragraph
+                    );
 
 
-                textBox.appendChild(
+                articleText.appendChild(
                     p
                 );
             }
 
 
-            if (
-                !textBox.children.length
-            ) {
-
-                textBox.innerHTML =
-                    "<p>Redaktionen laddar kaffet och texten...</p>";
-            }
-
-
-            // ===============================================
-            // VARFÖR FIKA
-            // ===============================================
+            const reasons =
+                safeArray(
+                    article.whyTalkAboutIt
+                );
 
 
             const whyBox =
@@ -3061,12 +2381,6 @@
             const whyList =
                 document.getElementById(
                     "why-list"
-                );
-
-
-            const reasons =
-                safeArray(
-                    article.whyTalkAboutIt
                 );
 
 
@@ -3087,19 +2401,6 @@
                     of reasons
                 ) {
 
-                    const cleaned =
-                        cleanReaderText(
-                            reason
-                        );
-
-
-                    if (
-                        !cleaned
-                    ) {
-                        continue;
-                    }
-
-
                     const li =
                         document.createElement(
                             "li"
@@ -3107,7 +2408,9 @@
 
 
                     li.textContent =
-                        cleaned;
+                        cleanReaderText(
+                            reason
+                        );
 
 
                     whyList.appendChild(
@@ -3115,17 +2418,11 @@
                     );
                 }
 
-
             } else {
 
                 whyBox.style.display =
                     "none";
             }
-
-
-            // ===============================================
-            // SIGNATUR
-            // ===============================================
 
 
             const byline =
@@ -3172,11 +2469,6 @@
                 bylineBox.style.display =
                     "none";
             }
-
-
-            // ===============================================
-            // FIKAFRÅGA
-            // ===============================================
 
 
             document
@@ -3235,8 +2527,7 @@
 
                     radio.value =
                         String(
-                            index +
-                            1
+                            index + 1
                         );
 
 
@@ -3260,9 +2551,7 @@
             );
 
 
-        } catch (
-            error
-        ) {
+        } catch (error) {
 
             console.error(
                 error
@@ -3275,27 +2564,8 @@
                 )
                 .textContent =
                     "Kaffet är klart – snackisen dröjer lite";
-
-
-            document
-                .getElementById(
-                    "article-text"
-                )
-                .innerHTML =
-                    "<p>Redaktionen kunde inte hämta den senaste snackisen just nu. Testa att ladda om sidan om en liten stund.</p>";
-
-
-            renderSidebar(
-                new Date()
-                    .toDateString()
-            );
         }
     }
-
-
-    // =====================================================
-    // ARKIV
-    // =====================================================
 
 
     async function loadArchive() {
@@ -3314,41 +2584,13 @@
                     Date.now(),
                     {
                         cache:
-                            "no-store",
-
-                        headers: {
-                            Accept:
-                                "application/json"
-                        }
+                            "no-store"
                     }
                 );
 
 
-            if (
-                !response.ok
-            ) {
-
-                throw new Error(
-                    "Kunde inte hämta arkivet."
-                );
-            }
-
-
             const result =
                 await response.json();
-
-
-            if (
-                !result.success ||
-                !Array.isArray(
-                    result.articles
-                )
-            ) {
-
-                throw new Error(
-                    "Arkivet hade fel format."
-                );
-            }
 
 
             archiveList.innerHTML =
@@ -3356,7 +2598,9 @@
 
 
             const articles =
-                result.articles
+                safeArray(
+                    result.articles
+                )
 
                     .filter(
                         item =>
@@ -3370,17 +2614,6 @@
                         0,
                         5
                     );
-
-
-            if (
-                !articles.length
-            ) {
-
-                archiveList.innerHTML =
-                    "<p class='coming-soon'>Här dyker tidigare snackisar upp efter nästa publicering.</p>";
-
-                return;
-            }
 
 
             for (
@@ -3429,12 +2662,8 @@
                             item.createdAt
                         )
                     ]
-                    .filter(
-                        Boolean
-                    )
-                    .join(
-                        " · "
-                    );
+                    .filter(Boolean)
+                    .join(" · ");
 
 
                 const title =
@@ -3513,19 +2742,6 @@
                     )
                 ) {
 
-                    const cleaned =
-                        cleanReaderText(
-                            paragraph
-                        );
-
-
-                    if (
-                        !cleaned
-                    ) {
-                        continue;
-                    }
-
-
                     const p =
                         document.createElement(
                             "p"
@@ -3533,7 +2749,9 @@
 
 
                     p.textContent =
-                        cleaned;
+                        cleanReaderText(
+                            paragraph
+                        );
 
 
                     content.appendChild(
@@ -3542,7 +2760,7 @@
                 }
 
 
-                const archiveByline =
+                const byline =
                     cleanReaderText(
                         item.byline ||
                         article.byline ||
@@ -3551,7 +2769,7 @@
 
 
                 if (
-                    archiveByline
+                    byline
                 ) {
 
                     const signature =
@@ -3566,7 +2784,7 @@
 
                     signature.textContent =
                         "Skrivet av " +
-                        archiveByline +
+                        byline +
                         " ☕";
 
 
@@ -3587,69 +2805,52 @@
             }
 
 
-        } catch (
-            error
-        ) {
+        } catch (error) {
 
             console.error(
                 error
             );
 
 
-            archiveList.innerHTML =
-                "<p class='coming-soon'>Arkivet kunde inte hämtas just nu.</p>";
+            archiveList.textContent =
+                "Arkivet kunde inte hämtas just nu.";
         }
     }
-
-
-    // =====================================================
-    // DATUM
-    // =====================================================
 
 
     function formatPublishedTime(
         isoDate
     ) {
 
-        if (
-            !isoDate
-        ) {
+        if (!isoDate) {
             return "";
         }
 
 
-        try {
+        return new Intl.DateTimeFormat(
+            "sv-SE",
+            {
+                timeZone:
+                    "Europe/Stockholm",
 
-            return new Intl.DateTimeFormat(
-                "sv-SE",
-                {
-                    timeZone:
-                        "Europe/Stockholm",
+                day:
+                    "numeric",
 
-                    day:
-                        "numeric",
+                month:
+                    "long",
 
-                    month:
-                        "long",
+                hour:
+                    "2-digit",
 
-                    hour:
-                        "2-digit",
-
-                    minute:
-                        "2-digit"
-                }
+                minute:
+                    "2-digit"
+            }
+        )
+        .format(
+            new Date(
+                isoDate
             )
-            .format(
-                new Date(
-                    isoDate
-                )
-            );
-
-
-        } catch {
-
-            return "";
-        }
+        );
     }
 
 
@@ -3657,45 +2858,30 @@
         isoDate
     ) {
 
-        if (
-            !isoDate
-        ) {
+        if (!isoDate) {
             return "";
         }
 
 
-        try {
+        return new Intl.DateTimeFormat(
+            "sv-SE",
+            {
+                timeZone:
+                    "Europe/Stockholm",
 
-            return new Intl.DateTimeFormat(
-                "sv-SE",
-                {
-                    timeZone:
-                        "Europe/Stockholm",
+                day:
+                    "numeric",
 
-                    day:
-                        "numeric",
-
-                    month:
-                        "long"
-                }
+                month:
+                    "long"
+            }
+        )
+        .format(
+            new Date(
+                isoDate
             )
-            .format(
-                new Date(
-                    isoDate
-                )
-            );
-
-
-        } catch {
-
-            return "";
-        }
+        );
     }
-
-
-    // =====================================================
-    // TUMMAR
-    // =====================================================
 
 
     function voteThumb(
@@ -3720,23 +2906,13 @@
             );
 
 
-        if (
-            element
-        ) {
-
-            element.textContent =
-                Number(
-                    element.textContent
-                )
-                +
-                1;
-        }
+        element.textContent =
+            Number(
+                element.textContent
+            )
+            +
+            1;
     }
-
-
-    // =====================================================
-    // DELA
-    // =====================================================
 
 
     async function copyLink() {
@@ -3754,7 +2930,6 @@
                 "Länken är kopierad!"
             );
 
-
         } catch {
 
             alert(
@@ -3762,11 +2937,6 @@
             );
         }
     }
-
-
-    // =====================================================
-    // POLL
-    // =====================================================
 
 
     function submitPoll() {
@@ -3777,9 +2947,7 @@
             );
 
 
-        if (
-            !selected
-        ) {
+        if (!selected) {
 
             alert(
                 "Välj ett alternativ först!"
@@ -3806,11 +2974,6 @@
     }
 
 
-    // =====================================================
-    // KOMMENTAR
-    // =====================================================
-
-
     function addComment() {
 
         const nameInput =
@@ -3826,22 +2989,16 @@
 
 
         const name =
-            nameInput
-                .value
-                .trim()
+            nameInput.value.trim()
             ||
             "Anonym kollega";
 
 
         const text =
-            textInput
-                .value
-                .trim();
+            textInput.value.trim();
 
 
-        if (
-            !text
-        ) {
+        if (!text) {
 
             alert(
                 "Skriv en kommentar först!"
@@ -3851,38 +3008,16 @@
         }
 
 
-        const commentDiv =
+        const div =
             document.createElement(
                 "div"
             );
 
 
-        commentDiv.className =
-            "comment-item";
-
-
-        const strong =
-            document.createElement(
-                "strong"
-            );
-
-
-        strong.textContent =
+        div.textContent =
             name +
-            ":";
-
-
-        commentDiv.appendChild(
-            strong
-        );
-
-
-        commentDiv.append(
-            document.createTextNode(
-                " " +
-                text
-            )
-        );
+            ": " +
+            text;
 
 
         document
@@ -3890,7 +3025,7 @@
                 "comments-list"
             )
             .prepend(
-                commentDiv
+                div
             );
 
 
@@ -3901,11 +3036,6 @@
         textInput.value =
             "";
     }
-
-
-    // =====================================================
-    // START
-    // =====================================================
 
 
     async function startKafferasten() {
