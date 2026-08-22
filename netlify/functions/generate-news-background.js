@@ -1,34 +1,80 @@
 import { getStore } from "@netlify/blobs";
 
-export default async () => {
-  const OPENAI_API_KEY =
-    process.env.OPENAI_API_KEY;
+export default async (request) => {
+  const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+  const CRON_SECRET = process.env.KAFFERASTEN_CRON_SECRET;
 
-  const store =
-    getStore("kafferasten-news");
+  const store = getStore("kafferasten-news");
 
-  const now =
-    new Date();
+  const now = new Date();
 
-  const runId =
-    createRunId(now);
+  const runId = createRunId(now);
 
   const nowInSweden =
-    new Intl.DateTimeFormat(
-      "sv-SE",
-      {
-        timeZone:
-          "Europe/Stockholm",
-        dateStyle:
-          "full",
-        timeStyle:
-          "short"
-      }
-    ).format(now);
+    formatSwedishDateTime(now);
 
 
   // =====================================================
-  // DIAGNOSTIK – KÖRNING STARTAD
+  // KOSTNADSSKYDD
+  // =====================================================
+  //
+  // Generatorn får bara startas av vår egen
+  // schedule-news eller ett manuellt anrop som
+  // skickar rätt hemlighet.
+  // =====================================================
+
+  if (!CRON_SECRET) {
+    await saveGenerationStatus(
+      store,
+      {
+        runId,
+        status: "error",
+        stage: "security-config",
+        message:
+          "KAFFERASTEN_CRON_SECRET saknas i Netlify.",
+        startedAt:
+          now.toISOString(),
+        updatedAt:
+          new Date().toISOString(),
+        swedishTime:
+          nowInSweden
+      }
+    );
+
+    return jsonResponse(
+      {
+        success: false,
+        error:
+          "KAFFERASTEN_CRON_SECRET saknas i Netlify"
+      },
+      500
+    );
+  }
+
+
+  const authorization =
+    request.headers.get(
+      "authorization"
+    ) || "";
+
+
+  if (
+    authorization !==
+    `Bearer ${CRON_SECRET}`
+  ) {
+    return jsonResponse(
+      {
+        success: false,
+        error:
+          "Inte behörig att starta nyhetsgenereringen."
+      },
+      401
+    );
+  }
+
+
+  // =====================================================
+  // DIAGNOSTIK – START
   // =====================================================
 
   await saveGenerationStatus(
@@ -48,10 +94,6 @@ export default async () => {
     }
   );
 
-
-  // =====================================================
-  // KONTROLLERA API-NYCKEL
-  // =====================================================
 
   if (!OPENAI_API_KEY) {
     await saveGenerationStatus(
@@ -88,7 +130,9 @@ export default async () => {
 
   let generationLock;
 
+
   try {
+
     await saveGenerationStatus(
       store,
       {
@@ -106,6 +150,7 @@ export default async () => {
       }
     );
 
+
     generationLock =
       await acquireGenerationLock(
         store,
@@ -113,7 +158,10 @@ export default async () => {
         runId
       );
 
-    if (!generationLock.acquired) {
+
+    if (
+      !generationLock.acquired
+    ) {
       await saveGenerationStatus(
         store,
         {
@@ -137,6 +185,7 @@ export default async () => {
         }
       );
 
+
       return jsonResponse(
         {
           success: false,
@@ -151,6 +200,7 @@ export default async () => {
         409
       );
     }
+
 
     await saveGenerationStatus(
       store,
@@ -169,7 +219,9 @@ export default async () => {
       }
     );
 
+
   } catch (error) {
+
     await saveGenerationStatus(
       store,
       {
@@ -188,6 +240,7 @@ export default async () => {
           nowInSweden
       }
     );
+
 
     return jsonResponse(
       {
@@ -226,6 +279,7 @@ export default async () => {
       }
     );
 
+
     const recentHistory =
       await loadRecentHistory({
         store,
@@ -233,6 +287,13 @@ export default async () => {
         days: 14,
         limit: 20
       });
+
+
+    const recentTopicsForPrompt =
+      formatRecentTopicsForPrompt(
+        recentHistory
+      );
+
 
     await saveGenerationStatus(
       store,
@@ -253,10 +314,6 @@ export default async () => {
       }
     );
 
-    const recentTopicsForPrompt =
-      formatRecentTopicsForPrompt(
-        recentHistory
-      );
 
     const totalUsage = {
       research1: null,
@@ -270,6 +327,7 @@ export default async () => {
 
       writing: null
     };
+
 
     let rejectedTopic = "";
 
@@ -285,7 +343,7 @@ export default async () => {
     ) {
 
       // =====================================================
-      // STEG 1 – RESEARCH
+      // RESEARCH
       // =====================================================
 
       await saveGenerationStatus(
@@ -309,6 +367,7 @@ export default async () => {
         }
       );
 
+
       const research =
         await callOpenAI({
           apiKey:
@@ -319,8 +378,7 @@ export default async () => {
               "gpt-5.6-luna",
 
             reasoning: {
-              effort:
-                "none"
+              effort: "none"
             },
 
             max_tool_calls: 3,
@@ -336,8 +394,10 @@ export default async () => {
                 user_location: {
                   type:
                     "approximate",
+
                   country:
                     "SE",
+
                   timezone:
                     "Europe/Stockholm"
                 }
@@ -353,61 +413,57 @@ Du är researchredaktör för Kafferasten.se.
 Svensk tid:
 ${nowInSweden}
 
-Hitta EN aktuell snackis som passar riktigt bra vid en svensk fikarast.
+Hitta EN färsk, rolig eller intressant snackis
+som passar riktigt bra vid en svensk fikarast.
 
 Detta är kandidatförsök ${candidateAttempt} av 3.
 
-KRAV:
-Själva händelsen måste ha inträffat under de senaste 72 timmarna.
+GRUNDKRAV:
 
-En ny artikel om en gammal händelse räcker inte.
+- Själva händelsen ska normalt ha inträffat under de senaste 72 timmarna.
+- En ny artikel om en gammal händelse gör inte händelsen ny.
+- Ämnet ska vara lätt att förstå även för den som inte redan följer nyheten.
+- Det ska finnas en naturlig fikafråga eller åsikt att haka upp samtalet på.
 
-MYCKET VIKTIGT – REDAKTIONELLT MINNE:
+REDAKTIONELLT MINNE – MYCKET VIKTIGT:
 
-Nedan finns ämnen som Kafferasten.se redan har publicerat de senaste 14 dagarna.
-
-Välj INTE samma huvudsakliga:
-- händelse
-- TV-program
-- film
-- serie
-- person + händelse
-- premiär
-- lansering
-- trailer
-- nyhetsvinkel
-
-En ny rubrik eller omskrivning gör INTE ämnet nytt.
-
-Exempel:
-
-Om "Outer Banks säsong 5 har släppts" redan finns får du INTE välja:
-
-- Outer Banks är tillbaka
-- Sista säsongen av Outer Banks
-- Streamingpubliken får nya Outer Banks
-- Outer Banks-finalen väcker reaktioner
-
-Det är samma huvudsakliga nyhet.
-
-TIDIGARE PUBLICERADE ÄMNEN:
+Kafferasten.se har redan publicerat följande ämnen
+de senaste 14 dagarna:
 
 ${recentTopicsForPrompt || "Inga tidigare ämnen finns ännu."}
 
-Prioritera:
-- nöje
+Välj INTE samma huvudsakliga:
+- händelse
+- premiär
+- trailer
+- lansering
+- person + händelse
+- TV-program + händelse
+- film + händelse
+- serie + händelse
+- annan omskrivning av samma nyhet
+
+En annan rubrik räknas inte som en ny snackis.
+
+Prioritera gärna:
+
+- nöje och populärkultur
 - TV och streaming
-- populärkultur
-- arbetsliv
-- vardagsfenomen
+- musik
+- internetkultur
+- virala fenomen
 - teknik
 - konsumentnyheter
+- arbetsliv
+- vardagsfenomen
 - udda eller roliga nyheter
-- bred sport
-- svenska traditioner och fenomen
-- sådant som får folk att säga "Har ni hört?"
+- bred sport med tydlig snackisfaktor
+- svenska traditioner och säsongsfenomen
+- sådant som får folk att säga:
+  "Va? Har du hört det här?"
 
 Undvik:
+
 - krig
 - dödsfall
 - tragedier
@@ -421,24 +477,39 @@ Använd inte Reddit som källa.
 
 Försök hitta minst två oberoende trovärdiga källor.
 
-Om det bara finns en stark och trovärdig källa
-kan ämnet ändå föreslås.
+En stark och trovärdig källa får räcka
+om nyheten tydligt kan verifieras.
 
-${
-  rejectedTopic
-    ? `
+${rejectedTopic
+  ? `
 VIKTIGT:
 
-Ett tidigare förslag i denna körning har underkänts.
+Ett tidigare förslag i denna körning
+har underkänts.
 
-Välj INTE detta ämne eller en omskrivning av samma händelse:
+Välj INTE detta ämne eller en omskrivning
+av samma händelse:
 
 ${rejectedTopic}
 `
-    : ""
+  : ""
 }
 
-Svara kort:
+Bedöm också vilken TON ämnet naturligt passar för:
+
+UNGDOMLIG
+= musik, gaming, sociala medier, unga kändisar,
+internetfenomen, trendig populärkultur eller annat
+som tydligt drar yngre.
+
+BRED
+= allmän snackis för många åldrar.
+
+KLASSISK
+= traditioner, vardagsfenomen, nostalgi
+eller annat med klassisk fikabordskänsla.
+
+Svara kort i exakt denna struktur:
 
 VINNARE:
 [ämnet]
@@ -448,6 +519,9 @@ FÄRSK TRIGGER:
 
 TRIGGERDATUM:
 [YYYY-MM-DD]
+
+TON:
+[UNGDOMLIG, BRED eller KLASSISK]
 
 FAKTA:
 - 3 till 5 verifierade fakta
@@ -462,6 +536,7 @@ Använd källhänvisningar.
 
 
       if (!research.ok) {
+
         await saveGenerationStatus(
           store,
           {
@@ -486,6 +561,7 @@ Använd källhänvisningar.
               nowInSweden
           }
         );
+
 
         return jsonResponse(
           {
@@ -513,9 +589,37 @@ Använd källhänvisningar.
           research.data
         );
 
+
       const researchText =
         researchPart?.text ||
         "";
+
+
+      const researchSources =
+        filterAllowedSources(
+          extractCitedSources(
+            researchPart
+          )
+        );
+
+
+      // =====================================================
+      // BESTÄM SKRIBENT
+      // =====================================================
+
+      const editorialTone =
+        normalizeEditorialTone(
+          extractField(
+            researchText,
+            "TON"
+          )
+        );
+
+
+      const byline =
+        chooseByline(
+          editorialTone
+        );
 
 
       await saveGenerationStatus(
@@ -528,6 +632,8 @@ Använd källhänvisningar.
           message:
             "Research klar.",
           candidateAttempt,
+          editorialTone,
+          byline,
           researchPreview:
             researchText.slice(
               0,
@@ -543,42 +649,9 @@ Använd källhänvisningar.
       );
 
 
-      const researchSources =
-        filterAllowedSources(
-          extractCitedSources(
-            researchPart
-          )
-        );
-
-
       // =====================================================
-      // STEG 2 – FAKTAKONTROLL
+      // FAKTAKONTROLL
       // =====================================================
-
-      await saveGenerationStatus(
-        store,
-        {
-          runId,
-          status: "running",
-          stage:
-            `verification-${candidateAttempt}`,
-          message:
-            "Faktakontrollerar kandidaten.",
-          candidateAttempt,
-          researchPreview:
-            researchText.slice(
-              0,
-              500
-            ),
-          startedAt:
-            now.toISOString(),
-          updatedAt:
-            new Date().toISOString(),
-          swedishTime:
-            nowInSweden
-        }
-      );
-
 
       const verification =
         await callOpenAI({
@@ -590,8 +663,7 @@ Använd källhänvisningar.
               "gpt-5.6-luna",
 
             reasoning: {
-              effort:
-                "none"
+              effort: "none"
             },
 
             max_tool_calls: 3,
@@ -607,8 +679,10 @@ Använd källhänvisningar.
                 user_location: {
                   type:
                     "approximate",
+
                   country:
                     "SE",
+
                   timezone:
                     "Europe/Stockholm"
                 }
@@ -634,37 +708,28 @@ Du ska:
 2. fastställa datumet för triggern
 3. försöka hitta minst två oberoende trovärdiga källor
 4. säkerställa att själva händelsen är högst 72 timmar gammal
-5. skilja på artikelns publiceringsdatum och datumet då händelsen faktiskt inträffade
-
-VIKTIGT OM KÄLLOR:
+5. skilja på artikelns publiceringsdatum
+   och datumet då händelsen faktiskt inträffade
 
 Två oberoende källor är önskvärt.
 
-Men om bara EN stark och trovärdig källa finns
-får händelsen ändå markeras som AKTUELL: JA,
-förutsatt att händelsen tydligt kan verifieras.
+Men EN stark och trovärdig källa räcker
+om händelsen tydligt kan verifieras.
 
 En stark källa kan exempelvis vara:
+
 - etablerat nyhetsmedium
 - officiell organisation
 - officiell pressida
 - etablerat branschmedium
-- företagets eller programmets officiella sida
+- relevant officiell produkt- eller programsida
 
 Använd inte:
+
 - Reddit
 - forum
-- rena sociala medier som verifieringskälla
 - tveksamma aggregatorsidor
-
-Prioritera:
-- etablerade medier
-- officiella organisationer
-- officiella pressidor
-- etablerade branschmedier
-
-Två artiklar från samma organisation
-räknas inte som två oberoende källor.
+- rena sociala medier som verifieringskälla
 
 Svara exakt:
 
@@ -687,6 +752,7 @@ Använd källhänvisningar.
 
 
       if (!verification.ok) {
+
         await saveGenerationStatus(
           store,
           {
@@ -711,6 +777,7 @@ Använd källhänvisningar.
               nowInSweden
           }
         );
+
 
         return jsonResponse(
           {
@@ -737,6 +804,7 @@ Använd källhänvisningar.
         getOutputTextPart(
           verification.data
         );
+
 
       const verificationText =
         verificationPart?.text ||
@@ -815,6 +883,8 @@ Använd källhänvisningar.
             ),
           independentSources:
             independentSources.length,
+          editorialTone,
+          byline,
           verificationPreview:
             verificationText.slice(
               0,
@@ -829,19 +899,6 @@ Använd källhänvisningar.
         }
       );
 
-
-      // =====================================================
-      // KANDIDAT UNDERKÄND AV FAKTAKONTROLL
-      // =====================================================
-      //
-      // NY REGEL:
-      //
-      // Tidigare krävde vi minst 2 oberoende
-      // källor här.
-      //
-      // Nu räcker 1 trovärdig källa.
-      // Två är fortfarande målet.
-      // =====================================================
 
       if (
         !saysCurrent ||
@@ -896,21 +953,15 @@ Använd källhänvisningar.
         return jsonResponse(
           {
             success: false,
-
             stage:
               "verification",
-
             error:
               "Ingen kandidat klarade kraven på färsk trigger och minst en trovärdig källa.",
-
             triggerDate,
-
             sources:
               independentSources,
-
             usage: {
               ...totalUsage,
-
               totalTokens:
                 calculateTotalTokens(
                   totalUsage
@@ -950,30 +1001,8 @@ Använd källhänvisningar.
 
 
       // =====================================================
-      // STEG 2B – LOKAL DUBLETTCHECK
+      // DUBLETTCHECK
       // =====================================================
-
-      await saveGenerationStatus(
-        store,
-        {
-          runId,
-          status: "running",
-          stage:
-            `duplicate-check-${candidateAttempt}`,
-          message:
-            "Jämför kandidaten med tidigare publicerade snackisar.",
-          candidateAttempt,
-          triggerDescription:
-            verifiedTrigger.description,
-          startedAt:
-            now.toISOString(),
-          updatedAt:
-            new Date().toISOString(),
-          swedishTime:
-            nowInSweden
-        }
-      );
-
 
       const duplicateCandidate =
         findDuplicateMatch({
@@ -987,9 +1016,13 @@ Använd källhänvisningar.
         });
 
 
-      if (duplicateCandidate) {
+      if (
+        duplicateCandidate
+      ) {
+
         rejectedTopic =
           `Dubblett mot tidigare publicering: "${duplicateCandidate.title}". Välj ett helt annat ämne.`;
+
 
         await saveGenerationStatus(
           store,
@@ -1039,7 +1072,7 @@ Använd källhänvisningar.
 
 
       // =====================================================
-      // STEG 3 – SKRIV ARTIKEL
+      // SKRIV ARTIKEL
       // =====================================================
 
       await saveGenerationStatus(
@@ -1049,8 +1082,10 @@ Använd källhänvisningar.
           status: "running",
           stage: "writing",
           message:
-            "Kandidaten är godkänd. Skriver den färdiga artikeln.",
+            `${byline} skriver den färdiga artikeln.`,
           candidateAttempt,
+          editorialTone,
+          byline,
           triggerDescription:
             verifiedTrigger.description,
           triggerDate:
@@ -1084,10 +1119,14 @@ Använd källhänvisningar.
             input: `
 Du är skribent på Kafferasten.se.
 
+Dagens signatur är:
+${byline}
+
 Svensk tid:
 ${nowInSweden}
 
-Skriv en färdig artikel ENBART utifrån verifierad information.
+Skriv en färdig artikel ENBART
+utifrån verifierad information.
 
 RESEARCH:
 
@@ -1114,25 +1153,72 @@ ${selectedSources
   )
   .join("\n")}
 
-REGLER:
+KAFFERASTENS RÖST – MYCKET VIKTIGT:
 
-- använd bara verifierade fakta
-- hitta aldrig på datum
-- hitta aldrig på personer
-- hitta aldrig på citat
-- hitta aldrig på siffror
-- framhäv vad som faktiskt är nytt
-- skriv enkelt
-- skriv lättsam svenska
-- texten ska fungera för en vanlig svensk fikarast
-- 2 eller 3 korta stycken
-- undvik onödiga detaljer
-- ingen clickbait
-- rubriken ska vara tydlig och lockande
-- sammanfattningen ska vara kort
-- "whyTalkAboutIt" ska vara konkreta samtalsöppnare
-- pollfrågan ska vara enkel att svara på
-- pollfrågan ska ha exakt två alternativ
+- Skriv idiomatisk och naturlig svenska.
+- Texten får aldrig kännas direktöversatt från engelska.
+- Översätt engelska beskrivande ord när svenska är naturligt.
+- Skriv exempelvis "kristet metalband", ALDRIG "Christian metalband".
+- Behåll riktiga egennamn, filmtitlar, artistnamn,
+  varumärken och etablerade engelska titlar när de faktiskt heter så.
+- Undvik svengelska konstruktioner.
+- Undvik pressmeddelandespråk.
+- Undvik stela AI-formuleringar.
+- Våga ta ut svängarna språkligt.
+- Rubriken får ha humor, en oväntad formulering
+  eller en tydlig fikakrok.
+- Hitta däremot aldrig på fakta för att göra texten roligare.
+- Skriv som en kvick människa som just hittat något
+  hon verkligen vill berätta för kollegorna.
+- Var varm, nyfiken och lite smårolig.
+- Var inte tramsig.
+- Var inte hurtig.
+- Var inte krystat ungdomlig.
+- Undvik tomma klichéer som:
+  "väcker reaktioner",
+  "skapar rubriker",
+  "internet exploderar",
+  om de inte faktiskt tillför något.
+- Rubriken ska säga vad som hänt
+  och gärna samtidigt ge läsaren en anledning
+  att vilja prata om det.
+- Sammanfattningen ska vara högst två meningar.
+- Brödtexten ska vara 2 eller 3 korta stycken.
+- Tänk mobil.
+- "whyTalkAboutIt" ska vara 2–3 konkreta,
+  lite spetsiga samtalsöppnare.
+- Upprepa inte bara artikelns fakta där.
+- Pollfrågan ska vara enkel och gärna lite lekfull.
+- Pollfrågan ska ha exakt två alternativ.
+
+SKRIBENTENS TON:
+
+${writerVoice(byline)}
+
+BILDMETADATA FÖR NÄSTA PASS:
+
+Du ska också föreslå bildmetadata.
+Du ska INTE ange någon faktisk bild-URL.
+
+imageSearchQuery:
+- 3–7 konkreta engelska sökord
+- ska fungera för sökning efter licensierad stockbild
+- undvik abstrakta ord
+- om en exakt person, film eller TV-serie knappast finns
+  som stockbild, välj en relevant visuell metafor eller miljö
+
+imageAlt:
+- kort och naturlig svensk alt-text
+
+imagePrompt:
+- kort beskrivning för en redaktionell AI-illustration
+- ska passa artikeln
+- ingen text i bilden
+- inga logotyper
+- hitta inte på en nyhetshändelse som inte hänt
+
+imageStyle:
+- photo eller illustration
 `,
 
             text: {
@@ -1193,10 +1279,13 @@ REGLER:
                     paragraphs: {
                       type:
                         "array",
+
                       minItems:
                         2,
+
                       maxItems:
                         3,
+
                       items: {
                         type:
                           "string"
@@ -1206,10 +1295,13 @@ REGLER:
                     whyTalkAboutIt: {
                       type:
                         "array",
+
                       minItems:
                         2,
+
                       maxItems:
                         3,
+
                       items: {
                         type:
                           "string"
@@ -1224,14 +1316,42 @@ REGLER:
                     pollOptions: {
                       type:
                         "array",
+
                       minItems:
                         2,
+
                       maxItems:
                         2,
+
                       items: {
                         type:
                           "string"
                       }
+                    },
+
+                    imageSearchQuery: {
+                      type:
+                        "string"
+                    },
+
+                    imageAlt: {
+                      type:
+                        "string"
+                    },
+
+                    imagePrompt: {
+                      type:
+                        "string"
+                    },
+
+                    imageStyle: {
+                      type:
+                        "string",
+
+                      enum: [
+                        "photo",
+                        "illustration"
+                      ]
                     }
                   },
 
@@ -1244,7 +1364,11 @@ REGLER:
                     "paragraphs",
                     "whyTalkAboutIt",
                     "pollQuestion",
-                    "pollOptions"
+                    "pollOptions",
+                    "imageSearchQuery",
+                    "imageAlt",
+                    "imagePrompt",
+                    "imageStyle"
                   ]
                 }
               }
@@ -1253,7 +1377,10 @@ REGLER:
         });
 
 
-      if (!writing.ok) {
+      if (
+        !writing.ok
+      ) {
+
         await saveGenerationStatus(
           store,
           {
@@ -1277,11 +1404,11 @@ REGLER:
           }
         );
 
+
         return jsonResponse(
           {
             success: false,
-            stage:
-              "writing",
+            stage: "writing",
             error:
               writing.data.error ||
               writing.data
@@ -1306,13 +1433,16 @@ REGLER:
 
 
       try {
+
         article =
           JSON.parse(
             writingPart?.text ||
             ""
           );
 
+
       } catch (error) {
+
         await saveGenerationStatus(
           store,
           {
@@ -1341,11 +1471,11 @@ REGLER:
           }
         );
 
+
         return jsonResponse(
           {
             success: false,
-            stage:
-              "writing",
+            stage: "writing",
             error:
               "Artikeln kunde inte läsas som JSON."
           },
@@ -1354,7 +1484,9 @@ REGLER:
       }
 
 
-      // Modellen får inte ändra triggern själv.
+      // =====================================================
+      // SERVERN BESTÄMMER DESSA FÄLT
+      // =====================================================
 
       article.triggerDate =
         triggerDate;
@@ -1362,35 +1494,15 @@ REGLER:
       article.freshTrigger =
         verifiedTrigger.description;
 
+      article.byline =
+        byline;
 
-      await saveGenerationStatus(
-        store,
-        {
-          runId,
-          status: "running",
-          stage:
-            "article-written",
-          message:
-            "Artikeln är färdigskriven.",
-          candidateAttempt,
-          title:
-            article.title ||
-            null,
-          category:
-            article.category ||
-            null,
-          startedAt:
-            now.toISOString(),
-          updatedAt:
-            new Date().toISOString(),
-          swedishTime:
-            nowInSweden
-        }
-      );
+      article.editorialTone =
+        editorialTone;
 
 
       // =====================================================
-      // STEG 3B – SLUTLIG DUBLETTCHECK
+      // SLUTLIG DUBLETTCHECK
       // =====================================================
 
       const duplicateArticle =
@@ -1410,9 +1522,13 @@ REGLER:
         });
 
 
-      if (duplicateArticle) {
+      if (
+        duplicateArticle
+      ) {
+
         rejectedTopic =
           `Den färdiga artikeln blev för lik "${duplicateArticle.title}". Välj ett helt annat ämne.`;
+
 
         await saveGenerationStatus(
           store,
@@ -1465,7 +1581,7 @@ REGLER:
 
 
       // =====================================================
-      // STEG 4 – BYGG SPARAD POST
+      // BYGG POST
       // =====================================================
 
       const articleId =
@@ -1475,6 +1591,7 @@ REGLER:
 
 
       const savedNews = {
+
         id:
           articleId,
 
@@ -1483,19 +1600,13 @@ REGLER:
             .toISOString(),
 
         generatedAt:
-          new Intl.DateTimeFormat(
-            "sv-SE",
-            {
-              timeZone:
-                "Europe/Stockholm",
-              dateStyle:
-                "full",
-              timeStyle:
-                "short"
-            }
-          ).format(
+          formatSwedishDateTime(
             new Date()
           ),
+
+        byline,
+
+        editorialTone,
 
         verifiedTrigger,
 
@@ -1507,7 +1618,7 @@ REGLER:
 
 
       // =====================================================
-      // STEG 5 – HÄMTA NUVARANDE LATEST
+      // PUBLICERING
       // =====================================================
 
       await saveGenerationStatus(
@@ -1515,14 +1626,14 @@ REGLER:
         {
           runId,
           status: "running",
-          stage:
-            "publishing",
+          stage: "publishing",
           message:
             "Artikeln är godkänd. Förbereder publicering.",
           title:
             article.title,
-          articleId:
-            articleId,
+          byline,
+          editorialTone,
+          articleId,
           startedAt:
             now.toISOString(),
           updatedAt:
@@ -1545,59 +1656,22 @@ REGLER:
         );
 
 
-      // =====================================================
-      // STEG 6 – ARKIVERA FÖREGÅENDE LATEST
-      // =====================================================
+      if (
+        previousLatest?.id
+      ) {
 
-      if (previousLatest?.id) {
         await store.setJSON(
           `archive/${previousLatest.id}`,
           previousLatest
         );
-
-
-        await saveGenerationStatus(
-          store,
-          {
-            runId,
-            status: "running",
-            stage:
-              "previous-archived",
-            message:
-              "Föregående huvudartikel har arkiverats.",
-            archivedPreviousId:
-              previousLatest.id,
-            archivedPreviousTitle:
-              previousLatest
-                .article
-                ?.title ||
-              null,
-            newTitle:
-              article.title,
-            startedAt:
-              now.toISOString(),
-            updatedAt:
-              new Date().toISOString(),
-            swedishTime:
-              nowInSweden
-          }
-        );
       }
 
-
-      // =====================================================
-      // STEG 7 – SPARA NY LATEST
-      // =====================================================
 
       await store.setJSON(
         "latest",
         savedNews
       );
 
-
-      // =====================================================
-      // KONTROLLÄS LATEST
-      // =====================================================
 
       const confirmation =
         await store.get(
@@ -1616,6 +1690,7 @@ REGLER:
         confirmation.id !==
           articleId
       ) {
+
         await saveGenerationStatus(
           store,
           {
@@ -1656,7 +1731,7 @@ REGLER:
 
 
       // =====================================================
-      // KLART!
+      // KLART
       // =====================================================
 
       await saveGenerationStatus(
@@ -1664,8 +1739,7 @@ REGLER:
         {
           runId,
           status: "success",
-          stage:
-            "published",
+          stage: "published",
           message:
             "Ny artikel har publicerats som latest.",
           articleId,
@@ -1673,6 +1747,10 @@ REGLER:
             article.title,
           category:
             article.category,
+          byline,
+          editorialTone,
+          imageSearchQuery:
+            article.imageSearchQuery,
           candidateAttempt,
           historyChecked:
             recentHistory.length,
@@ -1692,17 +1770,7 @@ REGLER:
           updatedAt:
             new Date().toISOString(),
           swedishTime:
-            new Intl.DateTimeFormat(
-              "sv-SE",
-              {
-                timeZone:
-                  "Europe/Stockholm",
-                dateStyle:
-                  "full",
-                timeStyle:
-                  "short"
-              }
-            ).format(
+            formatSwedishDateTime(
               new Date()
             )
         }
@@ -1719,6 +1787,10 @@ REGLER:
           runId,
 
           candidateAttempt,
+
+          byline,
+
+          editorialTone,
 
           latest:
             savedNews,
@@ -1752,8 +1824,7 @@ REGLER:
       {
         runId,
         status: "error",
-        stage:
-          "no-result",
+        stage: "no-result",
         message:
           "Alla kandidatförsök tog slut utan publicering.",
         startedAt:
@@ -1777,6 +1848,7 @@ REGLER:
 
 
   } catch (error) {
+
     await saveGenerationStatus(
       store,
       {
@@ -1819,11 +1891,10 @@ REGLER:
 
   } finally {
 
-    // =====================================================
-    // SLÄPP KÖRLÅSET
-    // =====================================================
+    if (
+      generationLock?.token
+    ) {
 
-    if (generationLock?.token) {
       await releaseGenerationLock(
         store,
         generationLock.token
@@ -1841,13 +1912,17 @@ async function saveGenerationStatus(
   store,
   data
 ) {
+
   try {
+
     await store.setJSON(
       "_diagnostics/generation-status",
       data
     );
 
+
   } catch (error) {
+
     console.error(
       "Kunde inte spara generation-status:",
       error
@@ -1865,13 +1940,10 @@ async function acquireGenerationLock(
   now,
   runId
 ) {
+
   const key =
     "_locks/generate-news";
 
-
-  // Om ett jobb har dött helt får
-  // låset betraktas som gammalt
-  // efter 20 minuter.
 
   const staleAfterMs =
     20 *
@@ -1883,15 +1955,16 @@ async function acquireGenerationLock(
     await store.get(
       key,
       {
-        type:
-          "json",
-        consistency:
-          "strong"
+        type: "json",
+        consistency: "strong"
       }
     );
 
 
-  if (existing?.startedAt) {
+  if (
+    existing?.startedAt
+  ) {
+
     const started =
       new Date(
         existing.startedAt
@@ -1904,10 +1977,14 @@ async function acquireGenerationLock(
 
 
     if (
-      Number.isFinite(age) &&
+      Number.isFinite(
+        age
+      ) &&
       age >= 0 &&
-      age < staleAfterMs
+      age <
+        staleAfterMs
     ) {
+
       return {
         acquired: false,
         startedAt:
@@ -1918,8 +1995,6 @@ async function acquireGenerationLock(
       };
     }
 
-
-    // Gammalt övergivet lås.
 
     await store.delete(
       key
@@ -1936,12 +2011,14 @@ async function acquireGenerationLock(
   const result =
     await store.setJSON(
       key,
+
       {
         token,
         runId,
         startedAt:
           now.toISOString()
       },
+
       {
         onlyIfNew:
           true
@@ -1949,15 +2026,16 @@ async function acquireGenerationLock(
     );
 
 
-  if (!result.modified) {
+  if (
+    !result.modified
+  ) {
+
     const current =
       await store.get(
         key,
         {
-          type:
-            "json",
-          consistency:
-            "strong"
+          type: "json",
+          consistency: "strong"
         }
       );
 
@@ -1988,20 +2066,21 @@ async function releaseGenerationLock(
   store,
   token
 ) {
+
   if (!token) {
     return;
   }
 
 
   try {
+
     const current =
       await store.get(
         "_locks/generate-news",
+
         {
-          type:
-            "json",
-          consistency:
-            "strong"
+          type: "json",
+          consistency: "strong"
         }
       );
 
@@ -2010,6 +2089,7 @@ async function releaseGenerationLock(
       current?.token ===
       token
     ) {
+
       await store.delete(
         "_locks/generate-news"
       );
@@ -2017,6 +2097,7 @@ async function releaseGenerationLock(
 
 
   } catch (error) {
+
     console.error(
       "Kunde inte släppa körlåset:",
       error
@@ -2026,7 +2107,7 @@ async function releaseGenerationLock(
 
 
 // =====================================================
-// REDAKTIONELLT MINNE
+// HISTORIK
 // =====================================================
 
 async function loadRecentHistory({
@@ -2035,30 +2116,29 @@ async function loadRecentHistory({
   days,
   limit
 }) {
+
   const result =
     [];
+
 
   const seenIds =
     new Set();
 
 
-  // =====================================================
-  // NUVARANDE LATEST
-  // =====================================================
-
   const latest =
     await store.get(
       "latest",
       {
-        type:
-          "json",
-        consistency:
-          "strong"
+        type: "json",
+        consistency: "strong"
       }
     );
 
 
-  if (latest?.id) {
+  if (
+    latest?.id
+  ) {
+
     result.push(
       latest
     );
@@ -2068,10 +2148,6 @@ async function loadRecentHistory({
     );
   }
 
-
-  // =====================================================
-  // ARKIV
-  // =====================================================
 
   const listing =
     await store.list({
@@ -2111,14 +2187,13 @@ async function loadRecentHistory({
 
 
     try {
+
       const item =
         await store.get(
           key,
           {
-            type:
-              "json",
-            consistency:
-              "strong"
+            type: "json",
+            consistency: "strong"
           }
         );
 
@@ -2140,6 +2215,7 @@ async function loadRecentHistory({
           days
         )
       ) {
+
         result.push(
           item
         );
@@ -2151,6 +2227,7 @@ async function loadRecentHistory({
 
 
     } catch (error) {
+
       console.warn(
         "Kunde inte läsa arkivpost:",
         key,
@@ -2189,7 +2266,10 @@ async function loadRecentHistory({
 function formatRecentTopicsForPrompt(
   history
 ) {
-  if (!history.length) {
+
+  if (
+    !history.length
+  ) {
     return "";
   }
 
@@ -2249,20 +2329,120 @@ function formatRecentTopicsForPrompt(
 
 
 // =====================================================
-// DUBLETTSKYDD
+// SKRIBENT
+// =====================================================
+
+function normalizeEditorialTone(
+  value
+) {
+
+  const normalized =
+    String(
+      value ||
+      ""
+    )
+      .trim()
+      .toUpperCase();
+
+
+  if (
+    normalized.includes(
+      "UNGDOMLIG"
+    )
+  ) {
+    return "UNGDOMLIG";
+  }
+
+
+  if (
+    normalized.includes(
+      "KLASSISK"
+    )
+  ) {
+    return "KLASSISK";
+  }
+
+
+  return "BRED";
+}
+
+
+function chooseByline(
+  editorialTone
+) {
+
+  if (
+    editorialTone ===
+    "UNGDOMLIG"
+  ) {
+    return "Camille";
+  }
+
+
+  return Math.random() <
+    0.5
+    ? "Kent på Kafferasten"
+    : "Bettan";
+}
+
+
+function writerVoice(
+  byline
+) {
+
+  if (
+    byline ===
+    "Camille"
+  ) {
+
+    return `
+Camille är snabb, samtida och popkulturellt nyfiken.
+Hon kan vara lekfull och pigg, men använder naturlig svenska.
+Hon tvingar aldrig in ungdomsslang eller engelska uttryck.
+`;
+  }
+
+
+  if (
+    byline ===
+    "Bettan"
+  ) {
+
+    return `
+Bettan är varm, kvick och vardagsnära.
+Hon ser gärna den mänskliga eller småroliga detaljen
+som gör att folk börjar prata.
+Hon blir aldrig hurtig eller tillgjord.
+`;
+  }
+
+
+  return `
+Kent på Kafferasten är nyfiken, torrt smårolig och lite klurig.
+Han gillar en bra formulering och en oväntad vinkel,
+men håller texten enkel, folklig och lätt att prata vidare om.
+`;
+}
+
+
+// =====================================================
+// DUBLETTER
 // =====================================================
 
 function findDuplicateMatch({
   candidateText,
   history
 }) {
+
   const candidate =
     buildTopicTokens(
       candidateText
     );
 
 
-  if (!candidate.size) {
+  if (
+    !candidate.size
+  ) {
     return null;
   }
 
@@ -2295,7 +2475,9 @@ function findDuplicateMatch({
       );
 
 
-    if (!previous.size) {
+    if (
+      !previous.size
+    ) {
       continue;
     }
 
@@ -2319,14 +2501,10 @@ function findDuplicateMatch({
       ]);
 
 
-    const unionSize =
-      union.size;
-
-
     const jaccard =
-      unionSize
+      union.size
         ? intersection.length /
-          unionSize
+          union.size
         : 0;
 
 
@@ -2357,7 +2535,10 @@ function findDuplicateMatch({
       hasRareExactToken;
 
 
-    if (looksDuplicate) {
+    if (
+      looksDuplicate
+    ) {
+
       return {
         id:
           item.id ||
@@ -2494,12 +2675,16 @@ const GENERIC_TOPIC_WORDS =
 function buildTopicTokens(
   text
 ) {
+
   return new Set(
+
     normalizeTopicText(
       text
     )
       .split(" ")
+
       .filter(Boolean)
+
       .filter(
         token =>
           token.length >= 3 &&
@@ -2517,32 +2702,38 @@ function buildTopicTokens(
 function normalizeTopicText(
   text
 ) {
+
   return String(
     text ||
     ""
   )
     .toLowerCase()
+
     .normalize(
       "NFD"
     )
+
     .replace(
       /[\u0300-\u036f]/g,
       ""
     )
+
     .replace(
       /[^a-z0-9åäö]+/gi,
       " "
     )
+
     .replace(
       /\s+/g,
       " "
     )
+
     .trim();
 }
 
 
 // =====================================================
-// DATUMFILTER HISTORIK
+// DATUMFILTER
 // =====================================================
 
 function isWithinDays(
@@ -2550,6 +2741,7 @@ function isWithinDays(
   now,
   days
 ) {
+
   if (!isoDate) {
     return true;
   }
@@ -2595,9 +2787,11 @@ async function callOpenAI({
   apiKey,
   body
 }) {
+
   const response =
     await fetch(
       "https://api.openai.com/v1/responses",
+
       {
         method:
           "POST",
@@ -2622,10 +2816,13 @@ async function callOpenAI({
 
 
   try {
+
     data =
       await response.json();
 
+
   } catch {
+
     data = {
       error:
         "OpenAI-svaret kunde inte läsas som JSON."
@@ -2652,6 +2849,7 @@ async function callOpenAI({
 function getOutputTextPart(
   data
 ) {
+
   const message =
     data.output
       ?.find(
@@ -2678,14 +2876,17 @@ function getOutputTextPart(
 function extractCitedSources(
   textPart
 ) {
+
   return (
     textPart
       ?.annotations
+
       ?.filter(
         annotation =>
           annotation.type ===
           "url_citation"
       )
+
       ?.map(
         annotation => ({
           title:
@@ -2696,10 +2897,12 @@ function extractCitedSources(
             annotation.url
         })
       )
+
       ?.filter(
         source =>
           source.url
       ) ||
+
     []
   );
 }
@@ -2708,10 +2911,12 @@ function extractCitedSources(
 function filterAllowedSources(
   sources
 ) {
+
   return sources.filter(
     source => {
 
       try {
+
         const hostname =
           new URL(
             source.url
@@ -2727,6 +2932,7 @@ function filterAllowedSources(
             ".reddit.com"
           )
         ) {
+
           return false;
         }
 
@@ -2735,6 +2941,7 @@ function filterAllowedSources(
 
 
       } catch {
+
         return false;
       }
     }
@@ -2745,6 +2952,7 @@ function filterAllowedSources(
 function dedupeSources(
   sources
 ) {
+
   return sources.filter(
     (
       source,
@@ -2768,7 +2976,9 @@ function dedupeSources(
 function getDomain(
   url
 ) {
+
   try {
+
     const hostname =
       new URL(
         url
@@ -2812,6 +3022,7 @@ function getDomain(
         lastTwo
       )
     ) {
+
       return parts
         .slice(
           -3
@@ -2825,6 +3036,7 @@ function getDomain(
     if (
       parts.length >= 2
     ) {
+
       return lastTwo;
     }
 
@@ -2833,6 +3045,7 @@ function getDomain(
 
 
   } catch {
+
     return null;
   }
 }
@@ -2841,6 +3054,7 @@ function getDomain(
 function getDistinctDomainSources(
   sources
 ) {
+
   const seenDomains =
     new Set();
 
@@ -2866,6 +3080,7 @@ function getDistinctDomainSources(
         domain
       )
     ) {
+
       continue;
     }
 
@@ -2886,12 +3101,13 @@ function getDistinctDomainSources(
 
 
 // =====================================================
-// TRIGGERDATUM
+// TRIGGER
 // =====================================================
 
 function extractTriggerDate(
   text
 ) {
+
   const match =
     text.match(
       /TRIGGERDATUM:\s*(\d{4}-\d{2}-\d{2})/i
@@ -2908,6 +3124,7 @@ function extractField(
   text,
   fieldName
 ) {
+
   const regex =
     new RegExp(
       `${fieldName}:\\s*([^\\n]+)`,
@@ -2936,7 +3153,9 @@ function isFreshDate(
   now,
   hours
 ) {
+
   try {
+
     const trigger =
       new Date(
         `${dateString}T23:59:59Z`
@@ -2970,21 +3189,24 @@ function isFreshDate(
 
 
   } catch {
+
     return false;
   }
 }
 
 
 // =====================================================
-// ARTIKEL-ID
+// ID OCH TID
 // =====================================================
 
 function createArticleId(
   date
 ) {
+
   const formatter =
     new Intl.DateTimeFormat(
       "sv-SE",
+
       {
         timeZone:
           "Europe/Stockholm",
@@ -3027,6 +3249,7 @@ function createArticleId(
 function createRunId(
   date
 ) {
+
   return (
     createArticleId(
       date
@@ -3044,6 +3267,30 @@ function createRunId(
 }
 
 
+function formatSwedishDateTime(
+  date
+) {
+
+  return new Intl.DateTimeFormat(
+    "sv-SE",
+
+    {
+      timeZone:
+        "Europe/Stockholm",
+
+      dateStyle:
+        "full",
+
+      timeStyle:
+        "short"
+    }
+  )
+    .format(
+      date
+    );
+}
+
+
 // =====================================================
 // FELTEXT
 // =====================================================
@@ -3051,6 +3298,7 @@ function createRunId(
 function simplifyError(
   data
 ) {
+
   if (!data) {
     return null;
   }
@@ -3060,6 +3308,7 @@ function simplifyError(
     typeof data ===
     "string"
   ) {
+
     return data.slice(
       0,
       1500
@@ -3068,16 +3317,19 @@ function simplifyError(
 
 
   try {
+
     return JSON.stringify(
       data.error ||
       data
-    ).slice(
-      0,
-      1500
-    );
+    )
+      .slice(
+        0,
+        1500
+      );
 
 
   } catch {
+
     return "Okänt fel";
   }
 }
@@ -3090,10 +3342,12 @@ function simplifyError(
 function calculateTotalTokens(
   usageObject
 ) {
+
   return Object.values(
     usageObject
   )
     .filter(Boolean)
+
     .reduce(
       (
         sum,
@@ -3104,25 +3358,28 @@ function calculateTotalTokens(
           usage.total_tokens ||
           0
         ),
+
       0
     );
 }
 
 
 // =====================================================
-// JSON RESPONSE
+// JSON
 // =====================================================
 
 function jsonResponse(
   data,
   status = 200
 ) {
+
   return new Response(
     JSON.stringify(
       data,
       null,
       2
     ),
+
     {
       status,
 
