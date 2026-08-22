@@ -1448,7 +1448,7 @@ imageStyle:
 
 
       /* ===================================================
-         HUVUDBILD
+         BILDER
       =================================================== */
 
       await saveGenerationStatus(
@@ -1476,18 +1476,17 @@ imageStyle:
         await getHeroImage({
           apiKey:
             PEXELS_API_KEY,
+
           queries:
             article.imageSearchQueries,
+
           alt:
             article.imageAlt,
+
           category:
             article.category
         });
 
-
-      /* ===================================================
-         FIKATIPS + FIKAFAKTA + BILDER
-      =================================================== */
 
       const sidebarContent =
         await buildSidebarContent({
@@ -1550,22 +1549,29 @@ imageStyle:
           byline,
           editorialTone,
           articleId,
+
           imageProvider:
             heroImage?.provider ||
             "fallback",
+
           imageSearchUsed:
             heroImage?.searchQuery ||
             null,
+
           fikaTipImageProvider:
             sidebarContent?.tip?.image?.provider ||
             "fallback",
+
           fikaFactImageProvider:
             sidebarContent?.fact?.image?.provider ||
             "fallback",
+
           startedAt:
             now.toISOString(),
+
           updatedAt:
             new Date().toISOString(),
+
           swedishTime:
             nowInSweden
         }
@@ -1657,12 +1663,17 @@ imageStyle:
           stage: "published",
           message:
             "Ny artikel har publicerats som latest.",
+
           articleId,
+
           title:
             article.title,
+
           category:
             article.category,
+
           byline,
+
           editorialTone,
 
           imageSearchQueries:
@@ -1762,13 +1773,31 @@ imageStyle:
     }
 
 
+    await saveGenerationStatus(
+      store,
+      {
+        runId,
+        status: "rejected",
+        stage: "no-result",
+        message:
+          "Alla tre kandidater underkändes. Ingen ny artikel publicerades.",
+        startedAt:
+          now.toISOString(),
+        updatedAt:
+          new Date().toISOString(),
+        swedishTime:
+          nowInSweden
+      }
+    );
+
+
     return jsonResponse(
       {
         success: false,
         error:
           "Ingen artikel kunde skapas."
       },
-      500
+      422
     );
 
 
@@ -1882,16 +1911,14 @@ async function buildSidebarContent({
   tip.image =
     tipImage ||
     {
-      provider:
-        "fallback"
+      provider: "fallback"
     };
 
 
   fact.image =
     factImage ||
     {
-      provider:
-        "fallback"
+      provider: "fallback"
     };
 
 
@@ -2048,8 +2075,7 @@ async function searchPexelsImage({
 
 
     return {
-      provider:
-        "pexels",
+      provider: "pexels",
 
       searchQuery:
         query,
@@ -2109,17 +2135,10 @@ function fallbackHeroImage(
 ) {
 
   return {
-    provider:
-      "fallback",
-
-    searchQuery:
-      null,
-
-    url:
-      null,
-
-    smallUrl:
-      null,
+    provider: "fallback",
+    searchQuery: null,
+    url: null,
+    smallUrl: null,
 
     alt:
       cleanReaderText(
@@ -2322,6 +2341,7 @@ async function loadRecentHistory({
 }) {
 
   const result = [];
+
   const seenIds =
     new Set();
 
@@ -2464,15 +2484,18 @@ function formatRecentTopicsForPrompt(
           item.article?.title ||
           "Okänd rubrik";
 
+
         const trigger =
           item.verifiedTrigger?.description ||
           item.article?.freshTrigger ||
           "";
 
+
         const date =
           item.verifiedTrigger?.date ||
           item.article?.triggerDate ||
           "";
+
 
         return (
           `${index + 1}. ${title}` +
@@ -2536,8 +2559,7 @@ function chooseByline(
 ) {
 
   if (
-    editorialTone ===
-    "UNGDOMLIG"
+    editorialTone === "UNGDOMLIG"
   ) {
 
     return "Camille";
@@ -2667,7 +2689,7 @@ function safeArray(
 
 
 /* =========================================================
-   DUBLETTER
+   DUBLETTER – NY, MINDRE AGGRESSIV VERSION
 ========================================================= */
 
 function findDuplicateMatch({
@@ -2742,25 +2764,69 @@ function findDuplicateMatch({
       );
 
 
-    const hasRareExactToken =
-      intersection.some(
+    /*
+    Viktigt:
+
+    Vi stoppar INTE längre en artikel bara för
+    att ett enda långt ord råkar vara gemensamt.
+
+    Exempel:
+    "traditionella" får aldrig ensamt göra två
+    helt olika nyheter till dubbletter.
+    */
+
+
+    const specificSharedTerms =
+      intersection.filter(
         token =>
-          token.length >= 9 &&
+          token.length >= 5 &&
           !GENERIC_TOPIC_WORDS.has(
+            token
+          ) &&
+          !SOFT_DUPLICATE_WORDS.has(
             token
           )
       );
 
 
+    /*
+    TRE sätt att bli dubblett:
+
+    1. Minst tre gemensamma ämnesord och
+       ganska hög överlappning.
+
+    2. Minst fyra gemensamma ord och
+       tydlig Jaccard-likhet.
+
+    3. Minst två ganska specifika gemensamma ord
+       och samtidigt en rimlig överlappning.
+
+    Detta fångar t.ex:
+    "Outer Banks + Netflix"
+    men INTE:
+    "traditionella".
+    */
+
+
+    const strongContainment =
+      intersection.length >= 3 &&
+      containment >= 0.42;
+
+
+    const strongJaccard =
+      intersection.length >= 4 &&
+      jaccard >= 0.24;
+
+
+    const strongSpecificMatch =
+      specificSharedTerms.length >= 2 &&
+      containment >= 0.30;
+
+
     const looksDuplicate =
-      (
-        intersection.length >= 2 &&
-        containment >= 0.42
-      )
-      ||
-      jaccard >= 0.28
-      ||
-      hasRareExactToken;
+      strongContainment ||
+      strongJaccard ||
+      strongSpecificMatch;
 
 
     if (looksDuplicate) {
@@ -2785,7 +2851,17 @@ function findDuplicateMatch({
           ),
 
         sharedTerms:
-          intersection.slice(0, 8)
+          intersection.slice(0, 10),
+
+        specificSharedTerms:
+          specificSharedTerms.slice(0, 10),
+
+        duplicateReason:
+          strongSpecificMatch
+            ? "specific-terms"
+            : strongContainment
+              ? "containment"
+              : "jaccard"
       };
     }
   }
@@ -2795,18 +2871,109 @@ function findDuplicateMatch({
 }
 
 
+/* =========================================================
+   STOPPORD
+========================================================= */
+
 const SWEDISH_STOP_WORDS =
   new Set([
-    "och", "att", "det", "den", "detta",
-    "denna", "de", "dem", "som", "för",
-    "från", "med", "till", "har", "hade",
-    "ska", "skall", "kan", "kommer", "är",
-    "var", "blir", "blev", "ett", "en",
-    "på", "av", "om", "nu", "nya", "ny",
-    "igen", "efter", "under", "över", "sin",
-    "sitt", "sina", "sig", "vid", "i",
-    "the", "a", "an", "of", "to", "and",
-    "is", "in", "on", "with"
+    "och",
+    "att",
+    "det",
+    "den",
+    "detta",
+    "denna",
+    "de",
+    "dem",
+    "som",
+    "för",
+    "från",
+    "med",
+    "till",
+    "har",
+    "hade",
+    "ska",
+    "skall",
+    "kan",
+    "kommer",
+    "är",
+    "var",
+    "blir",
+    "blev",
+    "ett",
+    "en",
+    "på",
+    "av",
+    "om",
+    "nu",
+    "nya",
+    "ny",
+    "igen",
+    "efter",
+    "under",
+    "över",
+    "sin",
+    "sitt",
+    "sina",
+    "sig",
+    "vid",
+    "i",
+    "the",
+    "a",
+    "an",
+    "of",
+    "to",
+    "and",
+    "is",
+    "in",
+    "on",
+    "with"
+  ]);
+
+
+/*
+Ord som förekommer i många helt olika nyheter.
+De får finnas med i texten, men ska inte väga
+tungt när vi bestämmer om två snackisar är samma.
+*/
+
+const SOFT_DUPLICATE_WORDS =
+  new Set([
+    "traditionella",
+    "traditionell",
+    "internationella",
+    "internationell",
+    "uppmärksamhet",
+    "uppmarksamhet",
+    "förändringen",
+    "forandringen",
+    "förändring",
+    "forandring",
+    "nyheten",
+    "nyheter",
+    "beskedet",
+    "besked",
+    "hjälpen",
+    "hjalpen",
+    "frågan",
+    "fragan",
+    "diskussion",
+    "reaktioner",
+    "reagerar",
+    "reagerat",
+    "aktuella",
+    "aktuell",
+    "händelsen",
+    "handelsen",
+    "händelse",
+    "handelse",
+    "personer",
+    "personen",
+    "företaget",
+    "foretaget",
+    "bolaget",
+    "svenska",
+    "sverige"
   ]);
 
 
@@ -2838,6 +3005,10 @@ const GENERIC_TOPIC_WORDS =
     "2026"
   ]);
 
+
+/* =========================================================
+   ÄMNESORD
+========================================================= */
 
 function buildTopicTokens(
   text
@@ -3390,7 +3561,7 @@ function formatSwedishDateTime(
 
 
 /* =========================================================
-   ÖVRIGT
+   FEL / TOKENS / JSON
 ========================================================= */
 
 function simplifyError(
