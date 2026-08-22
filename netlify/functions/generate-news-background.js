@@ -1,6 +1,6 @@
 import { getStore } from "@netlify/blobs";
 
-export default async (request) => {
+export default async () => {
   const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
   const CRON_SECRET = process.env.KAFFERASTEN_CRON_SECRET;
 
