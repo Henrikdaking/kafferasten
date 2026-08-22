@@ -244,6 +244,7 @@ export default async () => {
       }
     );
 
+
     const totalUsage = {
       research1: null,
       verification1: null,
@@ -291,6 +292,7 @@ export default async () => {
             nowInSweden
         }
       );
+
 
       const research =
         await callOpenAI({
@@ -451,7 +453,7 @@ FAKTA:
 VARFÖR FIKA:
 - en kort mening
 
-Använd källhänvisningar.
+Använd källhänvisningar i researchsvaret.
 `
           }
         });
@@ -659,7 +661,7 @@ TRIGGERDATUM:
 BEKRÄFTELSE:
 [kort sammanfattning]
 
-Använd källhänvisningar.
+Använd källhänvisningar i faktakontrollsvaret.
 `
           }
         });
@@ -1038,7 +1040,7 @@ TRIGGERDATUM:
 
 ${verifiedTrigger.date}
 
-KÄLLOR:
+KÄLLOR SOM ENDAST SKA ANVÄNDAS FÖR FAKTAKONTROLL:
 
 ${selectedSources
   .map(
@@ -1047,7 +1049,44 @@ ${selectedSources
   )
   .join("\n")}
 
-KAFFERASTENS RÖST – MYCKET VIKTIGT:
+
+=====================================================
+VIKTIGT: KÄLLORNA ÄR INTE EN DEL AV ARTIKELTEXTEN
+=====================================================
+
+Källorna ovan används bara för att säkerställa fakta.
+
+I alla läsarvända textfält – title, summary,
+freshTrigger, paragraphs, whyTalkAboutIt,
+pollQuestion och pollOptions – gäller:
+
+- skriv ALDRIG en URL
+- skriv ALDRIG en domän som svt.se, aftonbladet.se,
+  netflix.com, variety.com eller liknande
+- skriv ALDRIG parenteser med källhänvisningar
+- skriv ALDRIG "[källa]"
+- skriv ALDRIG "källa:"
+- skriv inte "enligt svt.se"
+- skriv inte "enligt [nyhetsmedium]" bara för att visa källa
+- skriv inte vilken webbplats informationen hittades på
+
+Om själva mediebolaget ÄR en del av nyheten
+får dess vanliga namn förstås nämnas.
+
+Exempel:
+"SVT har presenterat årets julvärd" är okej,
+eftersom SVT är en del av händelsen.
+
+"Årets julvärd är klar, enligt svt.se" är INTE okej.
+
+Artikeln ska kännas som att Kafferastens egen redaktion
+har läst in sig på nyheten och sedan berättar den
+med egen röst.
+
+
+=====================================================
+KAFFERASTENS RÖST
+=====================================================
 
 - Skriv idiomatisk och naturlig svenska.
 - Texten får aldrig kännas direktöversatt från engelska.
@@ -1061,7 +1100,7 @@ KAFFERASTENS RÖST – MYCKET VIKTIGT:
 - Våga ta ut svängarna språkligt.
 - Rubriken får ha humor, en oväntad formulering
   eller en tydlig fikakrok.
-- Hitta däremot aldrig på fakta för att göra texten roligare.
+- Hitta aldrig på fakta för att göra texten roligare.
 - Skriv som en kvick människa som just hittat något
   hon verkligen vill berätta för kollegorna.
 - Var varm, nyfiken och lite smårolig.
@@ -1085,11 +1124,34 @@ KAFFERASTENS RÖST – MYCKET VIKTIGT:
 - Pollfrågan ska vara enkel och gärna lite lekfull.
 - Pollfrågan ska ha exakt två alternativ.
 
-SKRIBENTENS TON:
+
+=====================================================
+FRESH TRIGGER / "DET NYA"
+=====================================================
+
+Fältet freshTrigger ska vara en MYCKET kort
+redaktionell sammanfattning av det som är nytt.
+
+Det ska:
+- vara en naturlig svensk mening
+- helst vara högst cirka 25 ord
+- INTE innehålla källnamn
+- INTE innehålla URL eller domän
+- INTE innehålla tekniska verifieringsformuleringar
+
+Det här fältet visas direkt för läsaren under rubriken.
+
+
+=====================================================
+SKRIBENTENS TON
+=====================================================
 
 ${writerVoice(byline)}
 
-BILDMETADATA FÖR NÄSTA PASS:
+
+=====================================================
+BILDMETADATA FÖR NÄSTA PASS
+=====================================================
 
 Du ska också föreslå bildmetadata.
 Du ska INTE ange någon faktisk bild-URL.
@@ -1366,14 +1428,58 @@ imageStyle:
       article.triggerDate =
         triggerDate;
 
-      article.freshTrigger =
-        verifiedTrigger.description;
+      // OBS:
+      // Vi ersätter INTE article.freshTrigger med
+      // faktakontrollens råa TRIGGER längre.
+      //
+      // article.freshTrigger är den rena,
+      // läsarvänliga formulering som skribenten just skapade.
 
       article.byline =
         byline;
 
       article.editorialTone =
         editorialTone;
+
+
+      // =====================================================
+      // EXTRA SKYDD MOT URL/DOMÄNER I LÄSARTEXT
+      // =====================================================
+
+      article.title =
+        cleanReaderText(
+          article.title
+        );
+
+      article.summary =
+        cleanReaderText(
+          article.summary
+        );
+
+      article.freshTrigger =
+        cleanReaderText(
+          article.freshTrigger
+        );
+
+      article.paragraphs =
+        (article.paragraphs || [])
+          .map(cleanReaderText)
+          .filter(Boolean);
+
+      article.whyTalkAboutIt =
+        (article.whyTalkAboutIt || [])
+          .map(cleanReaderText)
+          .filter(Boolean);
+
+      article.pollQuestion =
+        cleanReaderText(
+          article.pollQuestion
+        );
+
+      article.pollOptions =
+        (article.pollOptions || [])
+          .map(cleanReaderText)
+          .filter(Boolean);
 
 
       // =====================================================
@@ -1481,6 +1587,8 @@ imageStyle:
 
         article,
 
+        // Källorna sparas fortfarande internt.
+        // Frontend visar dem inte.
         sources:
           selectedSources
       };
@@ -2225,6 +2333,46 @@ men håller texten enkel, folklig och lätt att prata vidare om.
 
 
 // =====================================================
+// RENGÖR LÄSARVÄND TEXT
+// =====================================================
+
+function cleanReaderText(
+  value
+) {
+  if (!value) {
+    return "";
+  }
+
+  return String(value)
+    .replace(
+      /https?:\/\/\S+/gi,
+      ""
+    )
+    .replace(
+      /\bwww\.\S+/gi,
+      ""
+    )
+    .replace(
+      /\b[a-z0-9-]+(?:\.[a-z0-9-]+)+\b/gi,
+      ""
+    )
+    .replace(
+      /\(\s*\)/g,
+      ""
+    )
+    .replace(
+      /\s+([,.!?;:])/g,
+      "$1"
+    )
+    .replace(
+      /\s{2,}/g,
+      " "
+    )
+    .trim();
+}
+
+
+// =====================================================
 // DUBLETTER
 // =====================================================
 
@@ -2409,7 +2557,6 @@ const SWEDISH_STOP_WORDS =
     "sig",
     "vid",
     "i",
-
     "the",
     "a",
     "an",
