@@ -1,11 +1,21 @@
 import { getStore } from "@netlify/blobs";
 
+const STORE_NAME = "kafferasten-news";
+const LOCK_KEY = "_locks/generate-news";
+const STATUS_KEY = "_diagnostics/generation-status";
+const HISTORY_DAYS = 14;
+const HISTORY_LIMIT = 20;
+const MAX_ATTEMPTS = 3;
+
 export default async () => {
   const OPENAI_API_KEY =
     process.env.OPENAI_API_KEY;
 
+  const UNSPLASH_ACCESS_KEY =
+    process.env.UNSPLASH_ACCESS_KEY || "";
+
   const store =
-    getStore("kafferasten-news");
+    getStore(STORE_NAME);
 
   const now =
     new Date();
@@ -16,17 +26,18 @@ export default async () => {
   const nowInSweden =
     formatSwedishDateTime(now);
 
+  let generationLock =
+    null;
 
-  // =====================================================
-  // DIAGNOSTIK – START
-  // =====================================================
 
   await saveGenerationStatus(
     store,
     {
       runId,
-      status: "running",
-      stage: "start",
+      status:
+        "running",
+      stage:
+        "start",
       message:
         "Background-funktionen har startat.",
       startedAt:
@@ -40,12 +51,15 @@ export default async () => {
 
 
   if (!OPENAI_API_KEY) {
+
     await saveGenerationStatus(
       store,
       {
         runId,
-        status: "error",
-        stage: "api-key",
+        status:
+          "error",
+        stage:
+          "api-key",
         message:
           "OPENAI_API_KEY saknas i Netlify.",
         startedAt:
@@ -59,7 +73,9 @@ export default async () => {
 
     return jsonResponse(
       {
-        success: false,
+        success:
+          false,
+
         error:
           "OPENAI_API_KEY saknas i Netlify"
       },
@@ -68,29 +84,11 @@ export default async () => {
   }
 
 
-  // =====================================================
-  // KÖRLÅS
-  // =====================================================
-
-  let generationLock;
-
   try {
-    await saveGenerationStatus(
-      store,
-      {
-        runId,
-        status: "running",
-        stage: "lock-check",
-        message:
-          "Kontrollerar om en annan generering redan kör.",
-        startedAt:
-          now.toISOString(),
-        updatedAt:
-          new Date().toISOString(),
-        swedishTime:
-          nowInSweden
-      }
-    );
+
+    // =====================================================
+    // KÖRLÅS
+    // =====================================================
 
     generationLock =
       await acquireGenerationLock(
@@ -99,163 +97,100 @@ export default async () => {
         runId
       );
 
-    if (!generationLock.acquired) {
+
+    if (
+      !generationLock.acquired
+    ) {
+
       await saveGenerationStatus(
         store,
         {
           runId,
-          status: "blocked",
-          stage: "lock",
+          status:
+            "blocked",
+          stage:
+            "lock",
           message:
             "Körningen stoppades eftersom en annan generering redan verkar pågå.",
-          startedAt:
-            now.toISOString(),
-          updatedAt:
-            new Date().toISOString(),
-          swedishTime:
-            nowInSweden,
           lockStartedAt:
             generationLock.startedAt ||
             null,
           lockRunId:
             generationLock.runId ||
-            null
+            null,
+          startedAt:
+            now.toISOString(),
+          updatedAt:
+            new Date().toISOString(),
+          swedishTime:
+            nowInSweden
         }
       );
 
+
       return jsonResponse(
         {
-          success: false,
-          skipped: true,
-          stage: "lock",
-          error:
-            "En annan nyhetsgenerering pågår redan.",
-          lockStartedAt:
-            generationLock.startedAt ||
-            null
+          success:
+            false,
+
+          skipped:
+            true,
+
+          stage:
+            "lock"
         },
         409
       );
     }
 
-    await saveGenerationStatus(
-      store,
-      {
-        runId,
-        status: "running",
-        stage: "lock-acquired",
-        message:
-          "Körlåset är taget. Bara denna körning får fortsätta.",
-        startedAt:
-          now.toISOString(),
-        updatedAt:
-          new Date().toISOString(),
-        swedishTime:
-          nowInSweden
-      }
-    );
-
-  } catch (error) {
-    await saveGenerationStatus(
-      store,
-      {
-        runId,
-        status: "error",
-        stage: "lock-error",
-        message:
-          "Kunde inte skapa körlåset.",
-        details:
-          error.message,
-        startedAt:
-          now.toISOString(),
-        updatedAt:
-          new Date().toISOString(),
-        swedishTime:
-          nowInSweden
-      }
-    );
-
-    return jsonResponse(
-      {
-        success: false,
-        stage: "lock",
-        error:
-          "Kunde inte skapa körlås.",
-        details:
-          error.message
-      },
-      500
-    );
-  }
-
-
-  try {
 
     // =====================================================
     // REDAKTIONELLT MINNE
     // =====================================================
 
-    await saveGenerationStatus(
-      store,
-      {
-        runId,
-        status: "running",
-        stage: "history-start",
-        message:
-          "Läser tidigare publicerade snackisar.",
-        startedAt:
-          now.toISOString(),
-        updatedAt:
-          new Date().toISOString(),
-        swedishTime:
-          nowInSweden
-      }
-    );
-
     const recentHistory =
       await loadRecentHistory({
         store,
         now,
-        days: 14,
-        limit: 20
+        days:
+          HISTORY_DAYS,
+        limit:
+          HISTORY_LIMIT
       });
+
 
     const recentTopicsForPrompt =
       formatRecentTopicsForPrompt(
         recentHistory
       );
 
-    await saveGenerationStatus(
-      store,
-      {
-        runId,
-        status: "running",
-        stage: "history-loaded",
-        message:
-          `Redaktionellt minne laddat. ${recentHistory.length} tidigare artiklar hittades.`,
-        historyCount:
-          recentHistory.length,
-        startedAt:
-          now.toISOString(),
-        updatedAt:
-          new Date().toISOString(),
-        swedishTime:
-          nowInSweden
-      }
-    );
-
 
     const totalUsage = {
-      research1: null,
-      verification1: null,
-      research2: null,
-      verification2: null,
-      research3: null,
-      verification3: null,
-      writing: null
+      research1:
+        null,
+
+      verification1:
+        null,
+
+      research2:
+        null,
+
+      verification2:
+        null,
+
+      research3:
+        null,
+
+      verification3:
+        null,
+
+      writing:
+        null
     };
 
-    let rejectedTopic = "";
+
+    let rejectedTopic =
+      "";
 
 
     // =====================================================
@@ -264,23 +199,25 @@ export default async () => {
 
     for (
       let candidateAttempt = 1;
-      candidateAttempt <= 3;
+      candidateAttempt <= MAX_ATTEMPTS;
       candidateAttempt++
     ) {
 
-      // =====================================================
+
+      // ===================================================
       // RESEARCH
-      // =====================================================
+      // ===================================================
 
       await saveGenerationStatus(
         store,
         {
           runId,
-          status: "running",
+          status:
+            "running",
           stage:
             `research-${candidateAttempt}`,
           message:
-            `OpenAI letar efter kandidat ${candidateAttempt} av 3.`,
+            `OpenAI letar efter kandidat ${candidateAttempt} av ${MAX_ATTEMPTS}.`,
           candidateAttempt,
           historyCount:
             recentHistory.length,
@@ -304,10 +241,12 @@ export default async () => {
               "gpt-5.6-luna",
 
             reasoning: {
-              effort: "none"
+              effort:
+                "none"
             },
 
-            max_tool_calls: 3,
+            max_tool_calls:
+              3,
 
             tools: [
               {
@@ -320,8 +259,10 @@ export default async () => {
                 user_location: {
                   type:
                     "approximate",
+
                   country:
                     "SE",
+
                   timezone:
                     "Europe/Stockholm"
                 }
@@ -340,9 +281,9 @@ ${nowInSweden}
 Hitta EN färsk, rolig eller intressant snackis
 som passar riktigt bra vid en svensk fikarast.
 
-Detta är kandidatförsök ${candidateAttempt} av 3.
+Detta är kandidatförsök ${candidateAttempt} av ${MAX_ATTEMPTS}.
 
-GRUNDKRAV:
+KRAV:
 
 - Själva händelsen ska normalt ha inträffat under de senaste 72 timmarna.
 - En ny artikel om en gammal händelse gör inte händelsen ny.
@@ -352,11 +293,12 @@ GRUNDKRAV:
 REDAKTIONELLT MINNE – MYCKET VIKTIGT:
 
 Kafferasten.se har redan publicerat följande ämnen
-de senaste 14 dagarna:
+de senaste ${HISTORY_DAYS} dagarna:
 
 ${recentTopicsForPrompt || "Inga tidigare ämnen finns ännu."}
 
 Välj INTE samma huvudsakliga:
+
 - händelse
 - premiär
 - trailer
@@ -381,8 +323,9 @@ Prioritera gärna:
 - arbetsliv
 - vardagsfenomen
 - udda eller roliga nyheter
-- bred sport med tydlig snackisfaktor
-- svenska traditioner och säsongsfenomen
+- bred sport
+- svenska traditioner
+- säsongsfenomen
 - sådant som får folk att säga:
   "Va? Har du hört det här?"
 
@@ -404,34 +347,33 @@ Försök hitta minst två oberoende trovärdiga källor.
 En stark och trovärdig källa får räcka
 om nyheten tydligt kan verifieras.
 
-${rejectedTopic
-  ? `
+${
+  rejectedTopic
+    ? `
 VIKTIGT:
 
-Ett tidigare förslag i denna körning
-har underkänts.
+Ett tidigare förslag i denna körning har underkänts.
 
 Välj INTE detta ämne eller en omskrivning
 av samma händelse:
 
 ${rejectedTopic}
 `
-  : ""
+    : ""
 }
 
 Bedöm också vilken TON ämnet naturligt passar för:
 
 UNGDOMLIG
 = musik, gaming, sociala medier, unga kändisar,
-internetfenomen, trendig populärkultur eller annat
-som tydligt drar yngre.
+internetfenomen eller trendig populärkultur.
 
 BRED
 = allmän snackis för många åldrar.
 
 KLASSISK
 = traditioner, vardagsfenomen, nostalgi
-eller annat med klassisk fikabordskänsla.
+eller klassisk fikabordskänsla.
 
 Svara kort i exakt denna struktur:
 
@@ -459,12 +401,16 @@ Använd källhänvisningar i researchsvaret.
         });
 
 
-      if (!research.ok) {
+      if (
+        !research.ok
+      ) {
+
         await saveGenerationStatus(
           store,
           {
             runId,
-            status: "error",
+            status:
+              "error",
             stage:
               `research-${candidateAttempt}`,
             message:
@@ -485,14 +431,14 @@ Använd källhänvisningar i researchsvaret.
           }
         );
 
+
         return jsonResponse(
           {
-            success: false,
+            success:
+              false,
+
             stage:
-              `research-${candidateAttempt}`,
-            error:
-              research.data.error ||
-              research.data
+              `research-${candidateAttempt}`
           },
           500
         );
@@ -505,14 +451,17 @@ Använd källhänvisningar i researchsvaret.
         research.data.usage ||
         null;
 
+
       const researchPart =
         getOutputTextPart(
           research.data
         );
 
+
       const researchText =
         researchPart?.text ||
         "";
+
 
       const researchSources =
         filterAllowedSources(
@@ -522,10 +471,6 @@ Använd källhänvisningar i researchsvaret.
         );
 
 
-      // =====================================================
-      // BESTÄM SKRIBENT
-      // =====================================================
-
       const editorialTone =
         normalizeEditorialTone(
           extractField(
@@ -534,42 +479,16 @@ Använd källhänvisningar i researchsvaret.
           )
         );
 
+
       const byline =
         chooseByline(
           editorialTone
         );
 
 
-      await saveGenerationStatus(
-        store,
-        {
-          runId,
-          status: "running",
-          stage:
-            `research-${candidateAttempt}-done`,
-          message:
-            "Research klar.",
-          candidateAttempt,
-          editorialTone,
-          byline,
-          researchPreview:
-            researchText.slice(
-              0,
-              900
-            ),
-          startedAt:
-            now.toISOString(),
-          updatedAt:
-            new Date().toISOString(),
-          swedishTime:
-            nowInSweden
-        }
-      );
-
-
-      // =====================================================
+      // ===================================================
       // FAKTAKONTROLL
-      // =====================================================
+      // ===================================================
 
       const verification =
         await callOpenAI({
@@ -581,10 +500,12 @@ Använd källhänvisningar i researchsvaret.
               "gpt-5.6-luna",
 
             reasoning: {
-              effort: "none"
+              effort:
+                "none"
             },
 
-            max_tool_calls: 3,
+            max_tool_calls:
+              3,
 
             tools: [
               {
@@ -597,8 +518,10 @@ Använd källhänvisningar i researchsvaret.
                 user_location: {
                   type:
                     "approximate",
+
                   country:
                     "SE",
+
                   timezone:
                     "Europe/Stockholm"
                 }
@@ -624,21 +547,12 @@ Du ska:
 2. fastställa datumet för triggern
 3. försöka hitta minst två oberoende trovärdiga källor
 4. säkerställa att själva händelsen är högst 72 timmar gammal
-5. skilja på artikelns publiceringsdatum
-   och datumet då händelsen faktiskt inträffade
+5. skilja på artikelns publiceringsdatum och datumet då händelsen faktiskt inträffade
 
 Två oberoende källor är önskvärt.
 
 Men EN stark och trovärdig källa räcker
 om händelsen tydligt kan verifieras.
-
-En stark källa kan exempelvis vara:
-
-- etablerat nyhetsmedium
-- officiell organisation
-- officiell pressida
-- etablerat branschmedium
-- relevant officiell produkt- eller programsida
 
 Använd inte:
 
@@ -667,12 +581,16 @@ Använd källhänvisningar i faktakontrollsvaret.
         });
 
 
-      if (!verification.ok) {
+      if (
+        !verification.ok
+      ) {
+
         await saveGenerationStatus(
           store,
           {
             runId,
-            status: "error",
+            status:
+              "error",
             stage:
               `verification-${candidateAttempt}`,
             message:
@@ -693,14 +611,14 @@ Använd källhänvisningar i faktakontrollsvaret.
           }
         );
 
+
         return jsonResponse(
           {
-            success: false,
+            success:
+              false,
+
             stage:
-              `verification-${candidateAttempt}`,
-            error:
-              verification.data.error ||
-              verification.data
+              `verification-${candidateAttempt}`
           },
           500
         );
@@ -713,14 +631,17 @@ Använd källhänvisningar i faktakontrollsvaret.
         verification.data.usage ||
         null;
 
+
       const verificationPart =
         getOutputTextPart(
           verification.data
         );
 
+
       const verificationText =
         verificationPart?.text ||
         "";
+
 
       const verificationSources =
         filterAllowedSources(
@@ -729,15 +650,18 @@ Använd källhänvisningar i faktakontrollsvaret.
           )
         );
 
+
       const saysCurrent =
         /AKTUELL:\s*JA/i.test(
           verificationText
         );
 
+
       const triggerDate =
         extractTriggerDate(
           verificationText
         );
+
 
       const triggerDescription =
         extractField(
@@ -745,16 +669,15 @@ Använd källhänvisningar i faktakontrollsvaret.
           "TRIGGER"
         );
 
-      const allSources =
-        dedupeSources([
-          ...researchSources,
-          ...verificationSources
-        ]);
 
       const independentSources =
         getDistinctDomainSources(
-          allSources
+          dedupeSources([
+            ...researchSources,
+            ...verificationSources
+          ])
         );
+
 
       const triggerIsFresh =
         triggerDate &&
@@ -765,109 +688,75 @@ Använd källhänvisningar i faktakontrollsvaret.
         );
 
 
-      await saveGenerationStatus(
-        store,
-        {
-          runId,
-          status: "running",
-          stage:
-            `verification-${candidateAttempt}-done`,
-          message:
-            "Faktakontrollen är klar.",
-          candidateAttempt,
-          saysCurrent,
-          triggerDate:
-            triggerDate ||
-            null,
-          triggerDescription:
-            triggerDescription ||
-            null,
-          triggerIsFresh:
-            Boolean(
-              triggerIsFresh
-            ),
-          independentSources:
-            independentSources.length,
-          editorialTone,
-          byline,
-          verificationPreview:
-            verificationText.slice(
-              0,
-              900
-            ),
-          startedAt:
-            now.toISOString(),
-          updatedAt:
-            new Date().toISOString(),
-          swedishTime:
-            nowInSweden
-        }
-      );
-
-
       if (
         !saysCurrent ||
         !triggerIsFresh ||
         independentSources.length < 1
       ) {
+
         rejectedTopic =
           researchText;
+
 
         await saveGenerationStatus(
           store,
           {
             runId,
             status:
-              candidateAttempt < 3
+              candidateAttempt <
+              MAX_ATTEMPTS
                 ? "running"
                 : "rejected",
+
             stage:
               `candidate-${candidateAttempt}-rejected`,
+
             message:
               "Kandidaten underkändes eftersom den inte klarade färskhets- eller källkraven.",
+
             candidateAttempt,
+
             saysCurrent,
+
             triggerDate:
               triggerDate ||
               null,
+
             triggerIsFresh:
               Boolean(
                 triggerIsFresh
               ),
+
             independentSources:
               independentSources.length,
+
             startedAt:
               now.toISOString(),
+
             updatedAt:
               new Date().toISOString(),
+
             swedishTime:
               nowInSweden
           }
         );
 
+
         if (
-          candidateAttempt < 3
+          candidateAttempt <
+          MAX_ATTEMPTS
         ) {
           continue;
         }
 
+
         return jsonResponse(
           {
-            success: false,
+            success:
+              false,
+
             stage:
-              "verification",
-            error:
-              "Ingen kandidat klarade kraven på färsk trigger och minst en trovärdig källa.",
-            triggerDate,
-            sources:
-              independentSources,
-            usage: {
-              ...totalUsage,
-              totalTokens:
-                calculateTotalTokens(
-                  totalUsage
-                )
-            }
+              "verification"
           },
           422
         );
@@ -879,6 +768,7 @@ Använd källhänvisningar i faktakontrollsvaret.
           0,
           3
         );
+
 
       const verifiedTrigger = {
         description:
@@ -900,9 +790,9 @@ Använd källhänvisningar i faktakontrollsvaret.
       };
 
 
-      // =====================================================
+      // ===================================================
       // DUBLETTCHECK
-      // =====================================================
+      // ===================================================
 
       const duplicateCandidate =
         findDuplicateMatch({
@@ -919,79 +809,96 @@ Använd källhänvisningar i faktakontrollsvaret.
       if (
         duplicateCandidate
       ) {
+
         rejectedTopic =
           `Dubblett mot tidigare publicering: "${duplicateCandidate.title}". Välj ett helt annat ämne.`;
+
 
         await saveGenerationStatus(
           store,
           {
             runId,
+
             status:
-              candidateAttempt < 3
+              candidateAttempt <
+              MAX_ATTEMPTS
                 ? "running"
                 : "rejected",
+
             stage:
               `duplicate-rejected-${candidateAttempt}`,
+
             message:
               `Kandidaten bedömdes vara en dubblett av "${duplicateCandidate.title}".`,
+
             candidateAttempt,
+
             duplicateOf:
               duplicateCandidate,
+
             startedAt:
               now.toISOString(),
+
             updatedAt:
               new Date().toISOString(),
+
             swedishTime:
               nowInSweden
           }
         );
 
+
         if (
-          candidateAttempt < 3
+          candidateAttempt <
+          MAX_ATTEMPTS
         ) {
           continue;
         }
 
+
         return jsonResponse(
           {
-            success: false,
+            success:
+              false,
+
             stage:
-              "duplicate-check",
-            error:
-              "Alla kandidater låg för nära ämnen som redan publicerats.",
-            duplicateOf:
-              duplicateCandidate
+              "duplicate-check"
           },
           422
         );
       }
 
 
-      // =====================================================
+      // ===================================================
       // SKRIV ARTIKEL
-      // =====================================================
+      // ===================================================
 
       await saveGenerationStatus(
         store,
         {
           runId,
-          status: "running",
-          stage: "writing",
+
+          status:
+            "running",
+
+          stage:
+            "writing",
+
           message:
             `${byline} skriver den färdiga artikeln.`,
+
           candidateAttempt,
+
           editorialTone,
+
           byline,
-          triggerDescription:
-            verifiedTrigger.description,
-          triggerDate:
-            verifiedTrigger.date,
-          sourceCount:
-            selectedSources.length,
+
           startedAt:
             now.toISOString(),
+
           updatedAt:
             new Date().toISOString(),
+
           swedishTime:
             nowInSweden
         }
@@ -1016,13 +923,14 @@ Använd källhänvisningar i faktakontrollsvaret.
 Du är skribent på Kafferasten.se.
 
 Dagens signatur är:
+
 ${byline}
 
 Svensk tid:
+
 ${nowInSweden}
 
-Skriv en färdig artikel ENBART
-utifrån verifierad information.
+Skriv en färdig artikel ENBART utifrån verifierad information.
 
 RESEARCH:
 
@@ -1049,129 +957,70 @@ ${selectedSources
   )
   .join("\n")}
 
-
-=====================================================
-VIKTIGT: KÄLLORNA ÄR INTE EN DEL AV ARTIKELTEXTEN
-=====================================================
+VIKTIGT OM KÄLLOR:
 
 Källorna ovan används bara för att säkerställa fakta.
 
-I alla läsarvända textfält – title, summary,
-freshTrigger, paragraphs, whyTalkAboutIt,
-pollQuestion och pollOptions – gäller:
+I title, summary, freshTrigger, paragraphs,
+whyTalkAboutIt, pollQuestion och pollOptions
+får du ALDRIG skriva:
 
-- skriv ALDRIG en URL
-- skriv ALDRIG en domän som svt.se, aftonbladet.se,
-  netflix.com, variety.com eller liknande
-- skriv ALDRIG parenteser med källhänvisningar
-- skriv ALDRIG "[källa]"
-- skriv ALDRIG "källa:"
-- skriv inte "enligt svt.se"
-- skriv inte "enligt [nyhetsmedium]" bara för att visa källa
-- skriv inte vilken webbplats informationen hittades på
+- URL
+- domännamn
+- teknisk citationsmarkering
+- "källa:"
+- "enligt svt.se"
+- motsvarande tekniskt källspråk
 
-Om själva mediebolaget ÄR en del av nyheten
-får dess vanliga namn förstås nämnas.
+Om ett mediebolag i sig är en del av nyheten
+får dess vanliga namn naturligtvis nämnas.
 
-Exempel:
-"SVT har presenterat årets julvärd" är okej,
-eftersom SVT är en del av händelsen.
-
-"Årets julvärd är klar, enligt svt.se" är INTE okej.
-
-Artikeln ska kännas som att Kafferastens egen redaktion
-har läst in sig på nyheten och sedan berättar den
-med egen röst.
-
-
-=====================================================
-KAFFERASTENS RÖST
-=====================================================
+KAFFERASTENS RÖST:
 
 - Skriv idiomatisk och naturlig svenska.
 - Texten får aldrig kännas direktöversatt från engelska.
 - Översätt engelska beskrivande ord när svenska är naturligt.
-- Skriv exempelvis "kristet metalband", ALDRIG "Christian metalband".
-- Behåll riktiga egennamn, filmtitlar, artistnamn,
-  varumärken och etablerade engelska titlar när de faktiskt heter så.
+- Skriv exempelvis "kristet metalband", aldrig "Christian metalband".
+- Behåll riktiga egennamn, filmtitlar, artistnamn, varumärken och etablerade engelska titlar när de faktiskt heter så.
 - Undvik svengelska konstruktioner.
 - Undvik pressmeddelandespråk.
 - Undvik stela AI-formuleringar.
-- Våga ta ut svängarna språkligt.
-- Rubriken får ha humor, en oväntad formulering
-  eller en tydlig fikakrok.
-- Hitta aldrig på fakta för att göra texten roligare.
-- Skriv som en kvick människa som just hittat något
-  hon verkligen vill berätta för kollegorna.
+- Våga ta ut svängarna språkligt utan att hitta på fakta.
+- Skriv som en kvick människa som just hittat något hon verkligen vill berätta för kollegorna.
 - Var varm, nyfiken och lite smårolig.
 - Var inte tramsig.
 - Var inte hurtig.
 - Var inte krystat ungdomlig.
-- Undvik tomma klichéer som:
-  "väcker reaktioner",
-  "skapar rubriker",
-  "internet exploderar",
-  om de inte faktiskt tillför något.
-- Rubriken ska säga vad som hänt
-  och gärna samtidigt ge läsaren en anledning
-  att vilja prata om det.
+- Rubriken ska säga vad som hänt och gärna ha en tydlig fikakrok.
 - Sammanfattningen ska vara högst två meningar.
 - Brödtexten ska vara 2 eller 3 korta stycken.
 - Tänk mobil.
-- "whyTalkAboutIt" ska vara 2–3 konkreta,
-  lite spetsiga samtalsöppnare.
-- Upprepa inte bara artikelns fakta där.
-- Pollfrågan ska vara enkel och gärna lite lekfull.
-- Pollfrågan ska ha exakt två alternativ.
+- whyTalkAboutIt ska vara 2–3 konkreta, lite spetsiga samtalsöppnare.
+- Pollfrågan ska vara enkel, gärna lekfull, och ha exakt två alternativ.
 
-
-=====================================================
-FRESH TRIGGER / "DET NYA"
-=====================================================
-
-Fältet freshTrigger ska vara en MYCKET kort
-redaktionell sammanfattning av det som är nytt.
-
-Det ska:
-- vara en naturlig svensk mening
-- helst vara högst cirka 25 ord
-- INTE innehålla källnamn
-- INTE innehålla URL eller domän
-- INTE innehålla tekniska verifieringsformuleringar
-
-Det här fältet visas direkt för läsaren under rubriken.
-
-
-=====================================================
-SKRIBENTENS TON
-=====================================================
+SKRIBENTENS TON:
 
 ${writerVoice(byline)}
 
+BILDMETADATA:
 
-=====================================================
-BILDMETADATA FÖR NÄSTA PASS
-=====================================================
-
-Du ska också föreslå bildmetadata.
-Du ska INTE ange någon faktisk bild-URL.
+Skapa också metadata för artikelns huvudbild.
 
 imageSearchQuery:
 - 3–7 konkreta engelska sökord
-- ska fungera för sökning efter licensierad stockbild
-- undvik abstrakta ord
-- om en exakt person, film eller TV-serie knappast finns
-  som stockbild, välj en relevant visuell metafor eller miljö
+- ska beskriva ett faktiskt visuellt motiv
+- ska fungera bra för en relevant redaktionell stockbild
+- prioritera det faktiska motivet i nyheten
+- om exakt person, film eller TV-serie knappast finns som stockbild,
+  välj en konkret visuell metafor eller miljö
 
 imageAlt:
-- kort och naturlig svensk alt-text
+- kort naturlig svensk alt-text
 
 imagePrompt:
-- kort beskrivning för en redaktionell AI-illustration
-- ska passa artikeln
-- ingen text i bilden
+- kort beskrivning för en möjlig redaktionell illustration
+- ingen text
 - inga logotyper
-- hitta inte på en nyhetshändelse som inte hänt
 
 imageStyle:
 - photo eller illustration
@@ -1196,6 +1045,7 @@ imageStyle:
                     false,
 
                   properties: {
+
                     title: {
                       type:
                         "string"
@@ -1234,10 +1084,13 @@ imageStyle:
                     paragraphs: {
                       type:
                         "array",
+
                       minItems:
                         2,
+
                       maxItems:
                         3,
+
                       items: {
                         type:
                           "string"
@@ -1247,10 +1100,13 @@ imageStyle:
                     whyTalkAboutIt: {
                       type:
                         "array",
+
                       minItems:
                         2,
+
                       maxItems:
                         3,
+
                       items: {
                         type:
                           "string"
@@ -1265,10 +1121,13 @@ imageStyle:
                     pollOptions: {
                       type:
                         "array",
+
                       minItems:
                         2,
+
                       maxItems:
                         2,
+
                       items: {
                         type:
                           "string"
@@ -1326,36 +1185,48 @@ imageStyle:
       if (
         !writing.ok
       ) {
+
         await saveGenerationStatus(
           store,
           {
             runId,
-            status: "error",
-            stage: "writing",
+
+            status:
+              "error",
+
+            stage:
+              "writing",
+
             message:
               "OpenAI kunde inte skriva artikeln.",
+
             openAIStatus:
               writing.status,
+
             openAIError:
               simplifyError(
                 writing.data
               ),
+
             startedAt:
               now.toISOString(),
+
             updatedAt:
               new Date().toISOString(),
+
             swedishTime:
               nowInSweden
           }
         );
 
+
         return jsonResponse(
           {
-            success: false,
-            stage: "writing",
-            error:
-              writing.data.error ||
-              writing.data
+            success:
+              false,
+
+            stage:
+              "writing"
           },
           500
         );
@@ -1366,30 +1237,42 @@ imageStyle:
         writing.data.usage ||
         null;
 
+
       const writingPart =
         getOutputTextPart(
           writing.data
         );
 
+
       let article;
 
+
       try {
+
         article =
           JSON.parse(
             writingPart?.text ||
             ""
           );
 
-      } catch (error) {
+      } catch (
+        error
+      ) {
+
         await saveGenerationStatus(
           store,
           {
             runId,
-            status: "error",
+
+            status:
+              "error",
+
             stage:
               "writing-json",
+
             message:
               "OpenAI svarade, men artikelns JSON kunde inte läsas.",
+
             writingPreview:
               writingPart
                 ?.text
@@ -1398,93 +1281,117 @@ imageStyle:
                   1000
                 ) ||
               "",
+
             details:
               error.message,
+
             startedAt:
               now.toISOString(),
+
             updatedAt:
               new Date().toISOString(),
+
             swedishTime:
               nowInSweden
           }
         );
 
+
         return jsonResponse(
           {
-            success: false,
-            stage: "writing",
-            error:
-              "Artikeln kunde inte läsas som JSON."
+            success:
+              false,
+
+            stage:
+              "writing-json"
           },
           500
         );
       }
 
 
-      // =====================================================
-      // SERVERN BESTÄMMER DESSA FÄLT
-      // =====================================================
+      // ===================================================
+      // SERVERN BESTÄMMER
+      // ===================================================
 
       article.triggerDate =
         triggerDate;
 
-      // OBS:
-      // Vi ersätter INTE article.freshTrigger med
-      // faktakontrollens råa TRIGGER längre.
-      //
-      // article.freshTrigger är den rena,
-      // läsarvänliga formulering som skribenten just skapade.
 
       article.byline =
         byline;
 
+
       article.editorialTone =
         editorialTone;
 
-
-      // =====================================================
-      // EXTRA SKYDD MOT URL/DOMÄNER I LÄSARTEXT
-      // =====================================================
 
       article.title =
         cleanReaderText(
           article.title
         );
 
+
       article.summary =
         cleanReaderText(
           article.summary
         );
+
 
       article.freshTrigger =
         cleanReaderText(
           article.freshTrigger
         );
 
+
       article.paragraphs =
-        (article.paragraphs || [])
-          .map(cleanReaderText)
-          .filter(Boolean);
+        (
+          article.paragraphs ||
+          []
+        )
+          .map(
+            cleanReaderText
+          )
+          .filter(
+            Boolean
+          );
+
 
       article.whyTalkAboutIt =
-        (article.whyTalkAboutIt || [])
-          .map(cleanReaderText)
-          .filter(Boolean);
+        (
+          article.whyTalkAboutIt ||
+          []
+        )
+          .map(
+            cleanReaderText
+          )
+          .filter(
+            Boolean
+          );
+
 
       article.pollQuestion =
         cleanReaderText(
           article.pollQuestion
         );
 
+
       article.pollOptions =
-        (article.pollOptions || [])
-          .map(cleanReaderText)
-          .filter(Boolean);
+        (
+          article.pollOptions ||
+          []
+        )
+          .map(
+            cleanReaderText
+          )
+          .filter(
+            Boolean
+          );
 
 
-      // =====================================================
+      // ===================================================
       // SLUTLIG DUBLETTCHECK
-      // =====================================================
+      // ===================================================
 
       const duplicateArticle =
         findDuplicateMatch({
@@ -1492,10 +1399,7 @@ imageStyle:
             article.title,
             article.summary,
             article.freshTrigger,
-            ...(
-              article.paragraphs ||
-              []
-            )
+            ...article.paragraphs
           ].join("\n"),
 
           history:
@@ -1506,115 +1410,207 @@ imageStyle:
       if (
         duplicateArticle
       ) {
+
         rejectedTopic =
           `Den färdiga artikeln blev för lik "${duplicateArticle.title}". Välj ett helt annat ämne.`;
+
 
         await saveGenerationStatus(
           store,
           {
             runId,
+
             status:
-              candidateAttempt < 3
+              candidateAttempt <
+              MAX_ATTEMPTS
                 ? "running"
                 : "rejected",
+
             stage:
               "final-duplicate-check",
+
             message:
               `Den färdiga artikeln bedömdes vara för lik "${duplicateArticle.title}".`,
+
             candidateAttempt,
+
             articleTitle:
               article.title ||
               null,
+
             duplicateOf:
               duplicateArticle,
+
             startedAt:
               now.toISOString(),
+
             updatedAt:
               new Date().toISOString(),
+
             swedishTime:
               nowInSweden
           }
         );
 
+
         if (
-          candidateAttempt < 3
+          candidateAttempt <
+          MAX_ATTEMPTS
         ) {
           continue;
         }
 
+
         return jsonResponse(
           {
-            success: false,
+            success:
+              false,
+
             stage:
-              "duplicate-check-final",
-            error:
-              "Den färdiga artikeln blev för lik en tidigare publicering.",
-            duplicateOf:
-              duplicateArticle
+              "duplicate-check-final"
           },
           422
         );
       }
 
 
-      // =====================================================
+      // ===================================================
+      // PASS 2 – RELEVANT BILD
+      // ===================================================
+
+      await saveGenerationStatus(
+        store,
+        {
+          runId,
+
+          status:
+            "running",
+
+          stage:
+            "image",
+
+          message:
+            UNSPLASH_ACCESS_KEY
+              ? "Letar efter en relevant artikelbild."
+              : "Ingen Unsplash-nyckel finns. Använder fallbackbild.",
+
+          candidateAttempt,
+
+          imageSearchQuery:
+            article.imageSearchQuery,
+
+          startedAt:
+            now.toISOString(),
+
+          updatedAt:
+            new Date().toISOString(),
+
+          swedishTime:
+            nowInSweden
+        }
+      );
+
+
+      const heroImage =
+        await getHeroImage({
+          accessKey:
+            UNSPLASH_ACCESS_KEY,
+
+          query:
+            article.imageSearchQuery,
+
+          alt:
+            article.imageAlt,
+
+          category:
+            article.category
+        });
+
+
+      // ===================================================
       // BYGG POST
-      // =====================================================
+      // ===================================================
 
       const articleId =
         createArticleId(
           new Date()
         );
 
+
       const savedNews = {
+
         id:
           articleId,
+
 
         createdAt:
           new Date()
             .toISOString(),
+
 
         generatedAt:
           formatSwedishDateTime(
             new Date()
           ),
 
+
         byline,
+
 
         editorialTone,
 
+
         verifiedTrigger,
+
 
         article,
 
-        // Källorna sparas fortfarande internt.
-        // Frontend visar dem inte.
+
+        heroImage,
+
+
         sources:
           selectedSources
       };
 
 
-      // =====================================================
+      // ===================================================
       // PUBLICERING
-      // =====================================================
+      // ===================================================
 
       await saveGenerationStatus(
         store,
         {
           runId,
-          status: "running",
-          stage: "publishing",
+
+          status:
+            "running",
+
+          stage:
+            "publishing",
+
           message:
             "Artikeln är godkänd. Förbereder publicering.",
+
           title:
             article.title,
+
           byline,
+
           editorialTone,
+
           articleId,
+
+          imageProvider:
+            heroImage?.provider ||
+            "fallback",
+
           startedAt:
             now.toISOString(),
+
           updatedAt:
             new Date().toISOString(),
+
           swedishTime:
             nowInSweden
         }
@@ -1627,6 +1623,7 @@ imageStyle:
           {
             type:
               "json",
+
             consistency:
               "strong"
           }
@@ -1636,6 +1633,7 @@ imageStyle:
       if (
         previousLatest?.id
       ) {
+
         await store.setJSON(
           `archive/${previousLatest.id}`,
           previousLatest
@@ -1655,6 +1653,7 @@ imageStyle:
           {
             type:
               "json",
+
             consistency:
               "strong"
           }
@@ -1664,85 +1663,118 @@ imageStyle:
       if (
         !confirmation ||
         confirmation.id !==
-          articleId
+        articleId
       ) {
+
         await saveGenerationStatus(
           store,
           {
             runId,
-            status: "error",
+
+            status:
+              "error",
+
             stage:
               "publish-confirmation",
+
             message:
               "Artikeln skrevs till latest men kontrolläsningen matchade inte.",
+
             expectedId:
               articleId,
+
             actualId:
               confirmation?.id ||
               null,
-            title:
-              article.title,
+
             startedAt:
               now.toISOString(),
+
             updatedAt:
               new Date().toISOString(),
+
             swedishTime:
               nowInSweden
           }
         );
 
+
         return jsonResponse(
           {
-            success: false,
+            success:
+              false,
+
             stage:
-              "publish-confirmation",
-            error:
-              "Latest kunde inte verifieras efter publiceringen."
+              "publish-confirmation"
           },
           500
         );
       }
 
 
-      // =====================================================
+      // ===================================================
       // KLART
-      // =====================================================
+      // ===================================================
 
       await saveGenerationStatus(
         store,
         {
           runId,
-          status: "success",
-          stage: "published",
+
+          status:
+            "success",
+
+          stage:
+            "published",
+
           message:
             "Ny artikel har publicerats som latest.",
+
           articleId,
+
           title:
             article.title,
+
           category:
             article.category,
+
           byline,
+
           editorialTone,
+
           imageSearchQuery:
             article.imageSearchQuery,
+
+          imageProvider:
+            heroImage?.provider ||
+            "fallback",
+
           candidateAttempt,
+
           historyChecked:
             recentHistory.length,
+
           sourcesUsed:
             selectedSources.length,
+
           archivedPrevious:
             previousLatest?.id ||
             null,
+
           totalTokens:
             calculateTotalTokens(
               totalUsage
             ),
+
           startedAt:
             now.toISOString(),
+
           finishedAt:
             new Date().toISOString(),
+
           updatedAt:
             new Date().toISOString(),
+
           swedishTime:
             formatSwedishDateTime(
               new Date()
@@ -1753,7 +1785,8 @@ imageStyle:
 
       return jsonResponse(
         {
-          success: true,
+          success:
+            true,
 
           message:
             "Ny artikel skapad och publicerad!",
@@ -1765,6 +1798,8 @@ imageStyle:
           byline,
 
           editorialTone,
+
+          heroImage,
 
           latest:
             savedNews,
@@ -1787,8 +1822,7 @@ imageStyle:
                 totalUsage
               )
           }
-        },
-        200
+        }
       );
     }
 
@@ -1797,22 +1831,33 @@ imageStyle:
       store,
       {
         runId,
-        status: "error",
-        stage: "no-result",
+
+        status:
+          "error",
+
+        stage:
+          "no-result",
+
         message:
           "Alla kandidatförsök tog slut utan publicering.",
+
         startedAt:
           now.toISOString(),
+
         updatedAt:
           new Date().toISOString(),
+
         swedishTime:
           nowInSweden
       }
     );
 
+
     return jsonResponse(
       {
-        success: false,
+        success:
+          false,
+
         error:
           "Ingen artikel kunde skapas."
       },
@@ -1820,17 +1865,27 @@ imageStyle:
     );
 
 
-  } catch (error) {
+  } catch (
+    error
+  ) {
+
     await saveGenerationStatus(
       store,
       {
         runId,
-        status: "error",
-        stage: "crash",
+
+        status:
+          "error",
+
+        stage:
+          "crash",
+
         message:
           "Generate-news kraschade.",
+
         details:
           error.message,
+
         stack:
           String(
             error.stack ||
@@ -1839,20 +1894,27 @@ imageStyle:
             0,
             2500
           ),
+
         startedAt:
           now.toISOString(),
+
         updatedAt:
           new Date().toISOString(),
+
         swedishTime:
           nowInSweden
       }
     );
 
+
     return jsonResponse(
       {
-        success: false,
+        success:
+          false,
+
         error:
           "Generate-news kraschade",
+
         details:
           error.message
       },
@@ -1865,6 +1927,7 @@ imageStyle:
     if (
       generationLock?.token
     ) {
+
       await releaseGenerationLock(
         store,
         generationLock.token
@@ -1875,6 +1938,302 @@ imageStyle:
 
 
 // =====================================================
+// PASS 2 – BILDSÖKNING
+// =====================================================
+
+async function getHeroImage({
+  accessKey,
+  query,
+  alt,
+  category
+}) {
+
+  if (
+    !accessKey ||
+    !query
+  ) {
+
+    return fallbackHeroImage(
+      category,
+      alt
+    );
+  }
+
+
+  try {
+
+    const params =
+      new URLSearchParams({
+        query,
+
+        orientation:
+          "landscape",
+
+        per_page:
+          "5",
+
+        content_filter:
+          "high"
+      });
+
+
+    const response =
+      await fetch(
+        `https://api.unsplash.com/search/photos?${params.toString()}`,
+        {
+          headers: {
+            Authorization:
+              `Client-ID ${accessKey}`,
+
+            "Accept-Version":
+              "v1"
+          }
+        }
+      );
+
+
+    if (
+      !response.ok
+    ) {
+
+      return fallbackHeroImage(
+        category,
+        alt
+      );
+    }
+
+
+    const data =
+      await response.json();
+
+
+    const photo =
+      Array.isArray(
+        data.results
+      )
+        ? data.results[0]
+        : null;
+
+
+    if (
+      !photo?.urls?.regular
+    ) {
+
+      return fallbackHeroImage(
+        category,
+        alt
+      );
+    }
+
+
+    /*
+    Unsplash vill att download-endpointen anropas
+    när en bild väljs för användning.
+    */
+
+    if (
+      photo.links
+        ?.download_location
+    ) {
+
+      fetch(
+        photo.links
+          .download_location,
+        {
+          headers: {
+            Authorization:
+              `Client-ID ${accessKey}`,
+
+            "Accept-Version":
+              "v1"
+          }
+        }
+      )
+      .catch(
+        () => {}
+      );
+    }
+
+
+    const profileBase =
+      photo.user
+        ?.links
+        ?.html ||
+      "https://unsplash.com";
+
+
+    const photoBase =
+      photo.links
+        ?.html ||
+      "https://unsplash.com";
+
+
+    return {
+
+      provider:
+        "unsplash",
+
+
+      url:
+        photo.urls.regular,
+
+
+      smallUrl:
+        photo.urls.small ||
+        photo.urls.regular,
+
+
+      alt:
+        cleanReaderText(
+          alt ||
+          photo.alt_description ||
+          photo.description ||
+          "Bild till dagens snackis"
+        ),
+
+
+      photographerName:
+        photo.user
+          ?.name ||
+        "Unsplash-fotograf",
+
+
+      photographerUrl:
+        addUtm(
+          profileBase
+        ),
+
+
+      photoUrl:
+        addUtm(
+          photoBase
+        ),
+
+
+      unsplashUrl:
+        "https://unsplash.com/?utm_source=kafferasten&utm_medium=referral"
+    };
+
+
+  } catch {
+
+    return fallbackHeroImage(
+      category,
+      alt
+    );
+  }
+}
+
+
+// =====================================================
+// FALLBACKBILDER
+// =====================================================
+
+function fallbackHeroImage(
+  category,
+  alt
+) {
+
+  const fallbackByCategory = {
+
+    "Sport":
+      "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?auto=format&fit=crop&w=1400&q=82",
+
+
+    "Teknik":
+      "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1400&q=82",
+
+
+    "Arbetsliv":
+      "https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1400&q=82",
+
+
+    "TV & streaming":
+      "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=1400&q=82",
+
+
+    "Nöje":
+      "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1400&q=82",
+
+
+    "Udda":
+      "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=1400&q=82",
+
+
+    "Vardag":
+      "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=1400&q=82"
+  };
+
+
+  const imageUrl =
+    fallbackByCategory[
+      category
+    ] ||
+    fallbackByCategory.Vardag;
+
+
+  return {
+
+    provider:
+      "fallback",
+
+
+    url:
+      imageUrl,
+
+
+    smallUrl:
+      imageUrl,
+
+
+    alt:
+      cleanReaderText(
+        alt ||
+        "Bild till dagens snackis"
+      )
+  };
+}
+
+
+// =====================================================
+// UNSPLASH UTM
+// =====================================================
+
+function addUtm(
+  url
+) {
+
+  try {
+
+    const parsed =
+      new URL(
+        url
+      );
+
+
+    parsed.searchParams.set(
+      "utm_source",
+      "kafferasten"
+    );
+
+
+    parsed.searchParams.set(
+      "utm_medium",
+      "referral"
+    );
+
+
+    return parsed.toString();
+
+
+  } catch {
+
+    return url;
+  }
+}
+
+
+// =====================================================
 // DIAGNOSTIK
 // =====================================================
 
@@ -1882,12 +2241,18 @@ async function saveGenerationStatus(
   store,
   data
 ) {
+
   try {
+
     await store.setJSON(
-      "_diagnostics/generation-status",
+      STATUS_KEY,
       data
     );
-  } catch (error) {
+
+  } catch (
+    error
+  ) {
+
     console.error(
       "Kunde inte spara generation-status:",
       error
@@ -1905,34 +2270,40 @@ async function acquireGenerationLock(
   now,
   runId
 ) {
-  const key =
-    "_locks/generate-news";
 
   const staleAfterMs =
     20 *
     60 *
     1000;
 
+
   const existing =
     await store.get(
-      key,
+      LOCK_KEY,
       {
-        type: "json",
-        consistency: "strong"
+        type:
+          "json",
+
+        consistency:
+          "strong"
       }
     );
+
 
   if (
     existing?.startedAt
   ) {
+
     const started =
       new Date(
         existing.startedAt
       );
 
+
     const age =
       now.getTime() -
       started.getTime();
+
 
     if (
       Number.isFinite(
@@ -1942,32 +2313,41 @@ async function acquireGenerationLock(
       age <
         staleAfterMs
     ) {
+
       return {
-        acquired: false,
+        acquired:
+          false,
+
         startedAt:
           existing.startedAt,
+
         runId:
           existing.runId ||
           null
       };
     }
 
+
     await store.delete(
-      key
+      LOCK_KEY
     );
   }
+
 
   const token =
     `${now.getTime()}-${Math.random()
       .toString(36)
       .slice(2)}`;
 
+
   const result =
     await store.setJSON(
-      key,
+      LOCK_KEY,
       {
         token,
+
         runId,
+
         startedAt:
           now.toISOString()
       },
@@ -1977,33 +2357,47 @@ async function acquireGenerationLock(
       }
     );
 
+
   if (
     !result.modified
   ) {
+
     const current =
       await store.get(
-        key,
+        LOCK_KEY,
         {
-          type: "json",
-          consistency: "strong"
+          type:
+            "json",
+
+          consistency:
+            "strong"
         }
       );
 
+
     return {
-      acquired: false,
+      acquired:
+        false,
+
       startedAt:
         current?.startedAt ||
         null,
+
       runId:
         current?.runId ||
         null
     };
   }
 
+
   return {
-    acquired: true,
+    acquired:
+      true,
+
     token,
+
     runId,
+
     startedAt:
       now.toISOString()
   };
@@ -2014,30 +2408,41 @@ async function releaseGenerationLock(
   store,
   token
 ) {
+
   if (!token) {
     return;
   }
 
+
   try {
+
     const current =
       await store.get(
-        "_locks/generate-news",
+        LOCK_KEY,
         {
-          type: "json",
-          consistency: "strong"
+          type:
+            "json",
+
+          consistency:
+            "strong"
         }
       );
+
 
     if (
       current?.token ===
       token
     ) {
+
       await store.delete(
-        "_locks/generate-news"
+        LOCK_KEY
       );
     }
 
-  } catch (error) {
+  } catch (
+    error
+  ) {
+
     console.error(
       "Kunde inte släppa körlåset:",
       error
@@ -2056,38 +2461,49 @@ async function loadRecentHistory({
   days,
   limit
 }) {
+
   const result =
     [];
 
+
   const seenIds =
     new Set();
+
 
   const latest =
     await store.get(
       "latest",
       {
-        type: "json",
-        consistency: "strong"
+        type:
+          "json",
+
+        consistency:
+          "strong"
       }
     );
+
 
   if (
     latest?.id
   ) {
+
     result.push(
       latest
     );
+
 
     seenIds.add(
       latest.id
     );
   }
 
+
   const listing =
     await store.list({
       prefix:
         "archive/"
     });
+
 
   const archiveKeys =
     (
@@ -2105,10 +2521,12 @@ async function loadRecentHistory({
         50
       );
 
+
   for (
     const key
     of archiveKeys
   ) {
+
     if (
       result.length >=
       limit
@@ -2116,15 +2534,21 @@ async function loadRecentHistory({
       break;
     }
 
+
     try {
+
       const item =
         await store.get(
           key,
           {
-            type: "json",
-            consistency: "strong"
+            type:
+              "json",
+
+            consistency:
+              "strong"
           }
         );
+
 
       if (
         !item?.id ||
@@ -2135,6 +2559,7 @@ async function loadRecentHistory({
         continue;
       }
 
+
       if (
         isWithinDays(
           item.createdAt,
@@ -2142,16 +2567,22 @@ async function loadRecentHistory({
           days
         )
       ) {
+
         result.push(
           item
         );
+
 
         seenIds.add(
           item.id
         );
       }
 
-    } catch (error) {
+
+    } catch (
+      error
+    ) {
+
       console.warn(
         "Kunde inte läsa arkivpost:",
         key,
@@ -2160,7 +2591,9 @@ async function loadRecentHistory({
     }
   }
 
+
   return result
+
     .sort(
       (
         a,
@@ -2175,6 +2608,7 @@ async function loadRecentHistory({
           0
         )
     )
+
     .slice(
       0,
       limit
@@ -2189,17 +2623,14 @@ async function loadRecentHistory({
 function formatRecentTopicsForPrompt(
   history
 ) {
-  if (
-    !history.length
-  ) {
-    return "";
-  }
 
   return history
+
     .slice(
       0,
-      20
+      HISTORY_LIMIT
     )
+
     .map(
       (
         item,
@@ -2211,6 +2642,7 @@ function formatRecentTopicsForPrompt(
             ?.title ||
           "Okänd rubrik";
 
+
         const trigger =
           item.verifiedTrigger
             ?.description ||
@@ -2218,12 +2650,14 @@ function formatRecentTopicsForPrompt(
             ?.freshTrigger ||
           "";
 
+
         const date =
           item.verifiedTrigger
             ?.date ||
           item.article
             ?.triggerDate ||
           "";
+
 
         return (
           `${index + 1}. ${title}` +
@@ -2242,17 +2676,21 @@ function formatRecentTopicsForPrompt(
         );
       }
     )
-    .join("\n");
+
+    .join(
+      "\n"
+    );
 }
 
 
 // =====================================================
-// SKRIBENT
+// SKRIBENTER
 // =====================================================
 
 function normalizeEditorialTone(
   value
 ) {
+
   const normalized =
     String(
       value ||
@@ -2260,6 +2698,7 @@ function normalizeEditorialTone(
     )
       .trim()
       .toUpperCase();
+
 
   if (
     normalized.includes(
@@ -2269,6 +2708,7 @@ function normalizeEditorialTone(
     return "UNGDOMLIG";
   }
 
+
   if (
     normalized.includes(
       "KLASSISK"
@@ -2277,6 +2717,7 @@ function normalizeEditorialTone(
     return "KLASSISK";
   }
 
+
   return "BRED";
 }
 
@@ -2284,27 +2725,32 @@ function normalizeEditorialTone(
 function chooseByline(
   editorialTone
 ) {
+
   if (
     editorialTone ===
     "UNGDOMLIG"
   ) {
+
     return "Camille";
   }
 
+
   return Math.random() <
     0.5
-    ? "Kent på Kafferasten"
-    : "Bettan";
+      ? "Kent på Kafferasten"
+      : "Bettan";
 }
 
 
 function writerVoice(
   byline
 ) {
+
   if (
     byline ===
     "Camille"
   ) {
+
     return `
 Camille är snabb, samtida och popkulturellt nyfiken.
 Hon kan vara lekfull och pigg, men använder naturlig svenska.
@@ -2312,10 +2758,12 @@ Hon tvingar aldrig in ungdomsslang eller engelska uttryck.
 `;
   }
 
+
   if (
     byline ===
     "Bettan"
   ) {
+
     return `
 Bettan är varm, kvick och vardagsnära.
 Hon ser gärna den mänskliga eller småroliga detaljen
@@ -2323,6 +2771,7 @@ som gör att folk börjar prata.
 Hon blir aldrig hurtig eller tillgjord.
 `;
   }
+
 
   return `
 Kent på Kafferasten är nyfiken, torrt smårolig och lite klurig.
@@ -2333,41 +2782,72 @@ men håller texten enkel, folklig och lätt att prata vidare om.
 
 
 // =====================================================
-// RENGÖR LÄSARVÄND TEXT
+// RENGÖR LÄSARTEXT
 // =====================================================
 
 function cleanReaderText(
   value
 ) {
+
   if (!value) {
     return "";
   }
 
-  return String(value)
+
+  return String(
+    value
+  )
+
+    .replace(
+      /[\uE000-\uF8FF]/g,
+      ""
+    )
+
+    .replace(
+      /\[[^\]]*\]\(\s*https?:\/\/[^)]*\)/gi,
+      ""
+    )
+
     .replace(
       /https?:\/\/\S+/gi,
       ""
     )
+
     .replace(
       /\bwww\.\S+/gi,
       ""
     )
+
     .replace(
       /\b[a-z0-9-]+(?:\.[a-z0-9-]+)+\b/gi,
       ""
     )
+
     .replace(
-      /\(\s*\)/g,
+      /\[\s*\]\s*\(\s*\)/g,
       ""
     )
+
     .replace(
-      /\s+([,.!?;:])/g,
+      /\(\s*\[\s*\]\s*\)/g,
+      ""
+    )
+
+    .replace(
+      /[\[\]\(\)\{\}]{2,}/g,
+      ""
+    )
+
+    .replace(
+      /\s*([,.!?;:])/g,
       "$1"
     )
+
     .replace(
       /\s{2,}/g,
       " "
     )
+
     .trim();
 }
 
@@ -2380,10 +2860,12 @@ function findDuplicateMatch({
   candidateText,
   history
 }) {
+
   const candidate =
     buildTopicTokens(
       candidateText
     );
+
 
   if (
     !candidate.size
@@ -2391,11 +2873,14 @@ function findDuplicateMatch({
     return null;
   }
 
+
   for (
     const item
     of history
   ) {
+
     const previousText = [
+
       item.article
         ?.title,
 
@@ -2407,20 +2892,28 @@ function findDuplicateMatch({
 
       item.verifiedTrigger
         ?.description
+
     ]
-      .filter(Boolean)
-      .join("\n");
+      .filter(
+        Boolean
+      )
+      .join(
+        "\n"
+      );
+
 
     const previous =
       buildTopicTokens(
         previousText
       );
 
+
     if (
       !previous.size
     ) {
       continue;
     }
+
 
     const intersection =
       [
@@ -2433,17 +2926,20 @@ function findDuplicateMatch({
             )
         );
 
+
     const union =
       new Set([
         ...candidate,
         ...previous
       ]);
 
+
     const jaccard =
       union.size
         ? intersection.length /
           union.size
         : 0;
+
 
     const containment =
       intersection.length /
@@ -2452,39 +2948,58 @@ function findDuplicateMatch({
         previous.size
       );
 
+
     const hasRareExactToken =
       intersection.some(
         token =>
-          token.length >= 9 &&
+          token.length >=
+            9 &&
           !GENERIC_TOPIC_WORDS.has(
             token
           )
       );
 
+
     const looksDuplicate =
+
       (
-        intersection.length >= 2 &&
-        containment >= 0.42
-      ) ||
-      jaccard >= 0.28 ||
+        intersection.length >=
+          2 &&
+        containment >=
+          0.42
+      )
+
+      ||
+
+      jaccard >=
+        0.28
+
+      ||
+
       hasRareExactToken;
+
 
     if (
       looksDuplicate
     ) {
+
       return {
+
         id:
           item.id ||
           null,
+
 
         title:
           item.article
             ?.title ||
           "Tidigare snackis",
 
+
         createdAt:
           item.createdAt ||
           null,
+
 
         score:
           Number(
@@ -2497,6 +3012,7 @@ function findDuplicateMatch({
               )
           ),
 
+
         sharedTerms:
           intersection.slice(
             0,
@@ -2505,6 +3021,7 @@ function findDuplicateMatch({
       };
     }
   }
+
 
   return null;
 }
@@ -2516,6 +3033,7 @@ function findDuplicateMatch({
 
 const SWEDISH_STOP_WORDS =
   new Set([
+
     "och",
     "att",
     "det",
@@ -2557,6 +3075,7 @@ const SWEDISH_STOP_WORDS =
     "sig",
     "vid",
     "i",
+
     "the",
     "a",
     "an",
@@ -2572,6 +3091,7 @@ const SWEDISH_STOP_WORDS =
 
 const GENERIC_TOPIC_WORDS =
   new Set([
+
     "premiar",
     "premiaren",
     "sasong",
@@ -2606,15 +3126,25 @@ const GENERIC_TOPIC_WORDS =
 function buildTopicTokens(
   text
 ) {
+
   return new Set(
+
     normalizeTopicText(
       text
     )
-      .split(" ")
-      .filter(Boolean)
+
+      .split(
+        " "
+      )
+
+      .filter(
+        Boolean
+      )
+
       .filter(
         token =>
-          token.length >= 3 &&
+          token.length >=
+            3 &&
           !SWEDISH_STOP_WORDS.has(
             token
           ) &&
@@ -2629,32 +3159,39 @@ function buildTopicTokens(
 function normalizeTopicText(
   text
 ) {
+
   return String(
     text ||
     ""
   )
+
     .toLowerCase()
+
     .normalize(
       "NFD"
     )
+
     .replace(
       /[\u0300-\u036f]/g,
       ""
     )
+
     .replace(
       /[^a-z0-9åäö]+/gi,
       " "
     )
+
     .replace(
       /\s+/g,
       " "
     )
+
     .trim();
 }
 
 
 // =====================================================
-// DATUMFILTER
+// DATUM
 // =====================================================
 
 function isWithinDays(
@@ -2662,14 +3199,17 @@ function isWithinDays(
   now,
   days
 ) {
+
   if (!isoDate) {
     return true;
   }
+
 
   const date =
     new Date(
       isoDate
     );
+
 
   if (
     Number.isNaN(
@@ -2679,9 +3219,11 @@ function isWithinDays(
     return true;
   }
 
+
   const age =
     now.getTime() -
     date.getTime();
+
 
   return (
     age >= 0 &&
@@ -2703,6 +3245,7 @@ async function callOpenAI({
   apiKey,
   body
 }) {
+
   const response =
     await fetch(
       "https://api.openai.com/v1/responses",
@@ -2725,20 +3268,26 @@ async function callOpenAI({
       }
     );
 
+
   let data;
 
+
   try {
+
     data =
       await response.json();
 
   } catch {
+
     data = {
       error:
         "OpenAI-svaret kunde inte läsas som JSON."
     };
   }
 
+
   return {
+
     ok:
       response.ok,
 
@@ -2751,12 +3300,13 @@ async function callOpenAI({
 
 
 // =====================================================
-// OPENAI TEXT
+// OPENAI-TEXT
 // =====================================================
 
 function getOutputTextPart(
   data
 ) {
+
   const message =
     data.output
       ?.find(
@@ -2764,6 +3314,7 @@ function getOutputTextPart(
           item.type ===
           "message"
       );
+
 
   return message
     ?.content
@@ -2782,16 +3333,20 @@ function getOutputTextPart(
 function extractCitedSources(
   textPart
 ) {
+
   return (
     textPart
       ?.annotations
+
       ?.filter(
         annotation =>
           annotation.type ===
           "url_citation"
       )
+
       ?.map(
         annotation => ({
+
           title:
             annotation.title ||
             "Källa",
@@ -2800,10 +3355,14 @@ function extractCitedSources(
             annotation.url
         })
       )
+
       ?.filter(
         source =>
           source.url
-      ) ||
+      )
+
+    ||
+
     []
   );
 }
@@ -2812,9 +3371,12 @@ function extractCitedSources(
 function filterAllowedSources(
   sources
 ) {
+
   return sources.filter(
     source => {
+
       try {
+
         const hostname =
           new URL(
             source.url
@@ -2822,19 +3384,18 @@ function filterAllowedSources(
             .hostname
             .toLowerCase();
 
-        if (
-          hostname ===
-            "reddit.com" ||
-          hostname.endsWith(
+
+        return (
+          hostname !==
+            "reddit.com" &&
+          !hostname.endsWith(
             ".reddit.com"
           )
-        ) {
-          return false;
-        }
+        );
 
-        return true;
 
       } catch {
+
         return false;
       }
     }
@@ -2845,6 +3406,7 @@ function filterAllowedSources(
 function dedupeSources(
   sources
 ) {
+
   return sources.filter(
     (
       source,
@@ -2868,7 +3430,9 @@ function dedupeSources(
 function getDomain(
   url
 ) {
+
   try {
+
     const hostname =
       new URL(
         url
@@ -2880,10 +3444,12 @@ function getDomain(
           ""
         );
 
+
     const parts =
       hostname.split(
         "."
       );
+
 
     const twoPartSuffixes =
       [
@@ -2892,6 +3458,7 @@ function getDomain(
         "co.nz",
         "co.jp"
       ];
+
 
     const lastTwo =
       parts
@@ -2902,12 +3469,15 @@ function getDomain(
           "."
         );
 
+
     if (
-      parts.length >= 3 &&
+      parts.length >=
+        3 &&
       twoPartSuffixes.includes(
         lastTwo
       )
     ) {
+
       return parts
         .slice(
           -3
@@ -2917,15 +3487,15 @@ function getDomain(
         );
     }
 
-    if (
-      parts.length >= 2
-    ) {
-      return lastTwo;
-    }
 
-    return hostname;
+    return parts.length >=
+      2
+        ? lastTwo
+        : hostname;
+
 
   } catch {
+
     return null;
   }
 }
@@ -2934,20 +3504,25 @@ function getDomain(
 function getDistinctDomainSources(
   sources
 ) {
+
   const seenDomains =
     new Set();
 
+
   const result =
     [];
+
 
   for (
     const source
     of sources
   ) {
+
     const domain =
       getDomain(
         source.url
       );
+
 
     if (
       !domain ||
@@ -2958,14 +3533,17 @@ function getDistinctDomainSources(
       continue;
     }
 
+
     seenDomains.add(
       domain
     );
+
 
     result.push(
       source
     );
   }
+
 
   return result;
 }
@@ -2978,10 +3556,12 @@ function getDistinctDomainSources(
 function extractTriggerDate(
   text
 ) {
+
   const match =
     text.match(
       /TRIGGERDATUM:\s*(\d{4}-\d{2}-\d{2})/i
     );
+
 
   return match
     ? match[1]
@@ -2993,16 +3573,19 @@ function extractField(
   text,
   fieldName
 ) {
+
   const regex =
     new RegExp(
       `${fieldName}:\\s*([^\\n]+)`,
       "i"
     );
 
+
   const match =
     text.match(
       regex
     );
+
 
   return match
     ? match[1].trim()
@@ -3019,21 +3602,26 @@ function isFreshDate(
   now,
   hours
 ) {
+
   try {
+
     const trigger =
       new Date(
         `${dateString}T23:59:59Z`
       );
 
+
     const difference =
       now.getTime() -
       trigger.getTime();
+
 
     const maxAge =
       hours *
       60 *
       60 *
       1000;
+
 
     return (
       difference <=
@@ -3047,7 +3635,9 @@ function isFreshDate(
         )
     );
 
+
   } catch {
+
     return false;
   }
 }
@@ -3060,6 +3650,7 @@ function isFreshDate(
 function createArticleId(
   date
 ) {
+
   const formatter =
     new Intl.DateTimeFormat(
       "sv-SE",
@@ -3090,6 +3681,7 @@ function createArticleId(
       }
     );
 
+
   return formatter
     .format(
       date
@@ -3104,11 +3696,18 @@ function createArticleId(
 function createRunId(
   date
 ) {
+
   return (
     createArticleId(
       date
-    ) +
-    "-" +
+    )
+
+    +
+
+    "-"
+
+    +
+
     Math.random()
       .toString(
         36
@@ -3124,6 +3723,7 @@ function createRunId(
 function formatSwedishDateTime(
   date
 ) {
+
   return new Intl.DateTimeFormat(
     "sv-SE",
     {
@@ -3150,21 +3750,26 @@ function formatSwedishDateTime(
 function simplifyError(
   data
 ) {
+
   if (!data) {
     return null;
   }
+
 
   if (
     typeof data ===
     "string"
   ) {
+
     return data.slice(
       0,
       1500
     );
   }
 
+
   try {
+
     return JSON.stringify(
       data.error ||
       data
@@ -3174,7 +3779,9 @@ function simplifyError(
         1500
       );
 
+
   } catch {
+
     return "Okänt fel";
   }
 }
@@ -3187,10 +3794,15 @@ function simplifyError(
 function calculateTotalTokens(
   usageObject
 ) {
+
   return Object.values(
     usageObject
   )
-    .filter(Boolean)
+
+    .filter(
+      Boolean
+    )
+
     .reduce(
       (
         sum,
@@ -3214,6 +3826,7 @@ function jsonResponse(
   data,
   status = 200
 ) {
+
   return new Response(
     JSON.stringify(
       data,
@@ -3224,6 +3837,7 @@ function jsonResponse(
       status,
 
       headers: {
+
         "Content-Type":
           "application/json; charset=utf-8",
 
