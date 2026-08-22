@@ -156,9 +156,6 @@
 
             place-items:
                 end center;
-
-            flex:
-                0 0 auto;
         }
 
 
@@ -288,9 +285,6 @@
                 1px solid
                 var(--border-color);
 
-            color:
-                var(--primary-color);
-
             text-align:
                 center;
 
@@ -304,10 +298,10 @@
             display:
                 flex;
 
-            align-items:
+            justify-content:
                 center;
 
-            justify-content:
+            align-items:
                 center;
 
             gap:
@@ -479,13 +473,6 @@
         }
 
 
-        .hero-wrap {
-
-            margin-bottom:
-                1.2rem;
-        }
-
-
         .article-hero-img {
 
             display:
@@ -508,16 +495,11 @@
         }
 
 
-        .photo-credit {
+        .photo-credit,
+        .side-photo-credit {
 
             display:
                 none;
-
-            margin:
-                0.42rem 0 0;
-
-            font-size:
-                0.68rem;
 
             color:
                 var(--text-muted);
@@ -527,7 +509,28 @@
         }
 
 
-        .photo-credit a {
+        .photo-credit {
+
+            margin:
+                0.42rem 0 0;
+
+            font-size:
+                0.68rem;
+        }
+
+
+        .side-photo-credit {
+
+            margin:
+                0.3rem 0 0.9rem;
+
+            font-size:
+                0.61rem;
+        }
+
+
+        .photo-credit a,
+        .side-photo-credit a {
 
             color:
                 inherit;
@@ -713,13 +716,6 @@
         }
 
 
-        .source-row strong {
-
-            color:
-                var(--primary-color);
-        }
-
-
         .source-links {
 
             display:
@@ -743,13 +739,6 @@
 
             text-decoration:
                 none;
-        }
-
-
-        .source-link:hover {
-
-            text-decoration:
-                underline;
         }
 
 
@@ -886,11 +875,9 @@
         }
 
 
-        .sidebar-card {
-
-            overflow:
-                hidden;
-        }
+        /* ==================================================
+           SIDOBILDER
+        ================================================== */
 
 
         .side-visual {
@@ -898,17 +885,20 @@
             height:
                 155px;
 
+            position:
+                relative;
+
             display:
                 grid;
 
             place-items:
                 center;
 
+            overflow:
+                hidden;
+
             border-radius:
                 13px;
-
-            margin-bottom:
-                1rem;
 
             background:
                 linear-gradient(
@@ -916,6 +906,22 @@
                     #F6E5D6,
                     #E8C9B2
                 );
+        }
+
+
+        .side-image {
+
+            display:
+                none;
+
+            width:
+                100%;
+
+            height:
+                100%;
+
+            object-fit:
+                cover;
         }
 
 
@@ -929,7 +935,7 @@
         .side-kicker {
 
             margin:
-                0 0 0.3rem;
+                0.9rem 0 0.3rem;
 
             color:
                 var(--accent-color);
@@ -1109,50 +1115,40 @@
         ) {
 
             .container {
-
-                grid-template-columns:
-                    1fr;
-
-                margin-top:
-                    1rem;
-
-                gap:
-                    0.1rem;
+                grid-template-columns: 1fr;
+                margin-top: 1rem;
+                gap: 0.1rem;
             }
 
 
             header {
-
                 padding:
                     1.65rem 1rem 1.5rem;
             }
 
 
             .brand h1 {
-
-                font-size:
-                    2rem;
+                font-size: 2rem;
             }
 
 
             h2 {
-
-                font-size:
-                    1.62rem;
+                font-size: 1.62rem;
             }
 
 
             .card {
-
-                padding:
-                    1.2rem;
+                padding: 1.2rem;
             }
 
 
             .article-hero-img {
+                height: 230px;
+            }
 
-                height:
-                    230px;
+
+            .side-visual {
+                height: 190px;
             }
         }
 
@@ -1253,7 +1249,7 @@
         </h2>
 
 
-        <div class="hero-wrap">
+        <div>
 
             <img
                 id="article-img"
@@ -1525,6 +1521,13 @@
 
         <div class="side-visual">
 
+            <img
+                id="fika-tip-image"
+                class="side-image"
+                alt=""
+                loading="lazy"
+            >
+
             <span
                 class="visual-emoji"
                 id="fika-tip-emoji"
@@ -1532,6 +1535,13 @@
                 🥐
             </span>
 
+        </div>
+
+
+        <div
+            id="fika-tip-credit"
+            class="side-photo-credit"
+        >
         </div>
 
 
@@ -1567,6 +1577,13 @@
 
         <div class="side-visual">
 
+            <img
+                id="fika-fact-image"
+                class="side-image"
+                alt=""
+                loading="lazy"
+            >
+
             <span
                 class="visual-emoji"
                 id="fika-fact-emoji"
@@ -1574,6 +1591,13 @@
                 ☕
             </span>
 
+        </div>
+
+
+        <div
+            id="fika-fact-credit"
+            class="side-photo-credit"
+        >
         </div>
 
 
@@ -1616,8 +1640,13 @@
 
 const votes = {};
 
-window.currentLatestId = null;
+window.currentLatestId =
+    null;
 
+
+/* =====================================================
+   FALLBACK FIKATIPS
+===================================================== */
 
 const fikaTips = [
 
@@ -1642,7 +1671,7 @@ const fikaTips = [
         kicker: "Två tuggor räcker",
         title: "Småkakan gör comeback",
         text:
-            "En liten kaka till kaffet är underskattat. Bonuspoäng om den smular lagom mycket över tangentbordet."
+            "En liten kaka till kaffet är underskattat."
     },
 
     {
@@ -1674,7 +1703,7 @@ const fikaTips = [
         kicker: "Klassiker med krydda",
         title: "Kardemummabulle",
         text:
-            "När kanelbullen känns för självklar: kardemumma. Fortfarande fika, men med lite mer självförtroende."
+            "När kanelbullen känns för självklar: kardemumma."
     },
 
     {
@@ -1735,7 +1764,7 @@ const fikaFacts = [
         kicker: "Smörvetenskap",
         title: "Croissanten byggs i lager",
         text:
-            "Croissantdeg kavlas och viks med smör i flera lager. Det är där fraset föds."
+            "Croissantdeg kavlas och viks med smör i flera lager."
     },
 
     {
@@ -1743,7 +1772,7 @@ const fikaFacts = [
         kicker: "Före chokladen",
         title: "Kakao växer i stora frukter",
         text:
-            "Kakaobönor finns inuti stora kakaofrukter som växer direkt på kakaoträdet."
+            "Kakaobönor finns inuti stora kakaofrukter."
     },
 
     {
@@ -1757,15 +1786,21 @@ const fikaFacts = [
 ];
 
 
-function safeArray(value) {
+function safeArray(
+    value
+) {
 
-    return Array.isArray(value)
+    return Array.isArray(
+        value
+    )
         ? value
         : [];
 }
 
 
-function cleanReaderText(text) {
+function cleanReaderText(
+    text
+) {
 
     if (!text) {
         return "";
@@ -1813,7 +1848,13 @@ function cleanReaderText(text) {
 }
 
 
-function hashString(value) {
+/* =====================================================
+   SIDOINNEHÅLL
+===================================================== */
+
+function hashString(
+    value
+) {
 
     let hash = 0;
 
@@ -1832,15 +1873,11 @@ function hashString(value) {
 
         hash =
             (
-                (
-                    hash << 5
-                )
-                -
+                (hash << 5) -
                 hash
             )
             +
             text.charCodeAt(i);
-
 
         hash |= 0;
     }
@@ -1850,96 +1887,306 @@ function hashString(value) {
 }
 
 
-function renderSidebar(seed) {
+function fallbackSidebar(
+    seed
+) {
 
     const base =
         hashString(seed);
 
 
-    const tip =
-        fikaTips[
-            base %
-            fikaTips.length
-        ];
+    return {
 
+        tip:
+            fikaTips[
+                base %
+                fikaTips.length
+            ],
 
-    const fact =
-        fikaFacts[
-            (
-                base *
-                7
-                +
-                3
-            )
-            %
-            fikaFacts.length
-        ];
-
-
-    document
-        .getElementById(
-            "fika-tip-emoji"
-        )
-        .textContent =
-            tip.emoji;
-
-
-    document
-        .getElementById(
-            "fika-tip-kicker"
-        )
-        .textContent =
-            tip.kicker;
-
-
-    document
-        .getElementById(
-            "fika-tip-title"
-        )
-        .textContent =
-            tip.title;
-
-
-    document
-        .getElementById(
-            "fika-tip-text"
-        )
-        .textContent =
-            tip.text;
-
-
-    document
-        .getElementById(
-            "fika-fact-emoji"
-        )
-        .textContent =
-            fact.emoji;
-
-
-    document
-        .getElementById(
-            "fika-fact-kicker"
-        )
-        .textContent =
-            fact.kicker;
-
-
-    document
-        .getElementById(
-            "fika-fact-title"
-        )
-        .textContent =
-            fact.title;
-
-
-    document
-        .getElementById(
-            "fika-fact-text"
-        )
-        .textContent =
-            fact.text;
+        fact:
+            fikaFacts[
+                (
+                    base * 7 + 3
+                )
+                %
+                fikaFacts.length
+            ]
+    };
 }
 
+
+function renderSidebar(
+    latest
+) {
+
+    const sidebar =
+        latest.sidebarContent ||
+        fallbackSidebar(
+            latest.id ||
+            latest.article?.title
+        );
+
+
+    renderSideCard({
+        item:
+            sidebar.tip,
+
+        imageId:
+            "fika-tip-image",
+
+        emojiId:
+            "fika-tip-emoji",
+
+        creditId:
+            "fika-tip-credit",
+
+        kickerId:
+            "fika-tip-kicker",
+
+        titleId:
+            "fika-tip-title",
+
+        textId:
+            "fika-tip-text"
+    });
+
+
+    renderSideCard({
+        item:
+            sidebar.fact,
+
+        imageId:
+            "fika-fact-image",
+
+        emojiId:
+            "fika-fact-emoji",
+
+        creditId:
+            "fika-fact-credit",
+
+        kickerId:
+            "fika-fact-kicker",
+
+        titleId:
+            "fika-fact-title",
+
+        textId:
+            "fika-fact-text"
+    });
+}
+
+
+function renderSideCard({
+    item,
+    imageId,
+    emojiId,
+    creditId,
+    kickerId,
+    titleId,
+    textId
+}) {
+
+    const image =
+        document.getElementById(
+            imageId
+        );
+
+
+    const emoji =
+        document.getElementById(
+            emojiId
+        );
+
+
+    const credit =
+        document.getElementById(
+            creditId
+        );
+
+
+    document
+        .getElementById(
+            kickerId
+        )
+        .textContent =
+            item?.kicker || "";
+
+
+    document
+        .getElementById(
+            titleId
+        )
+        .textContent =
+            item?.title || "";
+
+
+    document
+        .getElementById(
+            textId
+        )
+        .textContent =
+            item?.text || "";
+
+
+    emoji.textContent =
+        item?.emoji || "☕";
+
+
+    const photo =
+        item?.image;
+
+
+    if (
+        photo?.provider ===
+            "pexels" &&
+        photo?.smallUrl
+    ) {
+
+        image.src =
+            photo.smallUrl;
+
+
+        image.alt =
+            cleanReaderText(
+                photo.alt ||
+                item.imageAlt ||
+                item.title ||
+                ""
+            );
+
+
+        image.style.display =
+            "block";
+
+
+        emoji.style.display =
+            "none";
+
+
+        renderPhotoCredit(
+            credit,
+            photo
+        );
+
+
+    } else {
+
+        image.style.display =
+            "none";
+
+
+        emoji.style.display =
+            "block";
+
+
+        credit.style.display =
+            "none";
+    }
+}
+
+
+/* =====================================================
+   FOTO-CREDIT
+===================================================== */
+
+function renderPhotoCredit(
+    element,
+    photo
+) {
+
+    element.innerHTML = "";
+
+
+    if (
+        photo?.provider !==
+            "pexels" ||
+        !photo.photographerName
+    ) {
+
+        element.style.display =
+            "none";
+
+        return;
+    }
+
+
+    const intro =
+        document.createTextNode(
+            "Foto: "
+        );
+
+
+    const photographer =
+        document.createElement(
+            "a"
+        );
+
+
+    photographer.href =
+        safeHttpUrl(
+            photo.photoUrl ||
+            photo.photographerUrl
+        )
+        ||
+        "https://www.pexels.com/";
+
+
+    photographer.target =
+        "_blank";
+
+
+    photographer.rel =
+        "noopener noreferrer";
+
+
+    photographer.textContent =
+        photo.photographerName;
+
+
+    const separator =
+        document.createTextNode(
+            " / "
+        );
+
+
+    const pexels =
+        document.createElement(
+            "a"
+        );
+
+
+    pexels.href =
+        "https://www.pexels.com/";
+
+
+    pexels.target =
+        "_blank";
+
+
+    pexels.rel =
+        "noopener noreferrer";
+
+
+    pexels.textContent =
+        "Pexels";
+
+
+    element.append(
+        intro,
+        photographer,
+        separator,
+        pexels
+    );
+
+
+    element.style.display =
+        "block";
+}
+
+
+/* =====================================================
+   HERO
+===================================================== */
 
 function renderHero(
     latest,
@@ -1959,11 +2206,12 @@ function renderHero(
 
 
     const hero =
-        latest.heroImage ||
-        null;
+        latest.heroImage;
 
 
-    if (hero?.url) {
+    if (
+        hero?.url
+    ) {
 
         image.src =
             hero.url;
@@ -1978,89 +2226,16 @@ function renderHero(
     }
 
 
-    credit.innerHTML = "";
-
-    credit.style.display =
-        "none";
-
-
-    if (
-        hero?.provider === "pexels" &&
-        hero.photographerName
-    ) {
-
-        const intro =
-            document.createTextNode(
-                "Foto: "
-            );
-
-
-        const photographer =
-            document.createElement(
-                "a"
-            );
-
-
-        photographer.href =
-            hero.photoUrl ||
-            hero.photographerUrl ||
-            "https://www.pexels.com/";
-
-
-        photographer.target =
-            "_blank";
-
-
-        photographer.rel =
-            "noopener noreferrer";
-
-
-        photographer.textContent =
-            hero.photographerName;
-
-
-        const separator =
-            document.createTextNode(
-                " / "
-            );
-
-
-        const pexels =
-            document.createElement(
-                "a"
-            );
-
-
-        pexels.href =
-            hero.pexelsUrl ||
-            "https://www.pexels.com/";
-
-
-        pexels.target =
-            "_blank";
-
-
-        pexels.rel =
-            "noopener noreferrer";
-
-
-        pexels.textContent =
-            "Pexels";
-
-
-        credit.append(
-            intro,
-            photographer,
-            separator,
-            pexels
-        );
-
-
-        credit.style.display =
-            "block";
-    }
+    renderPhotoCredit(
+        credit,
+        hero
+    );
 }
 
+
+/* =====================================================
+   KÄLLOR
+===================================================== */
 
 const SOURCE_NAMES = {
 
@@ -2109,18 +2284,6 @@ const SOURCE_NAMES = {
     "nytimes.com":
         "The New York Times",
 
-    "washingtonpost.com":
-        "The Washington Post",
-
-    "cbsnews.com":
-        "CBS News",
-
-    "nbcnews.com":
-        "NBC News",
-
-    "abcnews.go.com":
-        "ABC News",
-
     "people.com":
         "People",
 
@@ -2138,96 +2301,9 @@ const SOURCE_NAMES = {
 };
 
 
-function sourceDomain(url) {
-
-    try {
-
-        return new URL(url)
-            .hostname
-            .toLowerCase()
-            .replace(
-                /^www\./,
-                ""
-            );
-
-    } catch {
-
-        return "";
-    }
-}
-
-
-function sourceDisplayName(source) {
-
-    const domain =
-        sourceDomain(
-            source.url
-        );
-
-
-    if (
-        SOURCE_NAMES[
-            domain
-        ]
-    ) {
-
-        return SOURCE_NAMES[
-            domain
-        ];
-    }
-
-
-    const parts =
-        domain.split(".");
-
-
-    if (
-        parts.length >
-        2
-    ) {
-
-        const root =
-            parts
-                .slice(-2)
-                .join(".");
-
-
-        if (
-            SOURCE_NAMES[
-                root
-            ]
-        ) {
-
-            return SOURCE_NAMES[
-                root
-            ];
-        }
-    }
-
-
-    const title =
-        cleanReaderText(
-            source.title ||
-            ""
-        );
-
-
-    if (
-        title &&
-        title !== "Källa" &&
-        title.length <= 45
-    ) {
-
-        return title;
-    }
-
-
-    return domain ||
-        "Källa";
-}
-
-
-function safeHttpUrl(value) {
+function safeHttpUrl(
+    value
+) {
 
     try {
 
@@ -2253,7 +2329,100 @@ function safeHttpUrl(value) {
 }
 
 
-function renderSources(sources) {
+function sourceDomain(
+    url
+) {
+
+    try {
+
+        return new URL(url)
+            .hostname
+            .toLowerCase()
+            .replace(
+                /^www\./,
+                ""
+            );
+
+    } catch {
+
+        return "";
+    }
+}
+
+
+function sourceDisplayName(
+    source
+) {
+
+    const domain =
+        sourceDomain(
+            source.url
+        );
+
+
+    if (
+        SOURCE_NAMES[
+            domain
+        ]
+    ) {
+
+        return SOURCE_NAMES[
+            domain
+        ];
+    }
+
+
+    const parts =
+        domain.split(".");
+
+
+    if (
+        parts.length > 2
+    ) {
+
+        const root =
+            parts
+                .slice(-2)
+                .join(".");
+
+
+        if (
+            SOURCE_NAMES[
+                root
+            ]
+        ) {
+
+            return SOURCE_NAMES[
+                root
+            ];
+        }
+    }
+
+
+    const title =
+        cleanReaderText(
+            source.title || ""
+        );
+
+
+    if (
+        title &&
+        title !== "Källa" &&
+        title.length <= 45
+    ) {
+
+        return title;
+    }
+
+
+    return domain ||
+        "Källa";
+}
+
+
+function renderSources(
+    sources
+) {
 
     const row =
         document.getElementById(
@@ -2275,7 +2444,6 @@ function renderSources(sources) {
 
             .map(
                 source => ({
-
                     ...source,
 
                     safeUrl:
@@ -2375,24 +2543,24 @@ function renderSources(sources) {
 }
 
 
+/* =====================================================
+   SKRIBENT
+===================================================== */
+
 function bylineEmoji(
     byline
 ) {
 
     if (
-        byline ===
-        "Camille"
+        byline === "Camille"
     ) {
-
         return "✨";
     }
 
 
     if (
-        byline ===
-        "Bettan"
+        byline === "Bettan"
     ) {
-
         return "☕";
     }
 
@@ -2400,6 +2568,10 @@ function bylineEmoji(
     return "📰";
 }
 
+
+/* =====================================================
+   SENASTE ARTIKEL
+===================================================== */
 
 async function loadLatestNews() {
 
@@ -2410,8 +2582,7 @@ async function loadLatestNews() {
                 "/.netlify/functions/latest-news?t=" +
                 Date.now(),
                 {
-                    cache:
-                        "no-store"
+                    cache: "no-store"
                 }
             );
 
@@ -2490,8 +2661,7 @@ async function loadLatestNews() {
 
 
         renderSidebar(
-            latest.id ||
-            article.title
+            latest
         );
 
 
@@ -2536,7 +2706,8 @@ async function loadLatestNews() {
             );
 
 
-        articleText.innerHTML = "";
+        articleText.innerHTML =
+            "";
 
 
         for (
@@ -2591,7 +2762,8 @@ async function loadLatestNews() {
             );
 
 
-        whyList.innerHTML = "";
+        whyList.innerHTML =
+            "";
 
 
         if (
@@ -2692,7 +2864,8 @@ async function loadLatestNews() {
             );
 
 
-        pollBox.innerHTML = "";
+        pollBox.innerHTML =
+            "";
 
 
         safeArray(
@@ -2771,6 +2944,10 @@ async function loadLatestNews() {
 }
 
 
+/* =====================================================
+   ARKIV
+===================================================== */
+
 async function loadArchive() {
 
     const archiveList =
@@ -2796,14 +2973,14 @@ async function loadArchive() {
             await response.json();
 
 
-        archiveList.innerHTML = "";
+        archiveList.innerHTML =
+            "";
 
 
         const articles =
             safeArray(
                 result.articles
             )
-
                 .filter(
                     item =>
                         item &&
@@ -2811,7 +2988,6 @@ async function loadArchive() {
                         item.id !==
                             window.currentLatestId
                 )
-
                 .slice(
                     0,
                     5
@@ -3018,6 +3194,10 @@ async function loadArchive() {
 }
 
 
+/* =====================================================
+   DATUM
+===================================================== */
+
 function formatPublishedTime(
     isoDate
 ) {
@@ -3084,7 +3264,13 @@ function formatArchiveDate(
 }
 
 
-function voteThumb(id) {
+/* =====================================================
+   INTERAKTION
+===================================================== */
+
+function voteThumb(
+    id
+) {
 
     if (
         votes[id]
@@ -3099,8 +3285,7 @@ function voteThumb(id) {
 
     const element =
         document.getElementById(
-            "count-" +
-            id
+            "count-" + id
         );
 
 
@@ -3232,10 +3417,13 @@ function addComment() {
 
 
     nameInput.value = "";
-
     textInput.value = "";
 }
 
+
+/* =====================================================
+   START
+===================================================== */
 
 async function startKafferasten() {
 
