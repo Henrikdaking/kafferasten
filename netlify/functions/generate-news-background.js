@@ -7,12 +7,14 @@ const HISTORY_DAYS = 14;
 const HISTORY_LIMIT = 20;
 const MAX_ATTEMPTS = 3;
 
+
 export default async () => {
+
   const OPENAI_API_KEY =
     process.env.OPENAI_API_KEY;
 
-  const UNSPLASH_ACCESS_KEY =
-    process.env.UNSPLASH_ACCESS_KEY || "";
+  const PEXELS_API_KEY =
+    process.env.PEXELS_API_KEY || "";
 
   const store =
     getStore(STORE_NAME);
@@ -34,10 +36,8 @@ export default async () => {
     store,
     {
       runId,
-      status:
-        "running",
-      stage:
-        "start",
+      status: "running",
+      stage: "start",
       message:
         "Background-funktionen har startat.",
       startedAt:
@@ -56,10 +56,8 @@ export default async () => {
       store,
       {
         runId,
-        status:
-          "error",
-        stage:
-          "api-key",
+        status: "error",
+        stage: "api-key",
         message:
           "OPENAI_API_KEY saknas i Netlify.",
         startedAt:
@@ -71,11 +69,10 @@ export default async () => {
       }
     );
 
+
     return jsonResponse(
       {
-        success:
-          false,
-
+        success: false,
         error:
           "OPENAI_API_KEY saknas i Netlify"
       },
@@ -98,18 +95,14 @@ export default async () => {
       );
 
 
-    if (
-      !generationLock.acquired
-    ) {
+    if (!generationLock.acquired) {
 
       await saveGenerationStatus(
         store,
         {
           runId,
-          status:
-            "blocked",
-          stage:
-            "lock",
+          status: "blocked",
+          stage: "lock",
           message:
             "Körningen stoppades eftersom en annan generering redan verkar pågå.",
           lockStartedAt:
@@ -130,14 +123,9 @@ export default async () => {
 
       return jsonResponse(
         {
-          success:
-            false,
-
-          skipped:
-            true,
-
-          stage:
-            "lock"
+          success: false,
+          skipped: true,
+          stage: "lock"
         },
         409
       );
@@ -166,6 +154,7 @@ export default async () => {
 
 
     const totalUsage = {
+
       research1:
         null,
 
@@ -212,8 +201,7 @@ export default async () => {
         store,
         {
           runId,
-          status:
-            "running",
+          status: "running",
           stage:
             `research-${candidateAttempt}`,
           message:
@@ -233,16 +221,17 @@ export default async () => {
 
       const research =
         await callOpenAI({
+
           apiKey:
             OPENAI_API_KEY,
 
           body: {
+
             model:
               "gpt-5.6-luna",
 
             reasoning: {
-              effort:
-                "none"
+              effort: "none"
             },
 
             max_tool_calls:
@@ -401,16 +390,13 @@ Använd källhänvisningar i researchsvaret.
         });
 
 
-      if (
-        !research.ok
-      ) {
+      if (!research.ok) {
 
         await saveGenerationStatus(
           store,
           {
             runId,
-            status:
-              "error",
+            status: "error",
             stage:
               `research-${candidateAttempt}`,
             message:
@@ -434,9 +420,7 @@ Använd källhänvisningar i researchsvaret.
 
         return jsonResponse(
           {
-            success:
-              false,
-
+            success: false,
             stage:
               `research-${candidateAttempt}`
           },
@@ -492,16 +476,17 @@ Använd källhänvisningar i researchsvaret.
 
       const verification =
         await callOpenAI({
+
           apiKey:
             OPENAI_API_KEY,
 
           body: {
+
             model:
               "gpt-5.6-luna",
 
             reasoning: {
-              effort:
-                "none"
+              effort: "none"
             },
 
             max_tool_calls:
@@ -581,16 +566,13 @@ Använd källhänvisningar i faktakontrollsvaret.
         });
 
 
-      if (
-        !verification.ok
-      ) {
+      if (!verification.ok) {
 
         await saveGenerationStatus(
           store,
           {
             runId,
-            status:
-              "error",
+            status: "error",
             stage:
               `verification-${candidateAttempt}`,
             message:
@@ -614,9 +596,7 @@ Använd källhänvisningar i faktakontrollsvaret.
 
         return jsonResponse(
           {
-            success:
-              false,
-
+            success: false,
             stage:
               `verification-${candidateAttempt}`
           },
@@ -702,6 +682,7 @@ Använd källhänvisningar i faktakontrollsvaret.
           store,
           {
             runId,
+
             status:
               candidateAttempt <
               MAX_ATTEMPTS
@@ -752,9 +733,7 @@ Använd källhänvisningar i faktakontrollsvaret.
 
         return jsonResponse(
           {
-            success:
-              false,
-
+            success: false,
             stage:
               "verification"
           },
@@ -771,6 +750,7 @@ Använd källhänvisningar i faktakontrollsvaret.
 
 
       const verifiedTrigger = {
+
         description:
           triggerDescription ||
           "Verifierad aktuell händelse",
@@ -796,6 +776,7 @@ Använd källhänvisningar i faktakontrollsvaret.
 
       const duplicateCandidate =
         findDuplicateMatch({
+
           candidateText: [
             researchText,
             verifiedTrigger.description
@@ -806,9 +787,7 @@ Använd källhänvisningar i faktakontrollsvaret.
         });
 
 
-      if (
-        duplicateCandidate
-      ) {
+      if (duplicateCandidate) {
 
         rejectedTopic =
           `Dubblett mot tidigare publicering: "${duplicateCandidate.title}". Välj ett helt annat ämne.`;
@@ -858,9 +837,7 @@ Använd källhänvisningar i faktakontrollsvaret.
 
         return jsonResponse(
           {
-            success:
-              false,
-
+            success: false,
             stage:
               "duplicate-check"
           },
@@ -877,28 +854,17 @@ Använd källhänvisningar i faktakontrollsvaret.
         store,
         {
           runId,
-
-          status:
-            "running",
-
-          stage:
-            "writing",
-
+          status: "running",
+          stage: "writing",
           message:
             `${byline} skriver den färdiga artikeln.`,
-
           candidateAttempt,
-
           editorialTone,
-
           byline,
-
           startedAt:
             now.toISOString(),
-
           updatedAt:
             new Date().toISOString(),
-
           swedishTime:
             nowInSweden
         }
@@ -907,16 +873,17 @@ Använd källhänvisningar i faktakontrollsvaret.
 
       const writing =
         await callOpenAI({
+
           apiKey:
             OPENAI_API_KEY,
 
           body: {
+
             model:
               "gpt-5.6-luna",
 
             reasoning: {
-              effort:
-                "none"
+              effort: "none"
             },
 
             input: `
@@ -1009,10 +976,13 @@ Skapa också metadata för artikelns huvudbild.
 imageSearchQuery:
 - 3–7 konkreta engelska sökord
 - ska beskriva ett faktiskt visuellt motiv
-- ska fungera bra för en relevant redaktionell stockbild
+- ska fungera bra för en relevant stockbild på Pexels
 - prioritera det faktiska motivet i nyheten
+- använd gärna sport, miljö, objekt, aktivitet eller situation
 - om exakt person, film eller TV-serie knappast finns som stockbild,
   välj en konkret visuell metafor eller miljö
+- skriv INTE ord som "news", "article", "headline" eller "website"
+  om de inte faktiskt beskriver motivet
 
 imageAlt:
 - kort naturlig svensk alt-text
@@ -1027,7 +997,9 @@ imageStyle:
 `,
 
             text: {
+
               format: {
+
                 type:
                   "json_schema",
 
@@ -1038,6 +1010,7 @@ imageStyle:
                   true,
 
                 schema: {
+
                   type:
                     "object",
 
@@ -1047,11 +1020,11 @@ imageStyle:
                   properties: {
 
                     title: {
-                      type:
-                        "string"
+                      type: "string"
                     },
 
                     category: {
+
                       type:
                         "string",
 
@@ -1067,21 +1040,19 @@ imageStyle:
                     },
 
                     summary: {
-                      type:
-                        "string"
+                      type: "string"
                     },
 
                     freshTrigger: {
-                      type:
-                        "string"
+                      type: "string"
                     },
 
                     triggerDate: {
-                      type:
-                        "string"
+                      type: "string"
                     },
 
                     paragraphs: {
+
                       type:
                         "array",
 
@@ -1092,12 +1063,12 @@ imageStyle:
                         3,
 
                       items: {
-                        type:
-                          "string"
+                        type: "string"
                       }
                     },
 
                     whyTalkAboutIt: {
+
                       type:
                         "array",
 
@@ -1108,17 +1079,16 @@ imageStyle:
                         3,
 
                       items: {
-                        type:
-                          "string"
+                        type: "string"
                       }
                     },
 
                     pollQuestion: {
-                      type:
-                        "string"
+                      type: "string"
                     },
 
                     pollOptions: {
+
                       type:
                         "array",
 
@@ -1129,27 +1099,24 @@ imageStyle:
                         2,
 
                       items: {
-                        type:
-                          "string"
+                        type: "string"
                       }
                     },
 
                     imageSearchQuery: {
-                      type:
-                        "string"
+                      type: "string"
                     },
 
                     imageAlt: {
-                      type:
-                        "string"
+                      type: "string"
                     },
 
                     imagePrompt: {
-                      type:
-                        "string"
+                      type: "string"
                     },
 
                     imageStyle: {
+
                       type:
                         "string",
 
@@ -1182,38 +1149,26 @@ imageStyle:
         });
 
 
-      if (
-        !writing.ok
-      ) {
+      if (!writing.ok) {
 
         await saveGenerationStatus(
           store,
           {
             runId,
-
-            status:
-              "error",
-
-            stage:
-              "writing",
-
+            status: "error",
+            stage: "writing",
             message:
               "OpenAI kunde inte skriva artikeln.",
-
             openAIStatus:
               writing.status,
-
             openAIError:
               simplifyError(
                 writing.data
               ),
-
             startedAt:
               now.toISOString(),
-
             updatedAt:
               new Date().toISOString(),
-
             swedishTime:
               nowInSweden
           }
@@ -1222,11 +1177,8 @@ imageStyle:
 
         return jsonResponse(
           {
-            success:
-              false,
-
-            stage:
-              "writing"
+            success: false,
+            stage: "writing"
           },
           500
         );
@@ -1255,24 +1207,16 @@ imageStyle:
             ""
           );
 
-      } catch (
-        error
-      ) {
+      } catch (error) {
 
         await saveGenerationStatus(
           store,
           {
             runId,
-
-            status:
-              "error",
-
-            stage:
-              "writing-json",
-
+            status: "error",
+            stage: "writing-json",
             message:
               "OpenAI svarade, men artikelns JSON kunde inte läsas.",
-
             writingPreview:
               writingPart
                 ?.text
@@ -1281,16 +1225,12 @@ imageStyle:
                   1000
                 ) ||
               "",
-
             details:
               error.message,
-
             startedAt:
               now.toISOString(),
-
             updatedAt:
               new Date().toISOString(),
-
             swedishTime:
               nowInSweden
           }
@@ -1299,11 +1239,8 @@ imageStyle:
 
         return jsonResponse(
           {
-            success:
-              false,
-
-            stage:
-              "writing-json"
+            success: false,
+            stage: "writing-json"
           },
           500
         );
@@ -1317,10 +1254,8 @@ imageStyle:
       article.triggerDate =
         triggerDate;
 
-
       article.byline =
         byline;
-
 
       article.editorialTone =
         editorialTone;
@@ -1395,6 +1330,7 @@ imageStyle:
 
       const duplicateArticle =
         findDuplicateMatch({
+
           candidateText: [
             article.title,
             article.summary,
@@ -1407,9 +1343,7 @@ imageStyle:
         });
 
 
-      if (
-        duplicateArticle
-      ) {
+      if (duplicateArticle) {
 
         rejectedTopic =
           `Den färdiga artikeln blev för lik "${duplicateArticle.title}". Välj ett helt annat ämne.`;
@@ -1463,9 +1397,7 @@ imageStyle:
 
         return jsonResponse(
           {
-            success:
-              false,
-
+            success: false,
             stage:
               "duplicate-check-final"
           },
@@ -1475,7 +1407,7 @@ imageStyle:
 
 
       // ===================================================
-      // PASS 2 – RELEVANT BILD
+      // PASS 2 – PEXELS-BILD
       // ===================================================
 
       await saveGenerationStatus(
@@ -1490,9 +1422,9 @@ imageStyle:
             "image",
 
           message:
-            UNSPLASH_ACCESS_KEY
-              ? "Letar efter en relevant artikelbild."
-              : "Ingen Unsplash-nyckel finns. Använder fallbackbild.",
+            PEXELS_API_KEY
+              ? "Letar efter en relevant artikelbild på Pexels."
+              : "PEXELS_API_KEY saknas. Använder fallbackbild.",
 
           candidateAttempt,
 
@@ -1513,8 +1445,9 @@ imageStyle:
 
       const heroImage =
         await getHeroImage({
-          accessKey:
-            UNSPLASH_ACCESS_KEY,
+
+          apiKey:
+            PEXELS_API_KEY,
 
           query:
             article.imageSearchQuery,
@@ -1542,32 +1475,24 @@ imageStyle:
         id:
           articleId,
 
-
         createdAt:
           new Date()
             .toISOString(),
-
 
         generatedAt:
           formatSwedishDateTime(
             new Date()
           ),
 
-
         byline,
-
 
         editorialTone,
 
-
         verifiedTrigger,
-
 
         article,
 
-
         heroImage,
-
 
         sources:
           selectedSources
@@ -1582,35 +1507,24 @@ imageStyle:
         store,
         {
           runId,
-
-          status:
-            "running",
-
-          stage:
-            "publishing",
-
+          status: "running",
+          stage: "publishing",
           message:
             "Artikeln är godkänd. Förbereder publicering.",
-
           title:
             article.title,
-
           byline,
-
           editorialTone,
-
           articleId,
-
           imageProvider:
             heroImage?.provider ||
             "fallback",
-
+          imageQuery:
+            article.imageSearchQuery,
           startedAt:
             now.toISOString(),
-
           updatedAt:
             new Date().toISOString(),
-
           swedishTime:
             nowInSweden
         }
@@ -1621,18 +1535,13 @@ imageStyle:
         await store.get(
           "latest",
           {
-            type:
-              "json",
-
-            consistency:
-              "strong"
+            type: "json",
+            consistency: "strong"
           }
         );
 
 
-      if (
-        previousLatest?.id
-      ) {
+      if (previousLatest?.id) {
 
         await store.setJSON(
           `archive/${previousLatest.id}`,
@@ -1651,48 +1560,35 @@ imageStyle:
         await store.get(
           "latest",
           {
-            type:
-              "json",
-
-            consistency:
-              "strong"
+            type: "json",
+            consistency: "strong"
           }
         );
 
 
       if (
         !confirmation ||
-        confirmation.id !==
-        articleId
+        confirmation.id !== articleId
       ) {
 
         await saveGenerationStatus(
           store,
           {
             runId,
-
-            status:
-              "error",
-
+            status: "error",
             stage:
               "publish-confirmation",
-
             message:
               "Artikeln skrevs till latest men kontrolläsningen matchade inte.",
-
             expectedId:
               articleId,
-
             actualId:
               confirmation?.id ||
               null,
-
             startedAt:
               now.toISOString(),
-
             updatedAt:
               new Date().toISOString(),
-
             swedishTime:
               nowInSweden
           }
@@ -1701,9 +1597,7 @@ imageStyle:
 
         return jsonResponse(
           {
-            success:
-              false,
-
+            success: false,
             stage:
               "publish-confirmation"
           },
@@ -1720,61 +1614,43 @@ imageStyle:
         store,
         {
           runId,
-
-          status:
-            "success",
-
-          stage:
-            "published",
-
+          status: "success",
+          stage: "published",
           message:
             "Ny artikel har publicerats som latest.",
-
           articleId,
-
           title:
             article.title,
-
           category:
             article.category,
-
           byline,
-
           editorialTone,
-
           imageSearchQuery:
             article.imageSearchQuery,
-
           imageProvider:
             heroImage?.provider ||
             "fallback",
-
+          imagePhotographer:
+            heroImage?.photographerName ||
+            null,
           candidateAttempt,
-
           historyChecked:
             recentHistory.length,
-
           sourcesUsed:
             selectedSources.length,
-
           archivedPrevious:
             previousLatest?.id ||
             null,
-
           totalTokens:
             calculateTotalTokens(
               totalUsage
             ),
-
           startedAt:
             now.toISOString(),
-
           finishedAt:
             new Date().toISOString(),
-
           updatedAt:
             new Date().toISOString(),
-
           swedishTime:
             formatSwedishDateTime(
               new Date()
@@ -1785,38 +1661,25 @@ imageStyle:
 
       return jsonResponse(
         {
-          success:
-            true,
-
+          success: true,
           message:
             "Ny artikel skapad och publicerad!",
-
           runId,
-
           candidateAttempt,
-
           byline,
-
           editorialTone,
-
           heroImage,
-
           latest:
             savedNews,
-
           archivedPrevious:
             previousLatest?.id ||
             null,
-
           historyChecked:
             recentHistory.length,
-
           sourcesUsed:
             selectedSources.length,
-
           usage: {
             ...totalUsage,
-
             totalTokens:
               calculateTotalTokens(
                 totalUsage
@@ -1831,22 +1694,14 @@ imageStyle:
       store,
       {
         runId,
-
-        status:
-          "error",
-
-        stage:
-          "no-result",
-
+        status: "error",
+        stage: "no-result",
         message:
           "Alla kandidatförsök tog slut utan publicering.",
-
         startedAt:
           now.toISOString(),
-
         updatedAt:
           new Date().toISOString(),
-
         swedishTime:
           nowInSweden
       }
@@ -1855,9 +1710,7 @@ imageStyle:
 
     return jsonResponse(
       {
-        success:
-          false,
-
+        success: false,
         error:
           "Ingen artikel kunde skapas."
       },
@@ -1865,27 +1718,18 @@ imageStyle:
     );
 
 
-  } catch (
-    error
-  ) {
+  } catch (error) {
 
     await saveGenerationStatus(
       store,
       {
         runId,
-
-        status:
-          "error",
-
-        stage:
-          "crash",
-
+        status: "error",
+        stage: "crash",
         message:
           "Generate-news kraschade.",
-
         details:
           error.message,
-
         stack:
           String(
             error.stack ||
@@ -1894,13 +1738,10 @@ imageStyle:
             0,
             2500
           ),
-
         startedAt:
           now.toISOString(),
-
         updatedAt:
           new Date().toISOString(),
-
         swedishTime:
           nowInSweden
       }
@@ -1909,12 +1750,9 @@ imageStyle:
 
     return jsonResponse(
       {
-        success:
-          false,
-
+        success: false,
         error:
           "Generate-news kraschade",
-
         details:
           error.message
       },
@@ -1924,9 +1762,7 @@ imageStyle:
 
   } finally {
 
-    if (
-      generationLock?.token
-    ) {
+    if (generationLock?.token) {
 
       await releaseGenerationLock(
         store,
@@ -1938,18 +1774,18 @@ imageStyle:
 
 
 // =====================================================
-// PASS 2 – BILDSÖKNING
+// PASS 2 – PEXELS
 // =====================================================
 
 async function getHeroImage({
-  accessKey,
+  apiKey,
   query,
   alt,
   category
 }) {
 
   if (
-    !accessKey ||
+    !apiKey ||
     !query
   ) {
 
@@ -1964,37 +1800,46 @@ async function getHeroImage({
 
     const params =
       new URLSearchParams({
-        query,
+
+        query:
+          String(query),
 
         orientation:
           "landscape",
 
-        per_page:
-          "5",
+        size:
+          "medium",
 
-        content_filter:
-          "high"
+        locale:
+          "en-US",
+
+        per_page:
+          "5"
       });
 
 
     const response =
       await fetch(
-        `https://api.unsplash.com/search/photos?${params.toString()}`,
+        `https://api.pexels.com/v1/search?${params.toString()}`,
         {
+          method:
+            "GET",
+
           headers: {
             Authorization:
-              `Client-ID ${accessKey}`,
-
-            "Accept-Version":
-              "v1"
+              apiKey
           }
         }
       );
 
 
-    if (
-      !response.ok
-    ) {
+    if (!response.ok) {
+
+      console.error(
+        "Pexels svarade med status:",
+        response.status
+      );
+
 
       return fallbackHeroImage(
         category,
@@ -2007,16 +1852,22 @@ async function getHeroImage({
       await response.json();
 
 
-    const photo =
+    const photos =
       Array.isArray(
-        data.results
+        data.photos
       )
-        ? data.results[0]
-        : null;
+        ? data.photos
+        : [];
+
+
+    const photo =
+      photos[0] ||
+      null;
 
 
     if (
-      !photo?.urls?.regular
+      !photo ||
+      !photo.src
     ) {
 
       return fallbackHeroImage(
@@ -2026,96 +1877,76 @@ async function getHeroImage({
     }
 
 
-    /*
-    Unsplash vill att download-endpointen anropas
-    när en bild väljs för användning.
-    */
+    const imageUrl =
+      photo.src.landscape ||
+      photo.src.large ||
+      photo.src.large2x ||
+      photo.src.medium ||
+      photo.src.original;
 
-    if (
-      photo.links
-        ?.download_location
-    ) {
 
-      fetch(
-        photo.links
-          .download_location,
-        {
-          headers: {
-            Authorization:
-              `Client-ID ${accessKey}`,
+    const smallUrl =
+      photo.src.medium ||
+      photo.src.small ||
+      imageUrl;
 
-            "Accept-Version":
-              "v1"
-          }
-        }
-      )
-      .catch(
-        () => {}
+
+    if (!imageUrl) {
+
+      return fallbackHeroImage(
+        category,
+        alt
       );
     }
-
-
-    const profileBase =
-      photo.user
-        ?.links
-        ?.html ||
-      "https://unsplash.com";
-
-
-    const photoBase =
-      photo.links
-        ?.html ||
-      "https://unsplash.com";
 
 
     return {
 
       provider:
-        "unsplash",
-
+        "pexels",
 
       url:
-        photo.urls.regular,
-
+        imageUrl,
 
       smallUrl:
-        photo.urls.small ||
-        photo.urls.regular,
-
+        smallUrl,
 
       alt:
         cleanReaderText(
           alt ||
-          photo.alt_description ||
-          photo.description ||
+          photo.alt ||
           "Bild till dagens snackis"
         ),
 
-
       photographerName:
-        photo.user
-          ?.name ||
-        "Unsplash-fotograf",
-
+        photo.photographer ||
+        "Pexels-fotograf",
 
       photographerUrl:
-        addUtm(
-          profileBase
-        ),
-
+        photo.url ||
+        photo.photographer_url ||
+        "https://www.pexels.com/",
 
       photoUrl:
-        addUtm(
-          photoBase
-        ),
+        photo.url ||
+        "https://www.pexels.com/",
 
+      pexelsUrl:
+        "https://www.pexels.com/",
 
-      unsplashUrl:
-        "https://unsplash.com/?utm_source=kafferasten&utm_medium=referral"
+      pexelsPhotoId:
+        photo.id ||
+        null
     };
 
 
-  } catch {
+  } catch (error) {
+
+    console.error(
+      "Pexels-bildsökningen misslyckades:",
+      error.message
+    );
+
 
     return fallbackHeroImage(
       category,
@@ -2126,7 +1957,7 @@ async function getHeroImage({
 
 
 // =====================================================
-// FALLBACKBILDER
+// FALLBACKBILD
 // =====================================================
 
 function fallbackHeroImage(
@@ -2134,102 +1965,30 @@ function fallbackHeroImage(
   alt
 ) {
 
-  const fallbackByCategory = {
+  /*
+  Ingen extern API-bild används här.
 
-    "Sport":
-      "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?auto=format&fit=crop&w=1400&q=82",
-
-
-    "Teknik":
-      "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1400&q=82",
-
-
-    "Arbetsliv":
-      "https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1400&q=82",
-
-
-    "TV & streaming":
-      "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=1400&q=82",
-
-
-    "Nöje":
-      "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1400&q=82",
-
-
-    "Udda":
-      "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=1400&q=82",
-
-
-    "Vardag":
-      "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=1400&q=82"
-  };
-
-
-  const imageUrl =
-    fallbackByCategory[
-      category
-    ] ||
-    fallbackByCategory.Vardag;
-
+  Frontend behåller sin neutrala kaffebild
+  om Pexels av någon anledning inte fungerar.
+  */
 
   return {
 
     provider:
       "fallback",
 
-
     url:
-      imageUrl,
-
+      null,
 
     smallUrl:
-      imageUrl,
-
+      null,
 
     alt:
       cleanReaderText(
         alt ||
-        "Bild till dagens snackis"
+        `Bild till dagens snackis i kategorin ${category || "Vardag"}`
       )
   };
-}
-
-
-// =====================================================
-// UNSPLASH UTM
-// =====================================================
-
-function addUtm(
-  url
-) {
-
-  try {
-
-    const parsed =
-      new URL(
-        url
-      );
-
-
-    parsed.searchParams.set(
-      "utm_source",
-      "kafferasten"
-    );
-
-
-    parsed.searchParams.set(
-      "utm_medium",
-      "referral"
-    );
-
-
-    return parsed.toString();
-
-
-  } catch {
-
-    return url;
-  }
 }
 
 
@@ -2249,9 +2008,7 @@ async function saveGenerationStatus(
       data
     );
 
-  } catch (
-    error
-  ) {
+  } catch (error) {
 
     console.error(
       "Kunde inte spara generation-status:",
@@ -2281,18 +2038,13 @@ async function acquireGenerationLock(
     await store.get(
       LOCK_KEY,
       {
-        type:
-          "json",
-
-        consistency:
-          "strong"
+        type: "json",
+        consistency: "strong"
       }
     );
 
 
-  if (
-    existing?.startedAt
-  ) {
+  if (existing?.startedAt) {
 
     const started =
       new Date(
@@ -2306,21 +2058,15 @@ async function acquireGenerationLock(
 
 
     if (
-      Number.isFinite(
-        age
-      ) &&
+      Number.isFinite(age) &&
       age >= 0 &&
-      age <
-        staleAfterMs
+      age < staleAfterMs
     ) {
 
       return {
-        acquired:
-          false,
-
+        acquired: false,
         startedAt:
           existing.startedAt,
-
         runId:
           existing.runId ||
           null
@@ -2345,44 +2091,33 @@ async function acquireGenerationLock(
       LOCK_KEY,
       {
         token,
-
         runId,
-
         startedAt:
           now.toISOString()
       },
       {
-        onlyIfNew:
-          true
+        onlyIfNew: true
       }
     );
 
 
-  if (
-    !result.modified
-  ) {
+  if (!result.modified) {
 
     const current =
       await store.get(
         LOCK_KEY,
         {
-          type:
-            "json",
-
-          consistency:
-            "strong"
+          type: "json",
+          consistency: "strong"
         }
       );
 
 
     return {
-      acquired:
-        false,
-
+      acquired: false,
       startedAt:
         current?.startedAt ||
         null,
-
       runId:
         current?.runId ||
         null
@@ -2391,13 +2126,9 @@ async function acquireGenerationLock(
 
 
   return {
-    acquired:
-      true,
-
+    acquired: true,
     token,
-
     runId,
-
     startedAt:
       now.toISOString()
   };
@@ -2420,18 +2151,14 @@ async function releaseGenerationLock(
       await store.get(
         LOCK_KEY,
         {
-          type:
-            "json",
-
-          consistency:
-            "strong"
+          type: "json",
+          consistency: "strong"
         }
       );
 
 
     if (
-      current?.token ===
-      token
+      current?.token === token
     ) {
 
       await store.delete(
@@ -2439,9 +2166,8 @@ async function releaseGenerationLock(
       );
     }
 
-  } catch (
-    error
-  ) {
+
+  } catch (error) {
 
     console.error(
       "Kunde inte släppa körlåset:",
@@ -2474,18 +2200,13 @@ async function loadRecentHistory({
     await store.get(
       "latest",
       {
-        type:
-          "json",
-
-        consistency:
-          "strong"
+        type: "json",
+        consistency: "strong"
       }
     );
 
 
-  if (
-    latest?.id
-  ) {
+  if (latest?.id) {
 
     result.push(
       latest
@@ -2528,8 +2249,7 @@ async function loadRecentHistory({
   ) {
 
     if (
-      result.length >=
-      limit
+      result.length >= limit
     ) {
       break;
     }
@@ -2541,11 +2261,8 @@ async function loadRecentHistory({
         await store.get(
           key,
           {
-            type:
-              "json",
-
-            consistency:
-              "strong"
+            type: "json",
+            consistency: "strong"
           }
         );
 
@@ -2579,9 +2296,7 @@ async function loadRecentHistory({
       }
 
 
-    } catch (
-      error
-    ) {
+    } catch (error) {
 
       console.warn(
         "Kunde inte läsa arkivpost:",
@@ -2677,9 +2392,7 @@ function formatRecentTopicsForPrompt(
       }
     )
 
-    .join(
-      "\n"
-    );
+    .join("\n");
 }
 
 
@@ -2705,6 +2418,7 @@ function normalizeEditorialTone(
       "UNGDOMLIG"
     )
   ) {
+
     return "UNGDOMLIG";
   }
 
@@ -2714,6 +2428,7 @@ function normalizeEditorialTone(
       "KLASSISK"
     )
   ) {
+
     return "KLASSISK";
   }
 
@@ -2839,7 +2554,7 @@ function cleanReaderText(
     )
 
     .replace(
-      /\s*([,.!?;:])/g,
+      /\s+([,.!?;:])/g,
       "$1"
     )
 
@@ -2867,9 +2582,7 @@ function findDuplicateMatch({
     );
 
 
-  if (
-    !candidate.size
-  ) {
+  if (!candidate.size) {
     return null;
   }
 
@@ -2894,12 +2607,8 @@ function findDuplicateMatch({
         ?.description
 
     ]
-      .filter(
-        Boolean
-      )
-      .join(
-        "\n"
-      );
+      .filter(Boolean)
+      .join("\n");
 
 
     const previous =
@@ -2908,9 +2617,7 @@ function findDuplicateMatch({
       );
 
 
-    if (
-      !previous.size
-    ) {
+    if (!previous.size) {
       continue;
     }
 
@@ -2952,8 +2659,7 @@ function findDuplicateMatch({
     const hasRareExactToken =
       intersection.some(
         token =>
-          token.length >=
-            9 &&
+          token.length >= 9 &&
           !GENERIC_TOPIC_WORDS.has(
             token
           )
@@ -2963,25 +2669,20 @@ function findDuplicateMatch({
     const looksDuplicate =
 
       (
-        intersection.length >=
-          2 &&
-        containment >=
-          0.42
+        intersection.length >= 2 &&
+        containment >= 0.42
       )
 
       ||
 
-      jaccard >=
-        0.28
+      jaccard >= 0.28
 
       ||
 
       hasRareExactToken;
 
 
-    if (
-      looksDuplicate
-    ) {
+    if (looksDuplicate) {
 
       return {
 
@@ -2989,17 +2690,14 @@ function findDuplicateMatch({
           item.id ||
           null,
 
-
         title:
           item.article
             ?.title ||
           "Tidigare snackis",
 
-
         createdAt:
           item.createdAt ||
           null,
-
 
         score:
           Number(
@@ -3007,11 +2705,8 @@ function findDuplicateMatch({
               jaccard,
               containment
             )
-              .toFixed(
-                2
-              )
+              .toFixed(2)
           ),
-
 
         sharedTerms:
           intersection.slice(
@@ -3133,18 +2828,13 @@ function buildTopicTokens(
       text
     )
 
-      .split(
-        " "
-      )
+      .split(" ")
 
-      .filter(
-        Boolean
-      )
+      .filter(Boolean)
 
       .filter(
         token =>
-          token.length >=
-            3 &&
+          token.length >= 3 &&
           !SWEDISH_STOP_WORDS.has(
             token
           ) &&
@@ -3254,6 +2944,7 @@ async function callOpenAI({
           "POST",
 
         headers: {
+
           "Content-Type":
             "application/json",
 
@@ -3287,20 +2978,17 @@ async function callOpenAI({
 
 
   return {
-
     ok:
       response.ok,
-
     status:
       response.status,
-
     data
   };
 }
 
 
 // =====================================================
-// OPENAI-TEXT
+// OPENAI TEXT
 // =====================================================
 
 function getOutputTextPart(
@@ -3462,36 +3150,26 @@ function getDomain(
 
     const lastTwo =
       parts
-        .slice(
-          -2
-        )
-        .join(
-          "."
-        );
+        .slice(-2)
+        .join(".");
 
 
     if (
-      parts.length >=
-        3 &&
+      parts.length >= 3 &&
       twoPartSuffixes.includes(
         lastTwo
       )
     ) {
 
       return parts
-        .slice(
-          -3
-        )
-        .join(
-          "."
-        );
+        .slice(-3)
+        .join(".");
     }
 
 
-    return parts.length >=
-      2
-        ? lastTwo
-        : hostname;
+    return parts.length >= 2
+      ? lastTwo
+      : hostname;
 
 
   } catch {
@@ -3624,8 +3302,7 @@ function isFreshDate(
 
 
     return (
-      difference <=
-        maxAge &&
+      difference <= maxAge &&
       difference >
         -(
           24 *
@@ -3683,9 +3360,7 @@ function createArticleId(
 
 
   return formatter
-    .format(
-      date
-    )
+    .format(date)
     .replace(
       /\D/g,
       ""
@@ -3698,24 +3373,13 @@ function createRunId(
 ) {
 
   return (
-    createArticleId(
-      date
-    )
-
+    createArticleId(date)
     +
-
     "-"
-
     +
-
     Math.random()
-      .toString(
-        36
-      )
-      .slice(
-        2,
-        8
-      )
+      .toString(36)
+      .slice(2, 8)
   );
 }
 
@@ -3737,9 +3401,7 @@ function formatSwedishDateTime(
         "short"
     }
   )
-    .format(
-      date
-    );
+    .format(date);
 }
 
 
@@ -3799,9 +3461,7 @@ function calculateTotalTokens(
     usageObject
   )
 
-    .filter(
-      Boolean
-    )
+    .filter(Boolean)
 
     .reduce(
       (
