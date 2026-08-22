@@ -3,6 +3,7 @@ import { getStore } from "@netlify/blobs";
 const STORE_NAME = "kafferasten-news";
 const LOCK_KEY = "_locks/generate-news";
 const STATUS_KEY = "_diagnostics/generation-status";
+
 const HISTORY_DAYS = 14;
 const HISTORY_LIMIT = 20;
 const MAX_ATTEMPTS = 3;
@@ -734,8 +735,7 @@ Använd källhänvisningar i faktakontrollsvaret.
         return jsonResponse(
           {
             success: false,
-            stage:
-              "verification"
+            stage: "verification"
           },
           422
         );
@@ -939,6 +939,8 @@ får du ALDRIG skriva:
 - "enligt svt.se"
 - motsvarande tekniskt källspråk
 
+Källorna visas separat av sajten längst ner i artikeln.
+
 Om ett mediebolag i sig är en del av nyheten
 får dess vanliga namn naturligtvis nämnas.
 
@@ -969,26 +971,59 @@ SKRIBENTENS TON:
 
 ${writerVoice(byline)}
 
-BILDMETADATA:
+BILDMETADATA – MYCKET VIKTIGT:
 
-Skapa också metadata för artikelns huvudbild.
+Vi söker automatiskt bilder på Pexels.
 
-imageSearchQuery:
-- 3–7 konkreta engelska sökord
-- ska beskriva ett faktiskt visuellt motiv
-- ska fungera bra för en relevant stockbild på Pexels
-- prioritera det faktiska motivet i nyheten
-- använd gärna sport, miljö, objekt, aktivitet eller situation
-- om exakt person, film eller TV-serie knappast finns som stockbild,
-  välj en konkret visuell metafor eller miljö
-- skriv INTE ord som "news", "article", "headline" eller "website"
-  om de inte faktiskt beskriver motivet
+Skapa TRE olika engelska bildsökningar
+i prioriteringsordning.
+
+imageSearchQueries[0]:
+- DET EXAKTA HUVUDMOTIVET.
+- 1 till 4 mycket konkreta engelska ord.
+- Exempel:
+  "monitor lizard"
+  "curling stones"
+  "coffee beans"
+  "concert crowd"
+  "smartphone"
+
+imageSearchQueries[1]:
+- EN BREDDARE VERSION AV MOTIVET.
+- Exempel:
+  "large lizard reptile"
+  "curling ice sport"
+  "live music stage"
+
+imageSearchQueries[2]:
+- MILJÖ ELLER VISUELL METAFOR.
+- Används bara om de första sökningarna misslyckas.
+- Exempel:
+  "South Korea urban park"
+  "winter sports arena"
+  "streaming television living room"
+
+VIKTIGT:
+
+Lägg INTE platsnamn, land eller miljö i första sökningen
+om själva huvudmotivet kan sökas direkt.
+
+För en nyhet om en nilvaran ska första sökningen exempelvis
+vara "monitor lizard" – inte
+"monitor lizard walking path urban South Korea".
+
+Skriv INTE:
+- news
+- article
+- headline
+- website
+om det inte faktiskt är det visuella motivet.
 
 imageAlt:
 - kort naturlig svensk alt-text
 
 imagePrompt:
-- kort beskrivning för en möjlig redaktionell illustration
+- kort beskrivning för möjlig framtida illustration
 - ingen text
 - inga logotyper
 
@@ -1103,8 +1138,20 @@ imageStyle:
                       }
                     },
 
-                    imageSearchQuery: {
-                      type: "string"
+                    imageSearchQueries: {
+
+                      type:
+                        "array",
+
+                      minItems:
+                        3,
+
+                      maxItems:
+                        3,
+
+                      items: {
+                        type: "string"
+                      }
                     },
 
                     imageAlt: {
@@ -1137,7 +1184,7 @@ imageStyle:
                     "whyTalkAboutIt",
                     "pollQuestion",
                     "pollOptions",
-                    "imageSearchQuery",
+                    "imageSearchQueries",
                     "imageAlt",
                     "imagePrompt",
                     "imageStyle"
@@ -1214,7 +1261,8 @@ imageStyle:
           {
             runId,
             status: "error",
-            stage: "writing-json",
+            stage:
+              "writing-json",
             message:
               "OpenAI svarade, men artikelns JSON kunde inte läsas.",
             writingPreview:
@@ -1240,7 +1288,8 @@ imageStyle:
         return jsonResponse(
           {
             success: false,
-            stage: "writing-json"
+            stage:
+              "writing-json"
           },
           500
         );
@@ -1280,9 +1329,8 @@ imageStyle:
 
 
       article.paragraphs =
-        (
-          article.paragraphs ||
-          []
+        safeArray(
+          article.paragraphs
         )
           .map(
             cleanReaderText
@@ -1293,9 +1341,8 @@ imageStyle:
 
 
       article.whyTalkAboutIt =
-        (
-          article.whyTalkAboutIt ||
-          []
+        safeArray(
+          article.whyTalkAboutIt
         )
           .map(
             cleanReaderText
@@ -1312,15 +1359,32 @@ imageStyle:
 
 
       article.pollOptions =
-        (
-          article.pollOptions ||
-          []
+        safeArray(
+          article.pollOptions
         )
           .map(
             cleanReaderText
           )
           .filter(
             Boolean
+          );
+
+
+      article.imageSearchQueries =
+        safeArray(
+          article.imageSearchQueries
+        )
+          .map(
+            query =>
+              String(query || "")
+                .trim()
+          )
+          .filter(
+            Boolean
+          )
+          .slice(
+            0,
+            3
           );
 
 
@@ -1407,7 +1471,7 @@ imageStyle:
 
 
       // ===================================================
-      // PASS 2 – PEXELS-BILD
+      // PEXELS – FLERSTEGSSÖKNING
       // ===================================================
 
       await saveGenerationStatus(
@@ -1428,8 +1492,8 @@ imageStyle:
 
           candidateAttempt,
 
-          imageSearchQuery:
-            article.imageSearchQuery,
+          imageSearchQueries:
+            article.imageSearchQueries,
 
           startedAt:
             now.toISOString(),
@@ -1449,8 +1513,8 @@ imageStyle:
           apiKey:
             PEXELS_API_KEY,
 
-          query:
-            article.imageSearchQuery,
+          queries:
+            article.imageSearchQueries,
 
           alt:
             article.imageAlt,
@@ -1519,8 +1583,9 @@ imageStyle:
           imageProvider:
             heroImage?.provider ||
             "fallback",
-          imageQuery:
-            article.imageSearchQuery,
+          imageSearchUsed:
+            heroImage?.searchQuery ||
+            null,
           startedAt:
             now.toISOString(),
           updatedAt:
@@ -1625,8 +1690,11 @@ imageStyle:
             article.category,
           byline,
           editorialTone,
-          imageSearchQuery:
-            article.imageSearchQuery,
+          imageSearchQueries:
+            article.imageSearchQueries,
+          imageSearchUsed:
+            heroImage?.searchQuery ||
+            null,
           imageProvider:
             heroImage?.provider ||
             "fallback",
@@ -1774,20 +1842,17 @@ imageStyle:
 
 
 // =====================================================
-// PASS 2 – PEXELS
+// PEXELS – FLERSTEGSSÖKNING
 // =====================================================
 
 async function getHeroImage({
   apiKey,
-  query,
+  queries,
   alt,
   category
 }) {
 
-  if (
-    !apiKey ||
-    !query
-  ) {
+  if (!apiKey) {
 
     return fallbackHeroImage(
       category,
@@ -1796,13 +1861,78 @@ async function getHeroImage({
   }
 
 
+  const searchQueries =
+    safeArray(
+      queries
+    )
+      .map(
+        query =>
+          String(
+            query ||
+            ""
+          ).trim()
+      )
+      .filter(
+        Boolean
+      )
+      .slice(
+        0,
+        3
+      );
+
+
+  if (!searchQueries.length) {
+
+    return fallbackHeroImage(
+      category,
+      alt
+    );
+  }
+
+
+  for (
+    const query
+    of searchQueries
+  ) {
+
+    const result =
+      await searchPexels({
+        apiKey,
+        query,
+        alt
+      });
+
+
+    if (result) {
+
+      return result;
+    }
+  }
+
+
+  return fallbackHeroImage(
+    category,
+    alt
+  );
+}
+
+
+// =====================================================
+// EN PEXELS-SÖKNING
+// =====================================================
+
+async function searchPexels({
+  apiKey,
+  query,
+  alt
+}) {
+
   try {
 
     const params =
       new URLSearchParams({
 
-        query:
-          String(query),
+        query,
 
         orientation:
           "landscape",
@@ -1835,16 +1965,13 @@ async function getHeroImage({
 
     if (!response.ok) {
 
-      console.error(
-        "Pexels svarade med status:",
+      console.warn(
+        "Pexels-sökning misslyckades:",
+        query,
         response.status
       );
 
-
-      return fallbackHeroImage(
-        category,
-        alt
-      );
+      return null;
     }
 
 
@@ -1860,43 +1987,34 @@ async function getHeroImage({
         : [];
 
 
-    const photo =
-      photos[0] ||
-      null;
+    if (!photos.length) {
 
-
-    if (
-      !photo ||
-      !photo.src
-    ) {
-
-      return fallbackHeroImage(
-        category,
-        alt
-      );
+      return null;
     }
 
 
+    /*
+    Vi väljer första träffen.
+
+    Eftersom själva sökfrasen nu är mycket snävare
+    ska detta ge betydligt bättre motivträff än tidigare.
+    */
+
+    const photo =
+      photos[0];
+
+
     const imageUrl =
-      photo.src.landscape ||
-      photo.src.large ||
-      photo.src.large2x ||
-      photo.src.medium ||
-      photo.src.original;
-
-
-    const smallUrl =
-      photo.src.medium ||
-      photo.src.small ||
-      imageUrl;
+      photo.src?.landscape ||
+      photo.src?.large ||
+      photo.src?.large2x ||
+      photo.src?.medium ||
+      photo.src?.original;
 
 
     if (!imageUrl) {
 
-      return fallbackHeroImage(
-        category,
-        alt
-      );
+      return null;
     }
 
 
@@ -1905,11 +2023,16 @@ async function getHeroImage({
       provider:
         "pexels",
 
+      searchQuery:
+        query,
+
       url:
         imageUrl,
 
       smallUrl:
-        smallUrl,
+        photo.src?.medium ||
+        photo.src?.small ||
+        imageUrl,
 
       alt:
         cleanReaderText(
@@ -1923,8 +2046,8 @@ async function getHeroImage({
         "Pexels-fotograf",
 
       photographerUrl:
-        photo.url ||
         photo.photographer_url ||
+        photo.url ||
         "https://www.pexels.com/",
 
       photoUrl:
@@ -1942,16 +2065,14 @@ async function getHeroImage({
 
   } catch (error) {
 
-    console.error(
-      "Pexels-bildsökningen misslyckades:",
+    console.warn(
+      "Pexels-sökningen kraschade:",
+      query,
       error.message
     );
 
 
-    return fallbackHeroImage(
-      category,
-      alt
-    );
+    return null;
   }
 }
 
@@ -1965,17 +2086,13 @@ function fallbackHeroImage(
   alt
 ) {
 
-  /*
-  Ingen extern API-bild används här.
-
-  Frontend behåller sin neutrala kaffebild
-  om Pexels av någon anledning inte fungerar.
-  */
-
   return {
 
     provider:
       "fallback",
+
+    searchQuery:
+      null,
 
     url:
       null,
@@ -2158,7 +2275,8 @@ async function releaseGenerationLock(
 
 
     if (
-      current?.token === token
+      current?.token ===
+      token
     ) {
 
       await store.delete(
@@ -2564,6 +2682,22 @@ function cleanReaderText(
     )
 
     .trim();
+}
+
+
+// =====================================================
+// SAFE ARRAY
+// =====================================================
+
+function safeArray(
+  value
+) {
+
+  return Array.isArray(
+    value
+  )
+    ? value
+    : [];
 }
 
 
