@@ -1,69 +1,137 @@
 export default async (request) => {
   try {
-    // Vilken tid är det i Sverige just nu?
-    const stockholmParts = new Intl.DateTimeFormat("sv-SE", {
-      timeZone: "Europe/Stockholm",
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: false
-    }).formatToParts(new Date());
+    const CRON_SECRET =
+      process.env.KAFFERASTEN_CRON_SECRET;
 
-    const hour = Number(
-      stockholmParts.find(part => part.type === "hour")?.value
-    );
+    if (!CRON_SECRET) {
+      console.error(
+        "KAFFERASTEN_CRON_SECRET saknas."
+      );
 
-    const minute = Number(
-      stockholmParts.find(part => part.type === "minute")?.value
-    );
+      return new Response(
+        null,
+        {
+          status: 500
+        }
+      );
+    }
 
-    // Vi vill bara publicera kl 07 eller 13 svensk tid.
+    const stockholmParts =
+      new Intl.DateTimeFormat(
+        "sv-SE",
+        {
+          timeZone:
+            "Europe/Stockholm",
+
+          hour:
+            "2-digit",
+
+          minute:
+            "2-digit",
+
+          hour12:
+            false
+        }
+      )
+        .formatToParts(
+          new Date()
+        );
+
+    const hour =
+      Number(
+        stockholmParts
+          .find(
+            part =>
+              part.type ===
+              "hour"
+          )
+          ?.value
+      );
+
+    const minute =
+      Number(
+        stockholmParts
+          .find(
+            part =>
+              part.type ===
+              "minute"
+          )
+          ?.value
+      );
+
+    // Bara 07.00 och 13.00 svensk tid.
+    //
+    // Funktionen körs varje hel timme på vardagar
+    // men startar generatorn endast vid dessa två tider.
+    //
+    // Själva artikeln kan bli färdig några minuter senare.
+
     const shouldGenerate =
       minute === 0 &&
-      (hour === 7 || hour === 13);
+      (
+        hour === 7 ||
+        hour === 13
+      );
 
     if (!shouldGenerate) {
       console.log(
         `Ingen publicering nu. Svensk tid: ${hour}:${String(minute).padStart(2, "0")}`
       );
 
-      return new Response(null, {
-        status: 204
-      });
+      return new Response(
+        null,
+        {
+          status: 204
+        }
+      );
     }
 
-    // Hitta samma domän som scheduled-funktionen körs på.
-    const url = new URL(
-      "/.netlify/functions/generate-news-background",
-      request.url
-    );
+    const generateUrl =
+      new URL(
+        "/.netlify/functions/generate-news-background",
+        request.url
+      );
 
-    const response = await fetch(url, {
-      method: "POST"
-    });
+    const response =
+      await fetch(
+        generateUrl,
+        {
+          method: "POST",
+
+          headers: {
+            Authorization:
+              `Bearer ${CRON_SECRET}`
+          }
+        }
+      );
 
     console.log(
-      `Generate-news startad. Status: ${response.status}. Svensk tid: ${hour}:${String(minute).padStart(2, "0")}`
+      `Generate-news startad. Status ${response.status}. Svensk tid ${hour}:${String(minute).padStart(2, "0")}`
     );
 
-    return new Response(null, {
-      status: 204
-    });
+    return new Response(
+      null,
+      {
+        status: 204
+      }
+    );
 
   } catch (error) {
     console.error(
-      "Kunde inte starta generate-news:",
+      "Schemaläggningen misslyckades:",
       error
     );
 
-    return new Response(null, {
-      status: 500
-    });
+    return new Response(
+      null,
+      {
+        status: 500
+      }
+    );
   }
 };
 
-
-// Kör varje heltimme.
-// Funktionen själv avgör om svensk tid är 07.00 eller 13.00.
 export const config = {
-  schedule: "0 * * * 1-5"
+  schedule:
+    "0 * * * 1-5"
 };
