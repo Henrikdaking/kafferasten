@@ -1,4372 +1,816 @@
-<!DOCTYPE html>
-<html lang="sv">
+import { getStore } from "@netlify/blobs";
 
-<head>
 
-    <meta charset="UTF-8">
+const STORE_NAME =
+  "kafferasten-news";
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
 
-    <meta
-        name="theme-color"
-        content="#2D1A17"
-    >
+const MAX_COMMENTS =
+  10;
 
-    <meta
-        name="description"
-        content="Kafferasten.se serverar en ny snackis varje vardag inför 09-fikat och 15-rasten."
-    >
 
-    <title>
-        Kafferasten.se – Dagens snackis till fikat
-    </title>
+const MAX_NAME_LENGTH =
+  50;
 
 
-    <style>
+const MAX_COMMENT_LENGTH =
+  500;
 
-        :root {
 
-            --bg-color: #F8F4EE;
-            --card-bg: #FFFFFF;
+export default async (request) => {
 
-            --primary-color: #2D1A17;
-            --primary-soft: #49302B;
-
-            --accent-color: #C86D3B;
-            --accent-hover: #A85528;
-
-            --text-color: #2C221E;
-            --text-muted: #74635B;
-
-            --border-color: #E2D7CD;
-
-            --highlight-bg: #EFE4D8;
-            --soft-accent: #F5E7DD;
-
-            --green: #2E9D55;
-
-            --shadow:
-                0 10px 30px
-                rgba(
-                    45,
-                    26,
-                    23,
-                    0.055
-                );
-        }
-
-
-        * {
-            box-sizing: border-box;
-        }
-
-
-        html {
-            scroll-behavior: smooth;
-        }
-
-
-        body {
-
-            font-family:
-                -apple-system,
-                BlinkMacSystemFont,
-                "Segoe UI",
-                Roboto,
-                Helvetica,
-                Arial,
-                sans-serif;
-
-            background-color:
-                var(--bg-color);
-
-            background-image:
-                radial-gradient(
-                    #E2D7CD 0.7px,
-                    transparent 0.7px
-                );
-
-            background-size:
-                16px 16px;
-
-            color:
-                var(--text-color);
-
-            line-height:
-                1.65;
-
-            margin:
-                0;
-        }
-
-
-        button,
-        input,
-        textarea {
-            font: inherit;
-        }
-
-
-        a {
-            -webkit-tap-highlight-color:
-                transparent;
-        }
-
-
-        /* ==================================================
-           HEADER
-        ================================================== */
-
-
-        header {
-
-            position: relative;
-            overflow: hidden;
-
-            background:
-                linear-gradient(
-                    145deg,
-                    #281714 0%,
-                    #3B211C 100%
-                );
-
-            color: white;
-
-            padding:
-                2.35rem 1rem 2.05rem;
-
-            text-align: center;
-
-            border-bottom:
-                4px solid
-                var(--accent-color);
-        }
-
-
-        header::after {
-
-            content: "";
-
-            position: absolute;
-
-            width: 320px;
-            height: 320px;
-
-            border-radius: 50%;
-
-            right: -190px;
-            top: -210px;
-
-            background:
-                rgba(
-                    255,
-                    255,
-                    255,
-                    0.035
-                );
-        }
-
-
-        .brand {
-
-            position: relative;
-            z-index: 1;
-
-            display: inline-flex;
-
-            align-items: center;
-
-            gap: 0.75rem;
-
-            text-decoration: none;
-
-            color: white;
-        }
-
-
-        .brand h1 {
-
-            margin: 0;
-
-            font-size: 2.55rem;
-
-            font-weight: 900;
-
-            letter-spacing: -1.2px;
-
-            line-height: 1;
-        }
-
-
-        .coffee-mark {
-
-            position: relative;
-
-            width: 42px;
-            height: 48px;
-
-            display: inline-grid;
-
-            place-items: end center;
-
-            flex: 0 0 auto;
-        }
-
-
-        .coffee-cup {
-
-            font-size: 2rem;
-
-            line-height: 1;
-        }
-
-
-        .steam {
-
-            position: absolute;
-
-            width: 3px;
-            height: 17px;
-
-            border-radius: 50%;
-
-            background:
-                rgba(
-                    255,
-                    255,
-                    255,
-                    0.64
-                );
-
-            top: 0;
-
-            opacity: 0;
-
-            animation:
-                steam-rise
-                2.7s
-                ease-in-out
-                infinite;
-        }
-
-
-        .steam.s1 {
-
-            left: 13px;
-
-            animation-delay: 0s;
-        }
-
-
-        .steam.s2 {
-
-            left: 21px;
-
-            animation-delay: 0.7s;
-
-            height: 20px;
-        }
-
-
-        .steam.s3 {
-
-            left: 29px;
-
-            animation-delay: 1.35s;
-        }
-
-
-        @keyframes steam-rise {
-
-            0% {
-
-                transform:
-                    translateY(8px)
-                    scaleX(0.8);
-
-                opacity: 0;
-            }
-
-
-            25% {
-                opacity: 0.75;
-            }
-
-
-            70% {
-                opacity: 0.35;
-            }
-
-
-            100% {
-
-                transform:
-                    translateY(-10px)
-                    translateX(3px)
-                    scaleX(1.35);
-
-                opacity: 0;
-            }
-        }
-
-
-        header p {
-
-            position: relative;
-            z-index: 1;
-
-            margin:
-                0.72rem 0 0;
-
-            color:
-                #E4D7CF;
-
-            font-size: 1rem;
-        }
-
-
-        /* ==================================================
-           STATUSRAD
-        ================================================== */
-
-
-        .schedule-banner {
-
-            background:
-                rgba(
-                    239,
-                    228,
-                    216,
-                    0.96
-                );
-
-            border-bottom:
-                1px solid
-                var(--border-color);
-
-            text-align: center;
-
-            padding:
-                0.72rem 1rem
-                0.7rem;
-        }
-
-
-        .schedule-line {
-
-            display: flex;
-
-            justify-content: center;
-            align-items: center;
-
-            gap: 0.72rem;
-
-            flex-wrap: wrap;
-
-            font-size: 0.9rem;
-
-            font-weight: 650;
-        }
-
-
-        .brew-note {
-
-            margin-top: 0.18rem;
-
-            font-size: 0.77rem;
-
-            color:
-                var(--text-muted);
-        }
-
-
-        .status-badge {
-
-            display: inline-flex;
-
-            align-items: center;
-
-            gap: 0.3rem;
-
-            background:
-                var(--green);
-
-            color: white;
-
-            padding:
-                0.18rem 0.65rem;
-
-            border-radius: 999px;
-
-            font-size: 0.75rem;
-
-            font-weight: 850;
-
-            box-shadow:
-                0 2px 8px
-                rgba(
-                    46,
-                    157,
-                    85,
-                    0.2
-                );
-        }
-
-
-        /* ==================================================
-           LAYOUT
-        ================================================== */
-
-
-        .container {
-
-            max-width: 1060px;
-
-            margin:
-                1.7rem auto;
-
-            padding:
-                0 1rem;
-
-            display: grid;
-
-            grid-template-columns:
-                minmax(0, 2fr)
-                minmax(250px, 1fr);
-
-            gap: 1.45rem;
-
-            align-items: start;
-        }
-
-
-        .card {
-
-            background:
-                rgba(
-                    255,
-                    255,
-                    255,
-                    0.97
-                );
-
-            border:
-                1px solid
-                var(--border-color);
-
-            border-radius: 20px;
-
-            padding: 1.7rem;
-
-            margin-bottom: 1.25rem;
-
-            box-shadow:
-                var(--shadow);
-        }
-
-
-        /* ==================================================
-           HUVUDARTIKEL
-        ================================================== */
-
-
-        .article-topline {
-
-            display: flex;
-
-            justify-content:
-                space-between;
-
-            align-items: center;
-
-            gap: 0.75rem;
-
-            margin-bottom:
-                0.82rem;
-        }
-
-
-        .tag {
-
-            display: inline-flex;
-
-            align-items: center;
-
-            background:
-                var(--accent-color);
-
-            color: white;
-
-            padding:
-                0.28rem 0.75rem;
-
-            border-radius: 999px;
-
-            font-size: 0.72rem;
-
-            font-weight: 850;
-
-            text-transform: uppercase;
-
-            letter-spacing: 0.42px;
-        }
-
-
-        .read-time {
-
-            color:
-                var(--text-muted);
-
-            font-size: 0.76rem;
-
-            font-weight: 650;
-
-            white-space: nowrap;
-        }
-
-
-        h2 {
-
-            color:
-                var(--primary-color);
-
-            margin:
-                0 0 1.15rem;
-
-            max-width: 720px;
-
-            font-family:
-                Georgia,
-                "Times New Roman",
-                serif;
-
-            font-size: 2.15rem;
-
-            line-height: 1.12;
-
-            letter-spacing: -0.7px;
-
-            font-weight: 800;
-        }
-
-
-        h3 {
-
-            color:
-                var(--primary-color);
-
-            margin:
-                0 0 0.9rem;
-
-            font-size: 1.28rem;
-
-            line-height: 1.25;
-        }
-
-
-        .hero-wrap {
-
-            margin-bottom:
-                1.15rem;
-        }
-
-
-        .article-hero-img {
-
-            display: block;
-
-            width: 100%;
-
-            height: 310px;
-
-            object-fit: cover;
-
-            border-radius: 15px;
-
-            background:
-                var(--highlight-bg);
-        }
-
-
-        .photo-credit,
-        .side-photo-credit {
-
-            display: none;
-
-            color:
-                var(--text-muted);
-
-            text-align: right;
-        }
-
-
-        .photo-credit {
-
-            margin:
-                0.4rem 0 0;
-
-            font-size: 0.68rem;
-        }
-
-
-        .side-photo-credit {
-
-            margin:
-                0.28rem 0 0.75rem;
-
-            font-size: 0.61rem;
-        }
-
-
-        .photo-credit a,
-        .side-photo-credit a {
-
-            color: inherit;
-
-            text-decoration: underline;
-
-            text-underline-offset: 2px;
-        }
-
-
-        .summary-box {
-
-            background:
-                linear-gradient(
-                    135deg,
-                    #FBF7F2,
-                    #F3EAE1
-                );
-
-            border-left:
-                4px solid
-                var(--accent-color);
-
-            padding:
-                1.08rem 1.2rem;
-
-            margin:
-                1.3rem 0 1.55rem;
-
-            border-radius:
-                0 15px 15px 0;
-
-            font-size: 1rem;
-        }
-
-
-        .summary-box strong {
-
-            display: block;
-
-            margin-bottom: 0.38rem;
-
-            color:
-                var(--primary-color);
-
-            font-size: 1rem;
-        }
-
-
-        .article-content {
-
-            max-width: 690px;
-        }
-
-
-        .article-content p {
-
-            font-family:
-                Georgia,
-                "Times New Roman",
-                serif;
-
-            font-size: 1.06rem;
-
-            line-height: 1.7;
-
-            margin:
-                0 0 1.25rem;
-        }
-
-
-        .why-box {
-
-            background:
-                var(--highlight-bg);
-
-            padding:
-                1.2rem 1.25rem;
-
-            border-radius: 15px;
-
-            margin:
-                1.5rem 0;
-        }
-
-
-        .why-box strong {
-
-            color:
-                var(--primary-color);
-        }
-
-
-        .why-box ul {
-
-            margin:
-                0.6rem 0 0;
-
-            padding-left:
-                1.35rem;
-        }
-
-
-        .why-box li {
-
-            margin-bottom:
-                0.35rem;
-        }
-
-
-        /* ==================================================
-           SKRIBENT + KÄLLOR
-        ================================================== */
-
-
-        .article-meta-box {
-
-            margin-top:
-                1.55rem;
-
-            padding:
-                1rem 0;
-
-            border-top:
-                1px solid
-                var(--border-color);
-
-            border-bottom:
-                1px solid
-                var(--border-color);
-        }
-
-
-        .byline {
-
-            display: none;
-
-            align-items: center;
-
-            gap: 0.72rem;
-        }
-
-
-        .byline-avatar {
-
-            width: 39px;
-            height: 39px;
-
-            display: grid;
-
-            place-items: center;
-
-            border-radius: 50%;
-
-            background:
-                var(--soft-accent);
-
-            font-size: 1.05rem;
-        }
-
-
-        .byline-copy {
-
-            font-size: 0.77rem;
-
-            color:
-                var(--text-muted);
-
-            line-height: 1.25;
-        }
-
-
-        .byline-name {
-
-            display: block;
-
-            margin-top: 0.13rem;
-
-            color:
-                var(--primary-color);
-
-            font-size: 0.97rem;
-
-            font-weight: 850;
-        }
-
-
-        .source-row {
-
-            display: none;
-
-            align-items: flex-start;
-
-            gap: 0.45rem;
-
-            flex-wrap: wrap;
-
-            margin-top: 0.8rem;
-
-            padding-top: 0.7rem;
-
-            border-top:
-                1px dashed
-                var(--border-color);
-
-            color:
-                var(--text-muted);
-
-            font-size: 0.75rem;
-        }
-
-
-        .source-row strong {
-
-            color:
-                var(--primary-color);
-        }
-
-
-        .source-links {
-
-            display: inline-flex;
-
-            flex-wrap: wrap;
-
-            gap: 0.34rem;
-        }
-
-
-        .source-link {
-
-            color:
-                var(--accent-color);
-
-            font-weight: 750;
-
-            text-decoration: none;
-        }
-
-
-        .source-separator {
-
-            color:
-                #B7A79B;
-        }
-
-
-        /* ==================================================
-           FEEDBACK - KOMPAKTARE
-        ================================================== */
-
-
-        .feedback {
-
-            margin-top:
-                1.15rem;
-
-            padding:
-                1rem 1.05rem;
-
-            border-radius: 14px;
-
-            background:
-                #FBF8F4;
-
-            border:
-                1px solid
-                var(--border-color);
-        }
-
-
-        .feedback-title {
-
-            display: block;
-
-            margin-bottom:
-                0.55rem;
-
-            font-size: 0.94rem;
-
-            color:
-                var(--primary-color);
-        }
-
-
-        .btn-group {
-
-            display: flex;
-
-            gap: 0.45rem;
-
-            flex-wrap: wrap;
-        }
-
-
-        .btn {
-
-            appearance: none;
-
-            border:
-                1px solid
-                var(--border-color);
-
-            background:
-                var(--bg-color);
-
-            color:
-                var(--text-color);
-
-            padding:
-                0.58rem 0.85rem;
-
-            border-radius: 10px;
-
-            cursor: pointer;
-
-            font-weight: 700;
-        }
-
-
-        .btn-primary {
-
-            background:
-                var(--accent-color);
-
-            color: white;
-
-            border-color:
-                var(--accent-color);
-        }
-
-
-        .share-row {
-
-            display: flex;
-
-            justify-content:
-                space-between;
-
-            align-items: center;
-
-            gap: 0.75rem;
-
-            margin-top:
-                0.8rem;
-
-            padding-top:
-                0.72rem;
-
-            border-top:
-                1px solid
-                var(--border-color);
-        }
-
-
-        .share-label {
-
-            margin: 0;
-
-            font-size: 0.79rem;
-
-            color:
-                var(--text-muted);
-        }
-
-
-        /* ==================================================
-           FIKAFRÅGA
-        ================================================== */
-
-
-        .conversation-card {
-
-            position: relative;
-
-            overflow: hidden;
-        }
-
-
-        .conversation-card::before {
-
-            content: "💬";
-
-            position: absolute;
-
-            right: 1.2rem;
-            top: 0.45rem;
-
-            font-size: 4.7rem;
-
-            opacity: 0.045;
-
-            pointer-events: none;
-        }
-
-
-        .section-kicker {
-
-            margin-bottom:
-                0.3rem;
-
-            color:
-                var(--accent-color);
-
-            font-size: 0.72rem;
-
-            text-transform: uppercase;
-
-            letter-spacing: 0.7px;
-
-            font-weight: 850;
-        }
-
-
-        .poll-question {
-
-            margin:
-                0 0 1rem;
-
-            max-width: 620px;
-
-            font-family:
-                Georgia,
-                "Times New Roman",
-                serif;
-
-            font-size: 1.27rem;
-
-            line-height: 1.35;
-
-            color:
-                var(--primary-color);
-        }
-
-
-        .poll-option {
-
-            display: flex;
-
-            align-items: flex-start;
-
-            gap: 0.6rem;
-
-            background:
-                var(--bg-color);
-
-            padding:
-                0.8rem 0.9rem;
-
-            border-radius: 11px;
-
-            margin-bottom:
-                0.58rem;
-
-            border:
-                1px solid
-                var(--border-color);
-
-            cursor: pointer;
-        }
-
-
-        .poll-option input {
-
-            margin-top:
-                0.28rem;
-
-            accent-color:
-                var(--accent-color);
-        }
-
-
-        .poll-results {
-
-            display: none;
-
-            margin-top: 1rem;
-
-            padding: 1rem;
-
-            background:
-                var(--soft-accent);
-
-            border-radius: 11px;
-
-            font-weight: 700;
-        }
-
-
-        .comment-section {
-
-            margin-top:
-                1.5rem;
-
-            padding-top:
-                1.35rem;
-
-            border-top:
-                1px solid
-                var(--border-color);
-        }
-
-
-        .comment-section h4 {
-
-            margin:
-                0 0 0.65rem;
-
-            color:
-                var(--primary-color);
-
-            font-size: 1rem;
-        }
-
-
-        .comment-helper {
-
-            margin:
-                -0.2rem 0 0.8rem;
-
-            color:
-                var(--text-muted);
-
-            font-size: 0.8rem;
-        }
-
-
-        .comment-input {
-
-            width: 100%;
-
-            padding:
-                0.78rem 0.85rem;
-
-            border:
-                1px solid
-                var(--border-color);
-
-            border-radius: 11px;
-
-            margin-bottom: 0.7rem;
-
-            background:
-                #FCF9F5;
-
-            color:
-                var(--text-color);
-        }
-
-
-        textarea.comment-input {
-
-            resize: vertical;
-
-            min-height: 94px;
-        }
-
-
-        .comment-item {
-
-            background:
-                var(--bg-color);
-
-            padding:
-                0.75rem;
-
-            border-radius: 10px;
-
-            margin-top: 0.6rem;
-
-            border:
-                1px solid
-                var(--border-color);
-        }
-
-
-        /* ==================================================
-           SIDOKORT
-        ================================================== */
-
-
-        .sidebar-card {
-
-            overflow: hidden;
-        }
-
-
-        .side-visual {
-
-            height: 160px;
-
-            position: relative;
-
-            display: grid;
-
-            place-items: center;
-
-            overflow: hidden;
-
-            border-radius: 14px;
-
-            background:
-                linear-gradient(
-                    145deg,
-                    #F6E5D6,
-                    #E8C9B2
-                );
-        }
-
-
-        .side-image {
-
-            display: none;
-
-            width: 100%;
-            height: 100%;
-
-            object-fit: cover;
-        }
-
-
-        .visual-emoji {
-
-            font-size: 4.6rem;
-        }
-
-
-        .side-kicker {
-
-            margin:
-                0.85rem 0 0.28rem;
-
-            color:
-                var(--accent-color);
-
-            font-size: 0.7rem;
-
-            font-weight: 850;
-
-            text-transform: uppercase;
-
-            letter-spacing: 0.45px;
-        }
-
-
-        .side-title {
-
-            margin:
-                0 0 0.45rem;
-
-            color:
-                var(--primary-color);
-
-            font-family:
-                Georgia,
-                "Times New Roman",
-                serif;
-
-            font-size: 1.1rem;
-
-            line-height: 1.25;
-
-            font-weight: 800;
-        }
-
-
-        .side-text {
-
-            margin: 0;
-
-            font-size: 0.88rem;
-
-            color:
-                #493B35;
-        }
-
-
-        /* ==================================================
-           ARKIV - KOMPAKT
-        ================================================== */
-
-
-        .archive-header {
-
-            margin-bottom:
-                1rem;
-        }
-
-
-        .archive-header h3 {
-
-            margin: 0;
-        }
-
-
-        .archive-subtitle {
-
-            margin:
-                0.25rem 0 0;
-
-            color:
-                var(--text-muted);
-
-            font-size: 0.82rem;
-        }
-
-
-        .archive-grid {
-
-            display: grid;
-
-            gap: 0.78rem;
-        }
-
-
-        .archive-item {
-
-            background:
-                #FBF8F4;
-
-            border:
-                1px solid
-                var(--border-color);
-
-            border-radius: 13px;
-
-            padding:
-                1rem 1.05rem;
-        }
-
-
-        .archive-meta {
-
-            font-size: 0.72rem;
-
-            color:
-                var(--accent-color);
-
-            font-weight: 750;
-
-            text-transform: uppercase;
-
-            letter-spacing: 0.35px;
-        }
-
-
-        .archive-title {
-
-            display: block;
-
-            margin:
-                0.28rem 0 0.35rem;
-
-            color:
-                var(--primary-color);
-
-            font-family:
-                Georgia,
-                "Times New Roman",
-                serif;
-
-            font-size: 1.08rem;
-
-            line-height: 1.28;
-
-            font-weight: 800;
-        }
-
-
-        .archive-summary {
-
-            margin: 0;
-
-            color:
-                #554640;
-
-            font-size: 0.86rem;
-
-            line-height: 1.5;
-        }
-
-
-        .archive-open {
-
-            display: inline-block;
-
-            margin-top: 0.58rem;
-
-            color:
-                var(--accent-color);
-
-            font-size: 0.8rem;
-
-            font-weight: 800;
-
-            background: none;
-
-            border: 0;
-
-            padding: 0;
-
-            cursor: pointer;
-        }
-
-
-        /* ==================================================
-           ARKIVLÄSARE
-        ================================================== */
-
-
-        .archive-reader {
-
-            display: none;
-
-            margin-top: 1rem;
-
-            padding:
-                1.2rem;
-
-            background:
-                #FFFDFC;
-
-            border:
-                1px solid
-                var(--border-color);
-
-            border-radius: 14px;
-        }
-
-
-        .archive-reader.is-open {
-            display: block;
-        }
-
-
-        .archive-reader h4 {
-
-            margin:
-                0 0 0.7rem;
-
-            font-family:
-                Georgia,
-                "Times New Roman",
-                serif;
-
-            font-size: 1.25rem;
-
-            line-height: 1.25;
-
-            color:
-                var(--primary-color);
-        }
-
-
-        .archive-reader p {
-
-            font-family:
-                Georgia,
-                "Times New Roman",
-                serif;
-
-            font-size: 0.95rem;
-
-            line-height: 1.6;
-        }
-
-
-        .archive-reader-meta {
-
-            margin-bottom:
-                0.45rem;
-
-            color:
-                var(--accent-color);
-
-            font-size: 0.72rem;
-
-            font-weight: 800;
-
-            text-transform: uppercase;
-        }
-
-
-        .archive-reader-byline {
-
-            margin-top:
-                0.8rem;
-
-            color:
-                var(--text-muted);
-
-            font-size:
-                0.78rem;
-
-            font-style: italic;
-        }
-
-
-        .archive-close {
-
-            margin-top:
-                0.8rem;
-        }
-
-
-        /* ==================================================
-           FOOTER
-        ================================================== */
-
-
-        footer {
-
-            text-align: center;
-
-            padding:
-                2.6rem 1rem;
-
-            color:
-                var(--text-muted);
-
-            font-size: 0.83rem;
-
-            border-top:
-                1px solid
-                var(--border-color);
-        }
-
-
-        /* ==================================================
-           MOBIL
-        ================================================== */
-
-
-        @media (
-            max-width: 768px
-        ) {
-
-            body {
-
-                background-size:
-                    14px 14px;
-            }
-
-
-            header {
-
-                padding:
-                    1.55rem 1rem
-                    1.4rem;
-            }
-
-
-            .brand h1 {
-
-                font-size:
-                    1.95rem;
-            }
-
-
-            header p {
-
-                font-size:
-                    0.86rem;
-            }
-
-
-            .schedule-banner {
-
-                padding:
-                    0.62rem 0.75rem;
-            }
-
-
-            .schedule-line {
-
-                gap:
-                    0.45rem;
-
-                font-size:
-                    0.77rem;
-            }
-
-
-            .brew-note {
-
-                margin-top:
-                    0.26rem;
-
-                font-size:
-                    0.69rem;
-            }
-
-
-            .container {
-
-                grid-template-columns:
-                    1fr;
-
-                margin:
-                    0.85rem auto 0;
-
-                padding:
-                    0 0.72rem;
-
-                gap:
-                    0.05rem;
-            }
-
-
-            .card {
-
-                border-radius:
-                    17px;
-
-                padding:
-                    1.15rem;
-
-                margin-bottom:
-                    0.9rem;
-            }
-
-
-            .article-topline {
-
-                margin-bottom:
-                    0.72rem;
-            }
-
-
-            .tag {
-
-                padding:
-                    0.25rem 0.65rem;
-
-                font-size:
-                    0.67rem;
-            }
-
-
-            .read-time {
-
-                font-size:
-                    0.7rem;
-            }
-
-
-            h2 {
-
-                font-size:
-                    1.72rem;
-
-                line-height:
-                    1.12;
-
-                letter-spacing:
-                    -0.4px;
-
-                margin-bottom:
-                    0.95rem;
-            }
-
-
-            .article-hero-img {
-
-                height:
-                    auto;
-
-                aspect-ratio:
-                    16 / 10;
-
-                border-radius:
-                    13px;
-            }
-
-
-            .summary-box {
-
-                margin:
-                    1rem 0 1.2rem;
-
-                padding:
-                    0.92rem 1rem;
-
-                font-size:
-                    0.92rem;
-            }
-
-
-            .article-content p {
-
-                font-size:
-                    0.97rem;
-
-                line-height:
-                    1.62;
-
-                margin-bottom:
-                    1.08rem;
-            }
-
-
-            .why-box {
-
-                margin:
-                    1.2rem 0;
-
-                padding:
-                    0.95rem 1rem;
-            }
-
-
-            .feedback {
-
-                padding:
-                    0.85rem;
-
-                margin-top:
-                    1rem;
-            }
-
-
-            .feedback-title {
-
-                margin-bottom:
-                    0.45rem;
-
-                font-size:
-                    0.9rem;
-            }
-
-
-            .btn-group {
-
-                display: grid;
-
-                grid-template-columns:
-                    1fr 1fr;
-
-                gap:
-                    0.4rem;
-            }
-
-
-            .btn {
-
-                padding:
-                    0.56rem 0.6rem;
-
-                font-size:
-                    0.8rem;
-            }
-
-
-            .share-row {
-
-                margin-top:
-                    0.65rem;
-
-                padding-top:
-                    0.62rem;
-            }
-
-
-            .share-label {
-
-                font-size:
-                    0.74rem;
-            }
-
-
-            .poll-question {
-
-                font-size:
-                    1.16rem;
-            }
-
-
-            .side-visual {
-
-                height: auto;
-
-                aspect-ratio:
-                    16 / 9;
-            }
-
-
-            .archive-item {
-
-                padding:
-                    0.9rem;
-            }
-
-
-            .archive-title {
-
-                font-size:
-                    1.02rem;
-            }
-
-
-            .archive-reader {
-
-                padding:
-                    1rem;
-            }
-
-
-            .archive-reader p {
-
-                font-size:
-                    0.91rem;
-
-                line-height:
-                    1.58;
-            }
-
-
-            footer {
-
-                padding:
-                    2rem 1rem;
-            }
-        }
-
-
-        @media (
-            max-width: 390px
-        ) {
-
-            .brand h1 {
-
-                font-size:
-                    1.72rem;
-            }
-
-
-            h2 {
-
-                font-size:
-                    1.58rem;
-            }
-
-
-            .btn-group {
-
-                grid-template-columns:
-                    1fr;
-            }
-
-
-            .article-topline {
-
-                align-items:
-                    flex-start;
-            }
-        }
-
-    </style>
-
-</head>
-
-
-<body>
-
-
-<header>
-
-    <a
-        class="brand"
-        href="/"
-    >
-
-        <span class="coffee-mark">
-
-            <span class="steam s1"></span>
-            <span class="steam s2"></span>
-            <span class="steam s3"></span>
-
-            <span class="coffee-cup">
-                ☕
-            </span>
-
-        </span>
-
-
-        <h1>
-            Kafferasten.se
-        </h1>
-
-    </a>
-
-
-    <p>
-        En färsk snackis när kaffet behöver lite sällskap.
-    </p>
-
-</header>
-
-
-<div class="schedule-banner">
-
-    <div class="schedule-line">
-
-        <span>
-
-            ⏰
-
-            <strong>
-                RYKANDE FÄRSKT:
-            </strong>
-
-            <span id="fika-time-text">
-                Hämtar...
-            </span>
-
-        </span>
-
-
-        <span class="status-badge">
-            ☕ Nybryggt
-        </span>
-
-    </div>
-
-
-    <div class="brew-note">
-        Nya snackisar bryggs varje vardag inför 09-fikat och 15-rasten.
-    </div>
-
-</div>
-
-
-<div class="container">
-
-
-<main>
-
-
-    <article class="card">
-
-
-        <div class="article-topline">
-
-            <span
-                class="tag"
-                id="fika-badge"
-            >
-                ☕ DAGENS SNACKIS
-            </span>
-
-
-            <span
-                class="read-time"
-                id="read-time"
-            >
-                ☕ 1 minuts läsning
-            </span>
-
-        </div>
-
-
-        <h2 id="article-title">
-            Brygger dagens snackis...
-        </h2>
-
-
-        <div class="hero-wrap">
-
-            <img
-                id="article-img"
-                src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=1400&q=82"
-                alt="Kaffe"
-                class="article-hero-img"
-            >
-
-
-            <div
-                id="photo-credit"
-                class="photo-credit"
-            >
-            </div>
-
-        </div>
-
-
-        <div
-            class="summary-box"
-            id="summary-box"
-            style="display:none;"
-        >
-
-            <strong>
-                ⚡ Snabböversikt
-            </strong>
-
-            <span id="article-summary">
-            </span>
-
-        </div>
-
-
-        <div
-            class="article-content"
-            id="article-text"
-        >
-        </div>
-
-
-        <div
-            class="why-box"
-            id="why-box"
-            style="display:none;"
-        >
-
-            <strong>
-                ☕ Därför passar den på fikat
-            </strong>
-
-            <ul id="why-list">
-            </ul>
-
-        </div>
-
-
-        <div class="article-meta-box">
-
-
-            <div
-                class="byline"
-                id="article-byline"
-            >
-
-                <div
-                    class="byline-avatar"
-                    id="article-byline-avatar"
-                >
-                    ✍️
-                </div>
-
-
-                <div class="byline-copy">
-
-                    Dagens snackis är serverad av
-
-                    <span
-                        class="byline-name"
-                        id="article-byline-name"
-                    >
-                    </span>
-
-                </div>
-
-            </div>
-
-
-            <div
-                class="source-row"
-                id="source-row"
-            >
-
-                <strong>
-                    🔎 Lästs in från:
-                </strong>
-
-                <span
-                    class="source-links"
-                    id="source-links"
-                >
-                </span>
-
-            </div>
-
-
-        </div>
-
-
-        <div class="feedback">
-
-            <strong class="feedback-title">
-                Hur smakade dagens snackis?
-            </strong>
-
-
-            <div class="btn-group">
-
-                <button
-                    class="btn"
-                    onclick="voteThumb('main-up')"
-                >
-                    👍 Bra snack
-                    (
-                    <span id="count-main-up">
-                        0
-                    </span>
-                    )
-                </button>
-
-
-                <button
-                    class="btn"
-                    onclick="voteThumb('main-down')"
-                >
-                    🥱 Segt ämne
-                    (
-                    <span id="count-main-down">
-                        0
-                    </span>
-                    )
-                </button>
-
-            </div>
-
-
-            <div class="share-row">
-
-                <p class="share-label">
-                    Skicka vidare till fikagänget.
-                </p>
-
-
-                <button
-                    class="btn"
-                    onclick="copyLink()"
-                >
-                    🔗 Kopiera länk
-                </button>
-
-            </div>
-
-        </div>
-
-
-    </article>
-
-
-    <section class="card conversation-card">
-
-
-        <div class="section-kicker">
-            Fikabordets stora fråga
-        </div>
-
-
-        <h3>
-            💬 Dagens fikafråga
-        </h3>
-
-
-        <p
-            class="poll-question"
-            id="poll-question"
-        >
-        </p>
-
-
-        <div id="poll-form">
-
-            <div id="poll-options-container">
-            </div>
-
-
-            <button
-                onclick="submitPoll()"
-                class="btn btn-primary"
-            >
-                Skicka din röst
-            </button>
-
-        </div>
-
-
-        <div
-            id="poll-results"
-            class="poll-results"
-        >
-            ☕ Rösten är inne. Nu återstår bara att övertyga resten av fikabordet.
-        </div>
-
-
-        <div class="comment-section">
-
-            <h4>
-                💭 Vad sägs i ert fikarum?
-            </h4>
-
-
-            <p class="comment-helper">
-                Har någon kollega redan en stark åsikt? Lämna den här.
-            </p>
-
-
-            <input
-                id="comment-name"
-                class="comment-input"
-                placeholder="Namn eller avdelning – frivilligt"
-            >
-
-
-            <textarea
-                id="comment-text"
-                class="comment-input"
-                rows="3"
-                placeholder="Vad säger fikabordet?"
-            ></textarea>
-
-
-            <button
-                class="btn btn-primary"
-                onclick="addComment()"
-            >
-                Skicka kommentar
-            </button>
-
-
-            <div id="comments-list">
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <section class="card">
-
-
-        <div class="archive-header">
-
-            <h3>
-                📜 Tidigare snackisar
-            </h3>
-
-
-            <p class="archive-subtitle">
-                Missade du fikat? Här ligger de senaste ämnena kvar.
-            </p>
-
-        </div>
-
-
-        <div
-            id="archive-list"
-            class="archive-grid"
-        >
-            Hämtar tidigare snackisar...
-        </div>
-
-
-        <div
-            id="archive-reader"
-            class="archive-reader"
-        >
-
-            <div
-                id="archive-reader-meta"
-                class="archive-reader-meta"
-            >
-            </div>
-
-
-            <h4 id="archive-reader-title">
-            </h4>
-
-
-            <div id="archive-reader-content">
-            </div>
-
-
-            <div
-                id="archive-reader-byline"
-                class="archive-reader-byline"
-            >
-            </div>
-
-
-            <button
-                class="btn archive-close"
-                onclick="closeArchiveReader()"
-            >
-                ↑ Stäng snackisen
-            </button>
-
-        </div>
-
-
-    </section>
-
-
-</main>
-
-
-<aside>
-
-
-    <div class="card sidebar-card">
-
-        <h3>
-            🥐 Dagens fikatips
-        </h3>
-
-
-        <div class="side-visual">
-
-            <img
-                id="fika-tip-image"
-                class="side-image"
-                alt=""
-                loading="lazy"
-            >
-
-
-            <span
-                class="visual-emoji"
-                id="fika-tip-emoji"
-            >
-                🥐
-            </span>
-
-        </div>
-
-
-        <div
-            id="fika-tip-credit"
-            class="side-photo-credit"
-        >
-        </div>
-
-
-        <p
-            class="side-kicker"
-            id="fika-tip-kicker"
-        >
-        </p>
-
-
-        <p
-            class="side-title"
-            id="fika-tip-title"
-        >
-        </p>
-
-
-        <p
-            class="side-text"
-            id="fika-tip-text"
-        >
-        </p>
-
-    </div>
-
-
-    <div class="card sidebar-card">
-
-        <h3>
-            💡 Fikarast-fakta
-        </h3>
-
-
-        <div class="side-visual">
-
-            <img
-                id="fika-fact-image"
-                class="side-image"
-                alt=""
-                loading="lazy"
-            >
-
-
-            <span
-                class="visual-emoji"
-                id="fika-fact-emoji"
-            >
-                ☕
-            </span>
-
-        </div>
-
-
-        <div
-            id="fika-fact-credit"
-            class="side-photo-credit"
-        >
-        </div>
-
-
-        <p
-            class="side-kicker"
-            id="fika-fact-kicker"
-        >
-        </p>
-
-
-        <p
-            class="side-title"
-            id="fika-fact-title"
-        >
-        </p>
-
-
-        <p
-            class="side-text"
-            id="fika-fact-text"
-        >
-        </p>
-
-    </div>
-
-
-</aside>
-
-
-</div>
-
-
-<footer>
-    Kafferasten.se – något att prata om när kaffet är klart. ☕
-</footer>
-
-
-<script>
-
-
-const votes = {};
-
-let archiveArticles = [];
-
-window.currentLatestId = null;
-
-
-/* =====================================================
-   FALLBACK-SIDOINNEHÅLL
-===================================================== */
-
-
-const fikaTips = [
-
-    {
-        emoji: "🥐",
-        kicker: "Lite kontinentalt",
-        title: "Croissant utan krångel",
-        text:
-            "En bra croissant och en kopp kaffe. Franskt i teorin, fullt rimligt i ett svenskt fikarum."
-    },
-
-    {
-        emoji: "🍇",
-        kicker: "När sötsuget kommer",
-        title: "Kalla vindruvor",
-        text:
-            "Kalla vindruvor till kaffet är friskt, sött och märkligt lätt att fortsätta plocka av."
-    },
-
-    {
-        emoji: "🍪",
-        kicker: "Två tuggor räcker",
-        title: "Småkakan gör comeback",
-        text:
-            "En liten kaka till kaffet är underskattat."
-    },
-
-    {
-        emoji: "🍫",
-        kicker: "Akutlösningen",
-        title: "Två rutor choklad",
-        text:
-            "Två bra rutor choklad till kaffet."
-    },
-
-    {
-        emoji: "🍎",
-        kicker: "Enklast vinner",
-        title: "Äpple och kaffe",
-        text:
-            "Krispigt äpple till kaffe låter nästan för nyttigt för fika, men kombinationen fungerar."
-    },
-
-    {
-        emoji: "🥪",
-        kicker: "När fikat är hungrigt",
-        title: "Den lilla mackan",
-        text:
-            "En halv ost- eller skinkmacka gör underverk när det egentligen är lunchen du längtar efter."
-    },
-
-    {
-        emoji: "🧁",
-        kicker: "Klassiker med krydda",
-        title: "Kardemummabulle",
-        text:
-            "När kanelbullen känns för självklar: kardemumma."
-    },
-
-    {
-        emoji: "🍰",
-        kicker: "Fredagskänsla",
-        title: "En liten bit morotskaka",
-        text:
-            "Morot i namnet betyder inte sallad. Men det är åtminstone ett trevligt alibi."
-    }
-
-];
-
-
-const fikaFacts = [
-
-    {
-        emoji: "☕",
-        kicker: "Språkhörnan",
-        title: "Fika är både sak och handling",
-        text:
-            "På svenska kan fika vara både substantiv och verb: vi tar en fika – och vi fikar."
-    },
-
-    {
-        emoji: "🔄",
-        kicker: "Ordet fika",
-        title: "Kaffi blev fika",
-        text:
-            "En vanlig förklaring är att fika växte fram ur backslang där stavelserna i ”kaffi” kastades om."
-    },
-
-    {
-        emoji: "🍒",
-        kicker: "Från buske till kopp",
-        title: "Kaffe börjar som en frukt",
-        text:
-            "Kaffebönan är egentligen fröet inuti kaffeväxtens frukt."
-    },
-
-    {
-        emoji: "🌱",
-        kicker: "Två stora namn",
-        title: "Arabica och robusta",
-        text:
-            "Arabica och robusta är de två kaffevarianter som dominerar kaffemarknaden."
-    },
-
-    {
-        emoji: "🌿",
-        kicker: "Bakom kryddan",
-        title: "Kanel är bark",
-        text:
-            "Kanel kommer från den torkade innerbarken på träd i släktet Cinnamomum."
-    },
-
-    {
-        emoji: "🥐",
-        kicker: "Smörvetenskap",
-        title: "Croissanten byggs i lager",
-        text:
-            "Croissantdeg kavlas och viks med smör i flera lager."
-    },
-
-    {
-        emoji: "🍫",
-        kicker: "Före chokladen",
-        title: "Kakao växer i stora frukter",
-        text:
-            "Kakaobönor finns inuti stora kakaofrukter."
-    },
-
-    {
-        emoji: "🫖",
-        kicker: "Inte bara kaffe",
-        title: "Fika kräver ingen kaffekopp",
-        text:
-            "Fika handlar minst lika mycket om pausen och sällskapet som om drycken."
-    }
-
-];
-
-
-function safeArray(value) {
-
-    return Array.isArray(value)
-        ? value
-        : [];
-}
-
-
-function cleanReaderText(text) {
-
-    if (!text) {
-        return "";
-    }
-
-
-    return String(text)
-
-        .replace(
-            /[\uE000-\uF8FF]/g,
-            ""
-        )
-
-        .replace(
-            /\[[^\]]*\]\(\s*https?:\/\/[^)]*\)/gi,
-            ""
-        )
-
-        .replace(
-            /https?:\/\/\S+/gi,
-            ""
-        )
-
-        .replace(
-            /\bwww\.\S+/gi,
-            ""
-        )
-
-        .replace(
-            /[\[\]\(\)\{\}]{2,}/g,
-            ""
-        )
-
-        .replace(
-            /\s+([,.!?;:])/g,
-            "$1"
-        )
-
-        .replace(
-            /\s{2,}/g,
-            " "
-        )
-
-        .trim();
-}
-
-
-function calculateReadTime(article) {
-
-    const text = [
-
-        article?.summary,
-
-        ...safeArray(
-            article?.paragraphs
-        ),
-
-        ...safeArray(
-            article?.whyTalkAboutIt
-        )
-
-    ]
-        .filter(Boolean)
-        .join(" ");
-
-
-    const words =
-        text
-            .trim()
-            .split(/\s+/)
-            .filter(Boolean)
-            .length;
-
-
-    return Math.max(
-        1,
-        Math.ceil(
-            words / 200
-        )
+  const store =
+    getStore(
+      STORE_NAME
     );
-}
 
 
-function renderReadTime(article) {
+  try {
 
-    const minutes =
-        calculateReadTime(article);
-
-
-    document
-        .getElementById(
-            "read-time"
-        )
-        .textContent =
-            `☕ ${minutes} ${
-                minutes === 1
-                    ? "minuts"
-                    : "minuters"
-            } läsning`;
-}
+    const url =
+      new URL(
+        request.url
+      );
 
 
-function hashString(value) {
+    const method =
+      request.method
+        .toUpperCase();
 
-    let hash = 0;
 
-    const text =
+    /* =====================================================
+       GET – HÄMTA FIKARUMMET
+    ===================================================== */
+
+
+    if (
+      method === "GET"
+    ) {
+
+      const articleId =
+        sanitizeArticleId(
+          url.searchParams.get(
+            "articleId"
+          )
+        );
+
+
+      if (!articleId) {
+
+        return jsonResponse(
+          {
+            success: false,
+            error:
+              "articleId saknas."
+          },
+          400
+        );
+      }
+
+
+      const engagement =
+        await readEngagement(
+          store,
+          articleId
+        );
+
+
+      return jsonResponse(
+        {
+          success: true,
+          engagement
+        }
+      );
+    }
+
+
+    /* =====================================================
+       POST – SPARA INTERAKTION
+    ===================================================== */
+
+
+    if (
+      method === "POST"
+    ) {
+
+      let body;
+
+
+      try {
+
+        body =
+          await request.json();
+
+      } catch {
+
+        return jsonResponse(
+          {
+            success: false,
+            error:
+              "Ogiltig JSON."
+          },
+          400
+        );
+      }
+
+
+      const articleId =
+        sanitizeArticleId(
+          body.articleId
+        );
+
+
+      const action =
         String(
-            value ||
-            "kafferasten"
-        );
-
-
-    for (
-        let i = 0;
-        i < text.length;
-        i++
-    ) {
-
-        hash =
-            (
-                (hash << 5) -
-                hash
-            )
-            +
-            text.charCodeAt(i);
-
-        hash |= 0;
-    }
-
-
-    return Math.abs(hash);
-}
-
-
-function fallbackSidebar(seed) {
-
-    const base =
-        hashString(seed);
-
-
-    return {
-
-        tip:
-            fikaTips[
-                base %
-                fikaTips.length
-            ],
-
-        fact:
-            fikaFacts[
-                (
-                    base * 7 + 3
-                )
-                %
-                fikaFacts.length
-            ]
-    };
-}
-
-
-function renderSidebar(latest) {
-
-    const sidebar =
-        latest.sidebarContent
-        ||
-        fallbackSidebar(
-            latest.id ||
-            latest.article?.title
-        );
-
-
-    renderSideCard({
-        item: sidebar.tip,
-        imageId: "fika-tip-image",
-        emojiId: "fika-tip-emoji",
-        creditId: "fika-tip-credit",
-        kickerId: "fika-tip-kicker",
-        titleId: "fika-tip-title",
-        textId: "fika-tip-text"
-    });
-
-
-    renderSideCard({
-        item: sidebar.fact,
-        imageId: "fika-fact-image",
-        emojiId: "fika-fact-emoji",
-        creditId: "fika-fact-credit",
-        kickerId: "fika-fact-kicker",
-        titleId: "fika-fact-title",
-        textId: "fika-fact-text"
-    });
-}
-
-
-function renderSideCard({
-    item,
-    imageId,
-    emojiId,
-    creditId,
-    kickerId,
-    titleId,
-    textId
-}) {
-
-    const image =
-        document.getElementById(
-            imageId
-        );
-
-
-    const emoji =
-        document.getElementById(
-            emojiId
-        );
-
-
-    const credit =
-        document.getElementById(
-            creditId
-        );
-
-
-    document
-        .getElementById(
-            kickerId
+          body.action ||
+          ""
         )
-        .textContent =
-            item?.kicker || "";
+          .trim()
+          .toLowerCase();
 
 
-    document
-        .getElementById(
-            titleId
+      if (!articleId) {
+
+        return jsonResponse(
+          {
+            success: false,
+            error:
+              "articleId saknas."
+          },
+          400
+        );
+      }
+
+
+      if (
+        ![
+          "thumb",
+          "poll",
+          "comment"
+        ].includes(
+          action
         )
-        .textContent =
-            item?.title || "";
+      ) {
 
-
-    document
-        .getElementById(
-            textId
-        )
-        .textContent =
-            item?.text || "";
-
-
-    emoji.textContent =
-        item?.emoji || "☕";
-
-
-    const photo =
-        item?.image;
-
-
-    if (
-        photo?.provider === "pexels"
-        &&
-        (
-            photo?.smallUrl ||
-            photo?.url
-        )
-    ) {
-
-        image.src =
-            photo.smallUrl ||
-            photo.url;
-
-
-        image.alt =
-            cleanReaderText(
-                photo.alt ||
-                item.imageAlt ||
-                item.title ||
-                ""
-            );
-
-
-        image.style.display =
-            "block";
-
-
-        emoji.style.display =
-            "none";
-
-
-        renderPhotoCredit(
-            credit,
-            photo
+        return jsonResponse(
+          {
+            success: false,
+            error:
+              "Ogiltig action."
+          },
+          400
         );
+      }
 
 
-    } else {
+      const result =
+        await withArticleLock({
+          store,
+          articleId,
 
-        image.style.display =
-            "none";
+          task:
+            async () => {
 
-
-        emoji.style.display =
-            "block";
-
-
-        credit.style.display =
-            "none";
-    }
-}
-
-
-function safeHttpUrl(value) {
-
-    try {
-
-        const url =
-            new URL(value);
-
-
-        if (
-            url.protocol === "https:"
-            ||
-            url.protocol === "http:"
-        ) {
-
-            return url.toString();
-        }
-
-
-        return null;
-
-
-    } catch {
-
-        return null;
-    }
-}
-
-
-function renderPhotoCredit(
-    element,
-    photo
-) {
-
-    element.innerHTML = "";
-
-
-    if (
-        photo?.provider !== "pexels"
-        ||
-        !photo.photographerName
-    ) {
-
-        element.style.display =
-            "none";
-
-        return;
-    }
-
-
-    const intro =
-        document.createTextNode(
-            "Foto: "
-        );
-
-
-    const photographer =
-        document.createElement(
-            "a"
-        );
-
-
-    photographer.href =
-        safeHttpUrl(
-            photo.photoUrl ||
-            photo.photographerUrl
-        )
-        ||
-        "https://www.pexels.com/";
-
-
-    photographer.target =
-        "_blank";
-
-
-    photographer.rel =
-        "noopener noreferrer";
-
-
-    photographer.textContent =
-        photo.photographerName;
-
-
-    const separator =
-        document.createTextNode(
-            " / "
-        );
-
-
-    const pexels =
-        document.createElement(
-            "a"
-        );
-
-
-    pexels.href =
-        "https://www.pexels.com/";
-
-
-    pexels.target =
-        "_blank";
-
-
-    pexels.rel =
-        "noopener noreferrer";
-
-
-    pexels.textContent =
-        "Pexels";
-
-
-    element.append(
-        intro,
-        photographer,
-        separator,
-        pexels
-    );
-
-
-    element.style.display =
-        "block";
-}
-
-
-function renderHero(
-    latest,
-    article
-) {
-
-    const image =
-        document.getElementById(
-            "article-img"
-        );
-
-
-    const credit =
-        document.getElementById(
-            "photo-credit"
-        );
-
-
-    const hero =
-        latest.heroImage;
-
-
-    if (hero?.url) {
-
-        image.src =
-            hero.url;
-
-
-        image.alt =
-            cleanReaderText(
-                hero.alt ||
-                article.imageAlt ||
-                "Bild till dagens snackis"
-            );
-    }
-
-
-    renderPhotoCredit(
-        credit,
-        hero
-    );
-}
-
-
-const SOURCE_NAMES = {
-
-    "svt.se":
-        "SVT",
-
-    "sverigesradio.se":
-        "Sveriges Radio",
-
-    "sr.se":
-        "Sveriges Radio",
-
-    "tv4.se":
-        "TV4",
-
-    "aftonbladet.se":
-        "Aftonbladet",
-
-    "expressen.se":
-        "Expressen",
-
-    "dn.se":
-        "Dagens Nyheter",
-
-    "svd.se":
-        "Svenska Dagbladet",
-
-    "reuters.com":
-        "Reuters",
-
-    "apnews.com":
-        "AP",
-
-    "bbc.com":
-        "BBC",
-
-    "bbc.co.uk":
-        "BBC",
-
-    "cnn.com":
-        "CNN",
-
-    "theguardian.com":
-        "The Guardian",
-
-    "nytimes.com":
-        "The New York Times",
-
-    "washingtonpost.com":
-        "The Washington Post",
-
-    "people.com":
-        "People",
-
-    "variety.com":
-        "Variety",
-
-    "billboard.com":
-        "Billboard",
-
-    "espn.com":
-        "ESPN"
-};
-
-
-function sourceDomain(url) {
-
-    try {
-
-        return new URL(url)
-            .hostname
-            .toLowerCase()
-            .replace(
-                /^www\./,
-                ""
-            );
-
-
-    } catch {
-
-        return "";
-    }
-}
-
-
-function sourceDisplayName(source) {
-
-    const domain =
-        sourceDomain(
-            source.url
-        );
-
-
-    if (
-        SOURCE_NAMES[
-            domain
-        ]
-    ) {
-
-        return SOURCE_NAMES[
-            domain
-        ];
-    }
-
-
-    const parts =
-        domain.split(".");
-
-
-    if (
-        parts.length > 2
-    ) {
-
-        const root =
-            parts
-                .slice(-2)
-                .join(".");
-
-
-        if (
-            SOURCE_NAMES[
-                root
-            ]
-        ) {
-
-            return SOURCE_NAMES[
-                root
-            ];
-        }
-    }
-
-
-    const title =
-        cleanReaderText(
-            source.title ||
-            ""
-        );
-
-
-    if (
-        title
-        &&
-        title !== "Källa"
-        &&
-        title.length <= 48
-    ) {
-
-        return title;
-    }
-
-
-    return domain ||
-        "Källa";
-}
-
-
-function renderSources(sources) {
-
-    const row =
-        document.getElementById(
-            "source-row"
-        );
-
-
-    const links =
-        document.getElementById(
-            "source-links"
-        );
-
-
-    links.innerHTML =
-        "";
-
-
-    const valid =
-        safeArray(sources)
-
-            .map(
-                source => ({
-                    ...source,
-
-                    safeUrl:
-                        safeHttpUrl(
-                            source?.url
-                        )
-                })
-            )
-
-            .filter(
-                source =>
-                    source.safeUrl
-            )
-
-            .slice(
-                0,
-                3
-            );
-
-
-    if (!valid.length) {
-
-        row.style.display =
-            "none";
-
-        return;
-    }
-
-
-    valid.forEach(
-        (
-            source,
-            index
-        ) => {
-
-            if (
-                index > 0
-            ) {
-
-                const separator =
-                    document.createElement(
-                        "span"
-                    );
-
-
-                separator.className =
-                    "source-separator";
-
-
-                separator.textContent =
-                    "·";
-
-
-                links.appendChild(
-                    separator
-                );
-            }
-
-
-            const link =
-                document.createElement(
-                    "a"
+              const current =
+                await readEngagement(
+                  store,
+                  articleId
                 );
 
 
-            link.className =
-                "source-link";
+              /* ===========================================
+                 TUMME
+              =========================================== */
 
 
-            link.href =
-                source.safeUrl;
+              if (
+                action === "thumb"
+              ) {
+
+                const value =
+                  String(
+                    body.value ||
+                    ""
+                  )
+                    .trim()
+                    .toLowerCase();
 
 
-            link.target =
-                "_blank";
+                if (
+                  ![
+                    "up",
+                    "down"
+                  ].includes(
+                    value
+                  )
+                ) {
 
-
-            link.rel =
-                "noopener noreferrer";
-
-
-            link.textContent =
-                sourceDisplayName(
-                    source
-                );
-
-
-            links.appendChild(
-                link
-            );
-        }
-    );
-
-
-    row.style.display =
-        "flex";
-}
-
-
-function bylineEmoji(byline) {
-
-    if (
-        byline === "Camille"
-    ) {
-
-        return "✨";
-    }
-
-
-    if (
-        byline === "Bettan"
-    ) {
-
-        return "☕";
-    }
-
-
-    return "📰";
-}
-
-
-async function loadLatestNews() {
-
-    try {
-
-        const response =
-            await fetch(
-                "/.netlify/functions/latest-news?t="
-                +
-                Date.now(),
-                {
-                    cache:
-                        "no-store"
+                  throw new PublicError(
+                    "Ogiltig röst.",
+                    400
+                  );
                 }
-            );
 
 
-        if (!response.ok) {
+                if (
+                  value === "up"
+                ) {
 
-            throw new Error(
-                "Kunde inte hämta senaste snackisen."
-            );
-        }
+                  current.thumbs.up +=
+                    1;
 
+                } else {
 
-        const result =
-            await response.json();
+                  current.thumbs.down +=
+                    1;
+                }
+              }
 
 
-        const latest =
-            result.latest;
+              /* ===========================================
+                 OMRÖSTNING
+              =========================================== */
 
 
-        if (!latest) {
+              if (
+                action === "poll"
+              ) {
 
-            throw new Error(
-                "Ingen latest hittades."
-            );
-        }
+                const option =
+                  Number(
+                    body.option
+                  );
 
 
-        const article =
-            latest.article ||
-            {};
+                if (
+                  option !== 0 &&
+                  option !== 1
+                ) {
 
+                  throw new PublicError(
+                    "Ogiltigt svarsalternativ.",
+                    400
+                  );
+                }
 
-        window.currentLatestId =
-            latest.id ||
-            null;
 
+                current.poll[
+                  option
+                ] += 1;
+              }
 
-        document
-            .getElementById(
-                "fika-badge"
-            )
-            .textContent =
-                "☕ "
-                +
-                cleanReaderText(
-                    article.category ||
-                    "Dagens snackis"
-                );
 
+              /* ===========================================
+                 KOMMENTAR
+              =========================================== */
 
-        document
-            .getElementById(
-                "fika-time-text"
-            )
-            .textContent =
-                "Senast uppdaterad "
-                +
-                formatPublishedTime(
-                    latest.createdAt
-                );
 
+              if (
+                action === "comment"
+              ) {
 
-        document
-            .getElementById(
-                "article-title"
-            )
-            .textContent =
-                cleanReaderText(
-                    article.title
-                );
-
-
-        renderReadTime(
-            article
-        );
-
-
-        renderHero(
-            latest,
-            article
-        );
-
-
-        renderSidebar(
-            latest
-        );
-
-
-        renderSources(
-            latest.sources
-        );
-
-
-        const summaryBox =
-            document.getElementById(
-                "summary-box"
-            );
-
-
-        if (
-            article.summary
-        ) {
-
-            summaryBox.style.display =
-                "block";
-
-
-            document
-                .getElementById(
-                    "article-summary"
-                )
-                .textContent =
-                    cleanReaderText(
-                        article.summary
-                    );
-
-
-        } else {
-
-            summaryBox.style.display =
-                "none";
-        }
-
-
-        const articleText =
-            document.getElementById(
-                "article-text"
-            );
-
-
-        articleText.innerHTML =
-            "";
-
-
-        for (
-            const paragraph
-            of safeArray(
-                article.paragraphs
-            )
-        ) {
-
-            const cleaned =
-                cleanReaderText(
-                    paragraph
-                );
-
-
-            if (!cleaned) {
-                continue;
-            }
-
-
-            const p =
-                document.createElement(
-                    "p"
-                );
-
-
-            p.textContent =
-                cleaned;
-
-
-            articleText.appendChild(
-                p
-            );
-        }
-
-
-        const reasons =
-            safeArray(
-                article.whyTalkAboutIt
-            );
-
-
-        const whyBox =
-            document.getElementById(
-                "why-box"
-            );
-
-
-        const whyList =
-            document.getElementById(
-                "why-list"
-            );
-
-
-        whyList.innerHTML =
-            "";
-
-
-        if (
-            reasons.length
-        ) {
-
-            whyBox.style.display =
-                "block";
-
-
-            for (
-                const reason
-                of reasons
-            ) {
-
-                const li =
-                    document.createElement(
-                        "li"
-                    );
-
-
-                li.textContent =
-                    cleanReaderText(
-                        reason
-                    );
-
-
-                whyList.appendChild(
-                    li
-                );
-            }
-
-
-        } else {
-
-            whyBox.style.display =
-                "none";
-        }
-
-
-        const byline =
-            cleanReaderText(
-                latest.byline ||
-                article.byline ||
-                ""
-            );
-
-
-        const bylineBox =
-            document.getElementById(
-                "article-byline"
-            );
-
-
-        if (byline) {
-
-            document
-                .getElementById(
-                    "article-byline-name"
-                )
-                .textContent =
-                    byline;
-
-
-            document
-                .getElementById(
-                    "article-byline-avatar"
-                )
-                .textContent =
-                    bylineEmoji(
-                        byline
-                    );
-
-
-            bylineBox.style.display =
-                "flex";
-
-
-        } else {
-
-            bylineBox.style.display =
-                "none";
-        }
-
-
-        document
-            .getElementById(
-                "poll-question"
-            )
-            .textContent =
-                cleanReaderText(
-                    article.pollQuestion ||
-                    "Vad säger fikabordet?"
-                );
-
-
-        const pollBox =
-            document.getElementById(
-                "poll-options-container"
-            );
-
-
-        pollBox.innerHTML =
-            "";
-
-
-        safeArray(
-            article.pollOptions
-        )
-        .forEach(
-            (
-                option,
-                index
-            ) => {
-
-                const label =
-                    document.createElement(
-                        "label"
-                    );
-
-
-                label.className =
-                    "poll-option";
-
-
-                const radio =
-                    document.createElement(
-                        "input"
-                    );
-
-
-                radio.type =
-                    "radio";
-
-
-                radio.name =
-                    "poll";
-
-
-                radio.value =
-                    String(
-                        index + 1
-                    );
-
-
-                label.appendChild(
-                    radio
-                );
+                const name =
+                  sanitizePlainText(
+                    body.name,
+                    MAX_NAME_LENGTH
+                  )
+                  ||
+                  "Anonym kollega";
 
 
                 const text =
-                    document.createElement(
-                        "span"
-                    );
+                  sanitizePlainText(
+                    body.text,
+                    MAX_COMMENT_LENGTH
+                  );
 
 
-                text.textContent =
-                    cleanReaderText(
-                        option
-                    );
+                if (!text) {
 
-
-                label.appendChild(
-                    text
-                );
-
-
-                pollBox.appendChild(
-                    label
-                );
-            }
-        );
-
-
-    } catch (error) {
-
-        console.error(
-            error
-        );
-
-
-        document
-            .getElementById(
-                "article-title"
-            )
-            .textContent =
-                "Kaffet är klart – snackisen dröjer lite";
-    }
-}
-
-
-async function loadArchive() {
-
-    const archiveList =
-        document.getElementById(
-            "archive-list"
-        );
-
-
-    try {
-
-        const response =
-            await fetch(
-                "/.netlify/functions/archive-news?t="
-                +
-                Date.now(),
-                {
-                    cache:
-                        "no-store"
+                  throw new PublicError(
+                    "Kommentaren är tom.",
+                    400
+                  );
                 }
-            );
 
 
-        if (!response.ok) {
+                current.comments.unshift(
+                  {
+                    id:
+                      createCommentId(),
 
-            throw new Error(
-                "Arkivet svarade inte."
-            );
-        }
+                    name,
+
+                    text,
+
+                    createdAt:
+                      new Date()
+                        .toISOString()
+                  }
+                );
 
 
-        const result =
-            await response.json();
-
-
-        archiveList.innerHTML =
-            "";
-
-
-        archiveArticles =
-            safeArray(
-                result.articles
-            )
-                .filter(
-                    item =>
-                        item
-                        &&
-                        item.article
-                        &&
-                        item.id !==
-                        window.currentLatestId
-                )
-                .slice(
+                current.comments =
+                  current.comments.slice(
                     0,
-                    5
-                );
+                    MAX_COMMENTS
+                  );
+              }
 
 
-        if (
-            !archiveArticles.length
-        ) {
+              current.updatedAt =
+                new Date()
+                  .toISOString();
 
-            archiveList.textContent =
-                "Inga äldre snackisar ännu.";
 
-            return;
-        }
-
-
-        archiveArticles.forEach(
-            (
-                item,
-                index
-            ) => {
-
-                const article =
-                    item.article ||
-                    {};
-
-
-                const card =
-                    document.createElement(
-                        "div"
-                    );
-
-
-                card.className =
-                    "archive-item";
-
-
-                const meta =
-                    document.createElement(
-                        "div"
-                    );
-
-
-                meta.className =
-                    "archive-meta";
-
-
-                meta.textContent =
-                    [
-                        cleanReaderText(
-                            article.category
-                        ),
-
-                        formatArchiveDate(
-                            item.createdAt
-                        )
-                    ]
-                    .filter(Boolean)
-                    .join(" · ");
-
-
-                const title =
-                    document.createElement(
-                        "span"
-                    );
-
-
-                title.className =
-                    "archive-title";
-
-
-                title.textContent =
-                    cleanReaderText(
-                        article.title
-                    );
-
-
-                const intro =
-                    document.createElement(
-                        "p"
-                    );
-
-
-                intro.className =
-                    "archive-summary";
-
-
-                intro.textContent =
-                    cleanReaderText(
-                        article.summary
-                    );
-
-
-                const open =
-                    document.createElement(
-                        "button"
-                    );
-
-
-                open.className =
-                    "archive-open";
-
-
-                open.type =
-                    "button";
-
-
-                open.textContent =
-                    "Läs snackisen ↓";
-
-
-                open.addEventListener(
-                    "click",
-                    () =>
-                        openArchiveReader(
-                            index
-                        )
-                );
-
-
-                card.append(
-                    meta,
-                    title,
-                    intro,
-                    open
-                );
-
-
-                archiveList.appendChild(
-                    card
-                );
-            }
-        );
-
-
-    } catch (error) {
-
-        console.error(
-            error
-        );
-
-
-        archiveList.textContent =
-            "Arkivet kunde inte hämtas just nu.";
-    }
-}
-
-
-function openArchiveReader(
-    index
-) {
-
-    const item =
-        archiveArticles[
-            index
-        ];
-
-
-    if (!item) {
-        return;
-    }
-
-
-    const article =
-        item.article ||
-        {};
-
-
-    const reader =
-        document.getElementById(
-            "archive-reader"
-        );
-
-
-    const content =
-        document.getElementById(
-            "archive-reader-content"
-        );
-
-
-    content.innerHTML =
-        "";
-
-
-    document
-        .getElementById(
-            "archive-reader-meta"
-        )
-        .textContent =
-            [
-                cleanReaderText(
-                    article.category
+              await store.setJSON(
+                engagementKey(
+                  articleId
                 ),
-
-                formatArchiveDate(
-                    item.createdAt
-                )
-            ]
-            .filter(Boolean)
-            .join(" · ");
+                current
+              );
 
 
-    document
-        .getElementById(
-            "archive-reader-title"
-        )
-        .textContent =
-            cleanReaderText(
-                article.title
-            );
+              return current;
+            }
+        });
 
 
-    for (
-        const paragraph
-        of safeArray(
-            article.paragraphs
-        )
-    ) {
-
-        const cleaned =
-            cleanReaderText(
-                paragraph
-            );
-
-
-        if (!cleaned) {
-            continue;
-        }
-
-
-        const p =
-            document.createElement(
-                "p"
-            );
-
-
-        p.textContent =
-            cleaned;
-
-
-        content.appendChild(
-            p
-        );
-    }
-
-
-    const byline =
-        cleanReaderText(
-            item.byline ||
-            article.byline ||
-            ""
-        );
-
-
-    document
-        .getElementById(
-            "archive-reader-byline"
-        )
-        .textContent =
-            byline
-                ? `Serverad av ${byline} ☕`
-                : "";
-
-
-    reader.classList.add(
-        "is-open"
-    );
-
-
-    reader.scrollIntoView({
-        behavior:
-            "smooth",
-
-        block:
-            "start"
-    });
-}
-
-
-function closeArchiveReader() {
-
-    const reader =
-        document.getElementById(
-            "archive-reader"
-        );
-
-
-    reader.classList.remove(
-        "is-open"
-    );
-}
-
-
-function formatPublishedTime(
-    isoDate
-) {
-
-    if (!isoDate) {
-        return "";
-    }
-
-
-    return new Intl.DateTimeFormat(
-        "sv-SE",
+      return jsonResponse(
         {
-            timeZone:
-                "Europe/Stockholm",
-
-            day:
-                "numeric",
-
-            month:
-                "long",
-
-            hour:
-                "2-digit",
-
-            minute:
-                "2-digit"
+          success: true,
+          engagement:
+            result
         }
-    )
-    .format(
-        new Date(
-            isoDate
-        )
-    );
-}
-
-
-function formatArchiveDate(
-    isoDate
-) {
-
-    if (!isoDate) {
-        return "";
+      );
     }
 
 
-    return new Intl.DateTimeFormat(
-        "sv-SE",
-        {
-            timeZone:
-                "Europe/Stockholm",
-
-            day:
-                "numeric",
-
-            month:
-                "long"
-        }
-    )
-    .format(
-        new Date(
-            isoDate
-        )
+    return jsonResponse(
+      {
+        success: false,
+        error:
+          "Metoden stöds inte."
+      },
+      405
     );
-}
 
 
-function voteThumb(
-    id
-) {
+  } catch (error) {
 
     if (
-        votes[id]
+      error instanceof
+      PublicError
     ) {
-        return;
+
+      return jsonResponse(
+        {
+          success: false,
+          error:
+            error.message
+        },
+        error.status
+      );
     }
 
 
-    votes[id] =
-        true;
+    console.error(
+      "Engagement-fel:",
+      error
+    );
 
 
-    const element =
-        document.getElementById(
-            "count-" +
-            id
-        );
+    return jsonResponse(
+      {
+        success: false,
+        error:
+          "Fikarummet kunde inte uppdateras."
+      },
+      500
+    );
+  }
+};
 
 
-    element.textContent =
-        Number(
-            element.textContent
-        )
-        +
-        1;
+/* =========================================================
+   DATA
+========================================================= */
+
+
+function emptyEngagement(
+  articleId
+) {
+
+  return {
+
+    articleId,
+
+    thumbs: {
+      up: 0,
+      down: 0
+    },
+
+    poll: [
+      0,
+      0
+    ],
+
+    comments: [],
+
+    updatedAt:
+      null
+  };
 }
 
 
-async function copyLink() {
+async function readEngagement(
+  store,
+  articleId
+) {
 
-    try {
+  const saved =
+    await store.get(
+      engagementKey(
+        articleId
+      ),
+      {
+        type:
+          "json",
 
-        await navigator
-            .clipboard
-            .writeText(
-                window.location.href
+        consistency:
+          "strong"
+      }
+    );
+
+
+  if (!saved) {
+
+    return emptyEngagement(
+      articleId
+    );
+  }
+
+
+  return {
+
+    articleId,
+
+    thumbs: {
+
+      up:
+        safeNumber(
+          saved.thumbs?.up
+        ),
+
+      down:
+        safeNumber(
+          saved.thumbs?.down
+        )
+    },
+
+    poll: [
+
+      safeNumber(
+        saved.poll?.[0]
+      ),
+
+      safeNumber(
+        saved.poll?.[1]
+      )
+    ],
+
+    comments:
+      Array.isArray(
+        saved.comments
+      )
+        ? saved.comments
+            .slice(
+              0,
+              MAX_COMMENTS
+            )
+        : [],
+
+    updatedAt:
+      saved.updatedAt ||
+      null
+  };
+}
+
+
+function engagementKey(
+  articleId
+) {
+
+  return (
+    "engagement/"
+    +
+    articleId
+  );
+}
+
+
+/* =========================================================
+   LÅS – SKYDD MOT SAMTIDIGA RÖSTER
+========================================================= */
+
+
+async function withArticleLock({
+  store,
+  articleId,
+  task
+}) {
+
+  const lockKey =
+    `_locks/engagement-${articleId}`;
+
+
+  const token =
+    `${Date.now()}-${Math.random()
+      .toString(36)
+      .slice(2)}`;
+
+
+  const timeoutAt =
+    Date.now() +
+    5000;
+
+
+  while (
+    Date.now() <
+    timeoutAt
+  ) {
+
+    const existing =
+      await store.get(
+        lockKey,
+        {
+          type:
+            "json",
+
+          consistency:
+            "strong"
+        }
+      );
+
+
+    if (
+      existing?.startedAt
+    ) {
+
+      const age =
+        Date.now()
+        -
+        new Date(
+          existing.startedAt
+        )
+          .getTime();
+
+
+      if (
+        Number.isFinite(
+          age
+        )
+        &&
+        age >
+          8000
+      ) {
+
+        await store.delete(
+          lockKey
+        );
+      }
+    }
+
+
+    const lockResult =
+      await store.setJSON(
+        lockKey,
+        {
+          token,
+
+          startedAt:
+            new Date()
+              .toISOString()
+        },
+        {
+          onlyIfNew:
+            true
+        }
+      );
+
+
+    if (
+      lockResult.modified
+    ) {
+
+      try {
+
+        return await task();
+
+      } finally {
+
+        try {
+
+          const current =
+            await store.get(
+              lockKey,
+              {
+                type:
+                  "json",
+
+                consistency:
+                  "strong"
+              }
             );
 
 
-        alert(
-            "Länken är kopierad – skicka den till fikagänget! ☕"
-        );
+          if (
+            current?.token ===
+            token
+          ) {
 
+            await store.delete(
+              lockKey
+            );
+          }
 
-    } catch {
-
-        alert(
-            "Kunde inte kopiera länken."
-        );
+        } catch {
+          // Låt aldrig upplåsningen krascha svaret.
+        }
+      }
     }
+
+
+    await sleep(
+      120
+    );
+  }
+
+
+  throw new PublicError(
+    "Fikarummet är extra populärt just nu. Försök igen om en sekund.",
+    409
+  );
 }
 
 
-function submitPoll() {
-
-    const selected =
-        document.querySelector(
-            'input[name="poll"]:checked'
-        );
+/* =========================================================
+   HJÄLPFUNKTIONER
+========================================================= */
 
 
-    if (!selected) {
+class PublicError
+  extends Error {
 
-        alert(
-            "Välj ett alternativ först!"
-        );
+  constructor(
+    message,
+    status
+  ) {
 
-        return;
-    }
+    super(
+      message
+    );
 
-
-    document
-        .getElementById(
-            "poll-form"
-        )
-        .style.display =
-            "none";
-
-
-    document
-        .getElementById(
-            "poll-results"
-        )
-        .style.display =
-            "block";
+    this.status =
+      status;
+  }
 }
 
 
-function addComment() {
+function sanitizeArticleId(
+  value
+) {
 
-    const nameInput =
-        document.getElementById(
-            "comment-name"
-        );
-
-
-    const textInput =
-        document.getElementById(
-            "comment-text"
-        );
+  const text =
+    String(
+      value ||
+      ""
+    )
+      .trim();
 
 
-    const name =
-        nameInput.value.trim()
-        ||
-        "Anonym kollega";
+  if (
+    !/^[a-zA-Z0-9_-]{4,80}$/.test(
+      text
+    )
+  ) {
+
+    return null;
+  }
 
 
-    const text =
-        textInput.value.trim();
+  return text;
+}
 
 
-    if (!text) {
+function sanitizePlainText(
+  value,
+  maxLength
+) {
 
-        alert(
-            "Skriv vad fikabordet säger först!"
-        );
+  return String(
+    value ||
+    ""
+  )
 
-        return;
-    }
+    .replace(
+      /[\u0000-\u001F\u007F]/g,
+      " "
+    )
 
+    .replace(
+      /\s+/g,
+      " "
+    )
 
-    const div =
-        document.createElement(
-            "div"
-        );
+    .trim()
 
-
-    div.className =
-        "comment-item";
-
-
-    const strong =
-        document.createElement(
-            "strong"
-        );
-
-
-    strong.textContent =
-        name;
+    .slice(
+      0,
+      maxLength
+    );
+}
 
 
-    div.appendChild(
-        strong
+function safeNumber(
+  value
+) {
+
+  const number =
+    Number(
+      value
     );
 
 
-    div.append(
-        ": "
-        +
-        text
-    );
+  if (
+    !Number.isFinite(
+      number
+    )
+    ||
+    number < 0
+  ) {
+
+    return 0;
+  }
 
 
-    document
-        .getElementById(
-            "comments-list"
-        )
-        .prepend(
-            div
-        );
-
-
-    nameInput.value =
-        "";
-
-
-    textInput.value =
-        "";
+  return Math.floor(
+    number
+  );
 }
 
 
-async function startKafferasten() {
+function createCommentId() {
 
-    await loadLatestNews();
-
-    await loadArchive();
+  return (
+    Date.now()
+      .toString(36)
+    +
+    "-"
+    +
+    Math.random()
+      .toString(36)
+      .slice(2, 8)
+  );
 }
 
 
-startKafferasten();
+function sleep(
+  milliseconds
+) {
+
+  return new Promise(
+    resolve =>
+      setTimeout(
+        resolve,
+        milliseconds
+      )
+  );
+}
 
 
-</script>
+function jsonResponse(
+  data,
+  status = 200
+) {
 
+  return new Response(
+    JSON.stringify(
+      data,
+      null,
+      2
+    ),
+    {
+      status,
 
-</body>
+      headers: {
 
-</html>
+        "Content-Type":
+          "application/json; charset=utf-8",
+
+        "Cache-Control":
+          "no-store"
+      }
+    }
+  );
+}
