@@ -3,11 +3,19 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Kafferasten.se – Dagens snackis till fikat</title>
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        Kafferasten.se – Dagens snackis till fikat
+    </title>
+
 
     <style>
+
         :root {
             --bg-color: #F8F4EE;
             --card-bg: #FFFFFF;
@@ -20,386 +28,884 @@
             --highlight-bg: #EFE4D8;
         }
 
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-color);
-            background-image: radial-gradient(#E2D7CD 0.75px, transparent 0.75px);
-            background-size: 16px 16px;
-            color: var(--text-color);
-            line-height: 1.6;
-            margin: 0;
-            padding: 0;
+            font-family:
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                Roboto,
+                Helvetica,
+                Arial,
+                sans-serif;
+
+            background-color:
+                var(--bg-color);
+
+            background-image:
+                radial-gradient(
+                    #E2D7CD 0.75px,
+                    transparent 0.75px
+                );
+
+            background-size:
+                16px 16px;
+
+            color:
+                var(--text-color);
+
+            line-height:
+                1.6;
+
+            margin:
+                0;
+
+            padding:
+                0;
         }
+
 
         header {
-            background-color: var(--primary-color);
-            color: white;
-            padding: 2.5rem 1rem;
-            text-align: center;
-            border-bottom: 4px solid var(--accent-color);
+            background-color:
+                var(--primary-color);
+
+            color:
+                white;
+
+            padding:
+                2.5rem 1rem;
+
+            text-align:
+                center;
+
+            border-bottom:
+                4px solid
+                var(--accent-color);
         }
+
 
         header h1 {
-            margin: 0;
-            font-size: 2.5rem;
-            font-weight: 800;
-            letter-spacing: -0.5px;
+            margin:
+                0;
+
+            font-size:
+                2.5rem;
+
+            font-weight:
+                800;
+
+            letter-spacing:
+                -0.5px;
         }
+
 
         header a {
-            color: white;
-            text-decoration: none;
+            color:
+                white;
+
+            text-decoration:
+                none;
         }
+
 
         header p {
-            margin: 0.5rem 0 0;
-            color: #E2D7CD;
-            font-size: 1.15rem;
-            font-weight: 300;
+            margin:
+                0.5rem 0 0;
+
+            color:
+                #E2D7CD;
+
+            font-size:
+                1.15rem;
+
+            font-weight:
+                300;
         }
+
 
         .schedule-banner {
-            background-color: var(--highlight-bg);
-            border-bottom: 1px solid var(--border-color);
-            color: var(--primary-color);
-            text-align: center;
-            padding: 0.85rem 1rem;
-            font-size: 0.95rem;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 1.5rem;
-            flex-wrap: wrap;
+            background-color:
+                var(--highlight-bg);
+
+            border-bottom:
+                1px solid
+                var(--border-color);
+
+            color:
+                var(--primary-color);
+
+            text-align:
+                center;
+
+            padding:
+                0.85rem 1rem;
+
+            font-size:
+                0.95rem;
+
+            font-weight:
+                500;
+
+            display:
+                flex;
+
+            align-items:
+                center;
+
+            justify-content:
+                center;
+
+            gap:
+                1.5rem;
+
+            flex-wrap:
+                wrap;
         }
+
 
         .status-badge {
-            background: #28a745;
-            color: white;
-            padding: 0.2rem 0.6rem;
-            border-radius: 12px;
-            font-size: 0.8rem;
-            font-weight: bold;
+            background:
+                #28a745;
+
+            color:
+                white;
+
+            padding:
+                0.2rem 0.6rem;
+
+            border-radius:
+                12px;
+
+            font-size:
+                0.8rem;
+
+            font-weight:
+                bold;
         }
+
 
         .container {
-            max-width: 1040px;
-            margin: 2rem auto;
-            padding: 0 1rem;
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 2rem;
+            max-width:
+                1040px;
+
+            margin:
+                2rem auto;
+
+            padding:
+                0 1rem;
+
+            display:
+                grid;
+
+            grid-template-columns:
+                2fr 1fr;
+
+            gap:
+                2rem;
         }
 
-        @media (max-width: 768px) {
+
+        .card {
+            background:
+                var(--card-bg);
+
+            border:
+                1px solid
+                var(--border-color);
+
+            border-radius:
+                16px;
+
+            padding:
+                1.8rem;
+
+            margin-bottom:
+                1.5rem;
+
+            box-shadow:
+                0 4px 12px
+                rgba(
+                    45,
+                    26,
+                    23,
+                    0.04
+                );
+        }
+
+
+        .tag {
+            display:
+                inline-block;
+
+            background:
+                var(--accent-color);
+
+            color:
+                white;
+
+            padding:
+                0.25rem 0.75rem;
+
+            border-radius:
+                20px;
+
+            font-size:
+                0.75rem;
+
+            font-weight:
+                700;
+
+            text-transform:
+                uppercase;
+
+            letter-spacing:
+                0.5px;
+
+            margin-bottom:
+                1rem;
+        }
+
+
+        h2 {
+            color:
+                var(--primary-color);
+
+            margin-top:
+                0;
+
+            font-size:
+                1.9rem;
+
+            line-height:
+                1.25;
+        }
+
+
+        h3 {
+            color:
+                var(--primary-color);
+
+            margin-top:
+                0;
+        }
+
+
+        .article-hero-img {
+            width:
+                100%;
+
+            height:
+                260px;
+
+            object-fit:
+                cover;
+
+            border-radius:
+                12px;
+
+            margin-bottom:
+                1.2rem;
+        }
+
+
+        .summary-box {
+            background-color:
+                var(--bg-color);
+
+            border-left:
+                4px solid
+                var(--accent-color);
+
+            padding:
+                1.2rem;
+
+            margin:
+                1.2rem 0;
+
+            border-radius:
+                0 12px 12px 0;
+        }
+
+
+        .summary-box strong {
+            color:
+                var(--primary-color);
+
+            display:
+                block;
+
+            margin-bottom:
+                0.3rem;
+
+            font-size:
+                1.05rem;
+        }
+
+
+        .article-content p {
+            font-size:
+                1.05rem;
+
+            margin-bottom:
+                1.2rem;
+
+            color:
+                #382A25;
+        }
+
+
+        .fresh-info {
+            color:
+                var(--text-muted);
+
+            font-size:
+                0.85rem;
+
+            margin-bottom:
+                1.2rem;
+        }
+
+
+        .why-box {
+            background:
+                var(--highlight-bg);
+
+            padding:
+                1.2rem;
+
+            border-radius:
+                12px;
+
+            margin:
+                1.5rem 0;
+        }
+
+
+        .why-box ul {
+            margin-bottom:
+                0;
+        }
+
+
+        /*
+        ==================================================
+        NYTT: SKRIBENTSIGNATUR
+        ==================================================
+        */
+
+        .byline {
+            display:
+                none;
+
+            margin:
+                1.4rem 0 0.5rem;
+
+            padding-top:
+                1rem;
+
+            border-top:
+                1px solid
+                var(--border-color);
+
+            color:
+                var(--text-muted);
+
+            font-size:
+                0.92rem;
+
+            font-style:
+                italic;
+        }
+
+
+        .byline-name {
+            color:
+                var(--primary-color);
+
+            font-style:
+                normal;
+
+            font-weight:
+                750;
+        }
+
+
+        .btn-group {
+            display:
+                flex;
+
+            gap:
+                0.6rem;
+
+            flex-wrap:
+                wrap;
+
+            margin-top:
+                0.8rem;
+        }
+
+
+        .btn {
+            background:
+                var(--bg-color);
+
+            border:
+                1px solid
+                var(--border-color);
+
+            color:
+                var(--text-color);
+
+            padding:
+                0.65rem 1.2rem;
+
+            border-radius:
+                10px;
+
+            cursor:
+                pointer;
+
+            font-weight:
+                600;
+
+            font-size:
+                0.9rem;
+
+            transition:
+                all 0.2s ease;
+        }
+
+
+        .btn:hover {
+            background:
+                var(--accent-color);
+
+            color:
+                white;
+
+            border-color:
+                var(--accent-color);
+        }
+
+
+        .poll-option {
+            display:
+                block;
+
+            background:
+                var(--bg-color);
+
+            padding:
+                0.85rem 1rem;
+
+            border-radius:
+                10px;
+
+            margin-bottom:
+                0.6rem;
+
+            cursor:
+                pointer;
+
+            border:
+                1px solid
+                var(--border-color);
+        }
+
+
+        .poll-option:hover {
+            background:
+                var(--highlight-bg);
+        }
+
+
+        .poll-results {
+            display:
+                none;
+
+            margin-top:
+                1rem;
+
+            background:
+                var(--bg-color);
+
+            padding:
+                1.2rem;
+
+            border-radius:
+                10px;
+        }
+
+
+        .comment-input {
+            width:
+                100%;
+
+            padding:
+                0.8rem;
+
+            border:
+                1px solid
+                var(--border-color);
+
+            border-radius:
+                10px;
+
+            margin-bottom:
+                0.8rem;
+
+            font-family:
+                inherit;
+
+            box-sizing:
+                border-box;
+
+            background:
+                var(--bg-color);
+        }
+
+
+        .comment-input:focus {
+            outline:
+                none;
+
+            border-color:
+                var(--accent-color);
+        }
+
+
+        .comment-item {
+            background:
+                var(--bg-color);
+
+            padding:
+                0.8rem 1rem;
+
+            border-radius:
+                10px;
+
+            margin-bottom:
+                0.6rem;
+
+            border:
+                1px solid
+                var(--border-color);
+        }
+
+
+        .comment-item strong {
+            color:
+                var(--primary-color);
+
+            display:
+                block;
+
+            font-size:
+                0.85rem;
+        }
+
+
+        .fika-img {
+            width:
+                100%;
+
+            height:
+                200px;
+
+            object-fit:
+                cover;
+
+            border-radius:
+                10px;
+
+            margin-bottom:
+                1rem;
+        }
+
+
+        .coming-soon {
+            color:
+                var(--text-muted);
+
+            font-size:
+                0.9rem;
+        }
+
+
+        .archive-grid {
+            display:
+                grid;
+
+            gap:
+                1rem;
+        }
+
+
+        .archive-item {
+            background:
+                var(--bg-color);
+
+            border:
+                1px solid
+                var(--border-color);
+
+            border-radius:
+                12px;
+
+            overflow:
+                hidden;
+        }
+
+
+        .archive-item summary {
+            list-style:
+                none;
+
+            cursor:
+                pointer;
+
+            padding:
+                1.2rem;
+        }
+
+
+        .archive-item summary::-webkit-details-marker {
+            display:
+                none;
+        }
+
+
+        .archive-item summary:hover {
+            background:
+                var(--highlight-bg);
+        }
+
+
+        .archive-meta {
+            font-size:
+                0.8rem;
+
+            color:
+                var(--text-muted);
+
+            margin-bottom:
+                0.35rem;
+        }
+
+
+        .archive-title {
+            display:
+                block;
+
+            color:
+                var(--primary-color);
+
+            font-size:
+                1.15rem;
+
+            font-weight:
+                750;
+
+            line-height:
+                1.3;
+
+            margin-bottom:
+                0.4rem;
+        }
+
+
+        .archive-summary {
+            margin:
+                0;
+
+            color:
+                var(--text-color);
+
+            font-size:
+                0.95rem;
+        }
+
+
+        .archive-open {
+            display:
+                inline-block;
+
+            margin-top:
+                0.7rem;
+
+            color:
+                var(--accent-color);
+
+            font-size:
+                0.9rem;
+
+            font-weight:
+                700;
+        }
+
+
+        .archive-content {
+            padding:
+                0 1.2rem 1.2rem;
+
+            border-top:
+                1px solid
+                var(--border-color);
+        }
+
+
+        .archive-content p {
+            font-size:
+                0.95rem;
+        }
+
+
+        .archive-byline {
+            margin-top:
+                1rem;
+
+            color:
+                var(--text-muted);
+
+            font-size:
+                0.85rem;
+
+            font-style:
+                italic;
+        }
+
+
+        footer {
+            text-align:
+                center;
+
+            padding:
+                2.5rem 1rem;
+
+            color:
+                var(--text-muted);
+
+            font-size:
+                0.9rem;
+
+            border-top:
+                1px solid
+                var(--border-color);
+
+            margin-top:
+                3rem;
+        }
+
+
+        @media (
+            max-width: 768px
+        ) {
+
             .container {
-                grid-template-columns: 1fr;
+                grid-template-columns:
+                    1fr;
+
+                margin-top:
+                    1rem;
+            }
+
+
+            header {
+                padding:
+                    2rem 1rem;
+            }
+
+
+            header h1 {
+                font-size:
+                    2rem;
+            }
+
+
+            h2 {
+                font-size:
+                    1.65rem;
+            }
+
+
+            .card {
+                padding:
+                    1.3rem;
+            }
+
+
+            .article-hero-img {
+                height:
+                    220px;
             }
         }
 
-        .card {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 1.8rem;
-            margin-bottom: 1.5rem;
-            box-shadow: 0 4px 12px rgba(45, 26, 23, 0.04);
-        }
-
-        .tag {
-            display: inline-block;
-            background: var(--accent-color);
-            color: white;
-            padding: 0.25rem 0.75rem;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 1rem;
-        }
-
-        h2 {
-            color: var(--primary-color);
-            margin-top: 0;
-            font-size: 1.9rem;
-            line-height: 1.25;
-        }
-
-        h3 {
-            color: var(--primary-color);
-            margin-top: 0;
-        }
-
-        .article-hero-img {
-            width: 100%;
-            height: 260px;
-            object-fit: cover;
-            border-radius: 12px;
-            margin-bottom: 1.2rem;
-        }
-
-        .summary-box {
-            background-color: var(--bg-color);
-            border-left: 4px solid var(--accent-color);
-            padding: 1.2rem;
-            margin: 1.2rem 0;
-            border-radius: 0 12px 12px 0;
-        }
-
-        .summary-box strong {
-            color: var(--primary-color);
-            display: block;
-            margin-bottom: 0.3rem;
-            font-size: 1.05rem;
-        }
-
-        .article-content p {
-            font-size: 1.05rem;
-            margin-bottom: 1.2rem;
-            color: #382A25;
-        }
-
-        .why-box {
-            background: var(--highlight-bg);
-            padding: 1.2rem;
-            border-radius: 12px;
-            margin: 1.5rem 0;
-        }
-
-        .why-box ul {
-            margin-bottom: 0;
-        }
-
-        .fresh-info {
-            color: var(--text-muted);
-            font-size: 0.85rem;
-            margin-bottom: 1.2rem;
-        }
-
-        .btn-group {
-            display: flex;
-            gap: 0.6rem;
-            flex-wrap: wrap;
-            margin-top: 0.8rem;
-        }
-
-        .btn {
-            background: var(--bg-color);
-            border: 1px solid var(--border-color);
-            color: var(--text-color);
-            padding: 0.65rem 1.2rem;
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 0.9rem;
-            transition: all 0.2s ease;
-        }
-
-        .btn:hover {
-            background: var(--accent-color);
-            color: white;
-            border-color: var(--accent-color);
-        }
-
-        .sources-list {
-            list-style: none;
-            padding: 0;
-            margin: 0.6rem 0 0;
-        }
-
-        .sources-list li {
-            margin-bottom: 0.6rem;
-        }
-
-        .sources-list a {
-            color: var(--accent-color);
-            text-decoration: none;
-            font-weight: 600;
-        }
-
-        .sources-list a:hover {
-            text-decoration: underline;
-        }
-
-        .poll-option {
-            display: block;
-            background: var(--bg-color);
-            padding: 0.85rem 1rem;
-            border-radius: 10px;
-            margin-bottom: 0.6rem;
-            cursor: pointer;
-            border: 1px solid var(--border-color);
-        }
-
-        .poll-option:hover {
-            background: var(--highlight-bg);
-        }
-
-        .poll-results {
-            display: none;
-            margin-top: 1rem;
-            background: var(--bg-color);
-            padding: 1.2rem;
-            border-radius: 10px;
-        }
-
-        .comment-input {
-            width: 100%;
-            padding: 0.8rem;
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            margin-bottom: 0.8rem;
-            font-family: inherit;
-            box-sizing: border-box;
-            background: var(--bg-color);
-        }
-
-        .comment-input:focus {
-            outline: none;
-            border-color: var(--accent-color);
-        }
-
-        .comment-item {
-            background: var(--bg-color);
-            padding: 0.8rem 1rem;
-            border-radius: 10px;
-            margin-bottom: 0.6rem;
-            border: 1px solid var(--border-color);
-        }
-
-        .comment-item strong {
-            color: var(--primary-color);
-            display: block;
-            font-size: 0.85rem;
-        }
-
-        .fika-img {
-            width: 100%;
-            height: 200px;
-            object-fit: cover;
-            border-radius: 10px;
-            margin-bottom: 1rem;
-        }
-
-        .coming-soon {
-            color: var(--text-muted);
-            font-size: 0.9rem;
-        }
-
-        .archive-grid {
-            display: grid;
-            gap: 1rem;
-        }
-
-        .archive-item {
-            background: var(--bg-color);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            overflow: hidden;
-        }
-
-        .archive-item summary {
-            list-style: none;
-            cursor: pointer;
-            padding: 1.2rem;
-        }
-
-        .archive-item summary::-webkit-details-marker {
-            display: none;
-        }
-
-        .archive-item summary:hover {
-            background: var(--highlight-bg);
-        }
-
-        .archive-meta {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            margin-bottom: 0.35rem;
-        }
-
-        .archive-title {
-            display: block;
-            color: var(--primary-color);
-            font-size: 1.15rem;
-            font-weight: 750;
-            line-height: 1.3;
-            margin-bottom: 0.4rem;
-        }
-
-        .archive-summary {
-            margin: 0;
-            color: var(--text-color);
-            font-size: 0.95rem;
-        }
-
-        .archive-open {
-            display: inline-block;
-            margin-top: 0.7rem;
-            color: var(--accent-color);
-            font-size: 0.9rem;
-            font-weight: 700;
-        }
-
-        .archive-content {
-            padding: 0 1.2rem 1.2rem;
-            border-top: 1px solid var(--border-color);
-        }
-
-        .archive-content p {
-            font-size: 0.95rem;
-        }
-
-        .archive-sources {
-            margin-top: 1rem;
-            font-size: 0.85rem;
-        }
-
-        .archive-sources a {
-            color: var(--accent-color);
-        }
-
-        footer {
-            text-align: center;
-            padding: 2.5rem 1rem;
-            color: var(--text-muted);
-            font-size: 0.9rem;
-            border-top: 1px solid var(--border-color);
-            margin-top: 3rem;
-        }
     </style>
 </head>
 
+
 <body>
 
+
 <header>
-    <h1><a href="/">☕ Kafferasten.se</a></h1>
-    <p>Dagens snackisar och samtalsämnen till fikarasten</p>
+
+    <h1>
+        <a href="/">
+            ☕ Kafferasten.se
+        </a>
+    </h1>
+
+    <p>
+        Dagens snackisar och samtalsämnen till fikarasten
+    </p>
+
 </header>
 
+
 <div class="schedule-banner">
+
     <span>
-        ⏰ <strong>RYKANDE FÄRSKT:</strong>
-        <span id="fika-time-text">Hämtar senaste snackisen...</span>
+
+        ⏰
+        <strong>
+            RYKANDE FÄRSKT:
+        </strong>
+
+        <span id="fika-time-text">
+            Hämtar senaste snackisen...
+        </span>
+
     </span>
 
-    <span class="status-badge">☕ Nybryggt</span>
+
+    <span class="status-badge">
+        ☕ Nybryggt
+    </span>
+
 </div>
+
 
 <div class="container">
 
+
 <main>
+
 
     <article class="card">
 
-        <span class="tag" id="fika-badge">
+
+        <span
+            class="tag"
+            id="fika-badge"
+        >
             ☕ DAGENS SNACKIS
         </span>
+
 
         <h2 id="article-title">
             Brygger dagens snackis...
         </h2>
+
 
         <img
             id="article-img"
@@ -408,83 +914,186 @@
             class="article-hero-img"
         >
 
+
         <div
             class="summary-box"
             id="summary-box"
             style="display:none;"
         >
-            <strong>⚡ Snabböversikt</strong>
-            <span id="article-summary"></span>
+
+            <strong>
+                ⚡ Snabböversikt
+            </strong>
+
+            <span id="article-summary">
+            </span>
+
         </div>
+
 
         <div
             class="fresh-info"
-            id="fresh-info">
+            id="fresh-info"
+        >
         </div>
+
 
         <div
             class="article-content"
             id="article-text"
         >
-            <p>Hämtar senaste snackisen från redaktionen...</p>
+
+            <p>
+                Hämtar senaste snackisen från redaktionen...
+            </p>
+
         </div>
+
 
         <div
             class="why-box"
             id="why-box"
             style="display:none;"
         >
-            <strong>☕ Därför passar den på fikat</strong>
-            <ul id="why-list"></ul>
+
+            <strong>
+                ☕ Därför passar den på fikat
+            </strong>
+
+            <ul id="why-list">
+            </ul>
+
         </div>
 
-        <hr style="border:0; border-top:1px solid var(--border-color); margin:1.5rem 0;">
 
-        <strong>Blev det ett bra samtalsämne på rasten?</strong>
+        <!--
+        ==============================================
+        NYTT: SKRIBENTSIGNATUR
+        ==============================================
+        -->
+
+        <div
+            class="byline"
+            id="article-byline"
+        >
+
+            Skrivet av
+            <span
+                class="byline-name"
+                id="article-byline-name"
+            >
+            </span>
+
+            ☕
+
+        </div>
+
+
+        <hr
+            style="
+                border:0;
+                border-top:1px solid var(--border-color);
+                margin:1.5rem 0;
+            "
+        >
+
+
+        <strong>
+            Blev det ett bra samtalsämne på rasten?
+        </strong>
+
 
         <div class="btn-group">
-            <button class="btn" onclick="voteThumb('main-up')">
-                👍 Ja, bra snack! (<span id="count-main-up">0</span>)
+
+            <button
+                class="btn"
+                onclick="voteThumb('main-up')"
+            >
+
+                👍 Ja, bra snack!
+                (
+                <span id="count-main-up">
+                    0
+                </span>
+                )
+
             </button>
 
-            <button class="btn" onclick="voteThumb('main-down')">
-                👎 Nja, segt ämne (<span id="count-main-down">0</span>)
+
+            <button
+                class="btn"
+                onclick="voteThumb('main-down')"
+            >
+
+                👎 Nja, segt ämne
+                (
+                <span id="count-main-down">
+                    0
+                </span>
+                )
+
             </button>
+
         </div>
 
-        <div style="margin-top:1.5rem;">
-            <strong>Dela med kollegan:</strong>
+
+        <div
+            style="
+                margin-top:1.5rem;
+            "
+        >
+
+            <strong>
+                Dela med kollegan:
+            </strong>
+
 
             <div class="btn-group">
-                <button class="btn" onclick="copyLink()">
+
+                <button
+                    class="btn"
+                    onclick="copyLink()"
+                >
                     🔗 Kopiera länk
                 </button>
+
             </div>
+
         </div>
 
-        <div style="margin-top:1.5rem;">
-            <strong>Källor</strong>
 
-            <ul class="sources-list" id="article-sources">
-                <li>Hämtar källor...</li>
-            </ul>
-        </div>
+        <!--
+        KÄLLORNA FINNS FORTFARANDE I DATAN,
+        MEN VISAS INTE LÄNGRE PUBLIKT.
+        -->
+
 
     </article>
 
+
     <section class="card">
 
-        <h3>💬 Dagens fikafråga</h3>
+
+        <h3>
+            💬 Dagens fikafråga
+        </h3>
+
 
         <p>
+
             <strong id="poll-question">
                 Hämtar fråga...
             </strong>
+
         </p>
+
 
         <div id="poll-form">
 
-            <div id="poll-options-container"></div>
+
+            <div id="poll-options-container">
+            </div>
+
 
             <button
                 onclick="submitPoll()"
@@ -499,15 +1108,31 @@
                 Skicka din röst
             </button>
 
+
         </div>
 
-        <div id="poll-results" class="poll-results">
+
+        <div
+            id="poll-results"
+            class="poll-results"
+        >
             ☕ Tack för din röst!
         </div>
 
-        <hr style="border:0; border-top:1px solid var(--border-color); margin:1.8rem 0 1.2rem;">
 
-        <h4>💭 Vad sägs i ert fikarum?</h4>
+        <hr
+            style="
+                border:0;
+                border-top:1px solid var(--border-color);
+                margin:1.8rem 0 1.2rem;
+            "
+        >
+
+
+        <h4>
+            💭 Vad sägs i ert fikarum?
+        </h4>
+
 
         <input
             type="text"
@@ -516,12 +1141,14 @@
             class="comment-input"
         >
 
+
         <textarea
             id="comment-text"
             placeholder="Skriv en kommentar..."
             rows="3"
             class="comment-input"
         ></textarea>
+
 
         <button
             onclick="addComment()"
@@ -534,34 +1161,66 @@
             Skicka kommentar
         </button>
 
-        <div id="comments-list" style="margin-top:1.2rem;"></div>
+
+        <div
+            id="comments-list"
+            style="
+                margin-top:1.2rem;
+            "
+        >
+        </div>
+
 
     </section>
+
 
     <section class="card">
 
-        <h3>📜 Tidigare snackisar</h3>
 
-        <p style="color:var(--text-muted); font-size:0.9rem;">
-            Missade du fikat? Här är de senaste snackisarna.
+        <h3>
+            📜 Tidigare snackisar
+        </h3>
+
+
+        <p
+            style="
+                color:var(--text-muted);
+                font-size:0.9rem;
+            "
+        >
+            Missade du fikat?
+            Här är de senaste snackisarna.
         </p>
 
-        <div id="archive-list" class="archive-grid">
+
+        <div
+            id="archive-list"
+            class="archive-grid"
+        >
+
             <p class="coming-soon">
                 Hämtar tidigare snackisar...
             </p>
+
         </div>
 
+
     </section>
+
 
 </main>
 
 
 <aside>
 
+
     <div class="card">
 
-        <h3>🥐 Dagens fikatips</h3>
+
+        <h3>
+            🥐 Dagens fikatips
+        </h3>
+
 
         <img
             src="https://images.unsplash.com/photo-1555507036-ab1f4038808a?auto=format&fit=crop&w=600&q=80"
@@ -569,88 +1228,168 @@
             class="fika-img"
         >
 
-        <p><strong>Klassisk kanelbulle</strong></p>
+
+        <p>
+            <strong>
+                Klassisk kanelbulle
+            </strong>
+        </p>
+
 
         <p>
             Kanelbulle och kaffe.
-            Svårare än så behöver en svensk fikarast faktiskt inte vara.
+            Svårare än så behöver en svensk fikarast
+            faktiskt inte vara.
         </p>
 
+
     </div>
+
 
     <div class="card">
 
-        <h3>💡 Fikarast-fakta</h3>
 
-        <p style="font-size:0.9rem;">
-            Ordet <strong>fika</strong>
+        <h3>
+            💡 Fikarast-fakta
+        </h3>
+
+
+        <p
+            style="
+                font-size:0.9rem;
+            "
+        >
+
+            Ordet
+            <strong>
+                fika
+            </strong>
+
             brukar kopplas till gammal svensk
             backslang där stavelserna i
             "kaffi" kastades om.
+
         </p>
+
 
     </div>
 
+
 </aside>
+
 
 </div>
 
 
 <footer>
+
     <p>
-        Kafferasten.se – något att prata om när kaffet är klart. ☕
+        Kafferasten.se –
+        något att prata om när kaffet är klart. ☕
     </p>
+
 </footer>
 
 
 <script>
 
     const votes = {};
-    window.currentLatestId = null;
+
+    window.currentLatestId =
+        null;
 
 
-    function cleanText(text) {
+    // =====================================================
+    // TEXTRENGÖRING
+    // =====================================================
+
+    function cleanText(
+        text
+    ) {
 
         if (!text) {
             return "";
         }
 
+
         return String(text)
-            .replace(/\*\*/g, "")
-            .replace(/\*/g, "")
+            .replace(
+                /\*\*/g,
+                ""
+            )
+            .replace(
+                /\*/g,
+                ""
+            )
             .trim();
     }
 
 
-    function safeArray(value) {
+    /*
+    =====================================================
+    NYTT:
+    Ta bort rena URL:er/domännamn från läsartexten.
 
-        return Array.isArray(value)
+    Detta hjälper även äldre artiklar som redan ligger
+    sparade i Blobs.
+    =====================================================
+    */
+
+    function cleanReaderText(
+        text
+    ) {
+
+        if (!text) {
+            return "";
+        }
+
+
+        return cleanText(
+            text
+        )
+            .replace(
+                /https?:\/\/\S+/gi,
+                ""
+            )
+            .replace(
+                /\bwww\.\S+/gi,
+                ""
+            )
+            .replace(
+                /\b[a-z0-9-]+(?:\.[a-z0-9-]+)+\b/gi,
+                ""
+            )
+            .replace(
+                /\(\s*\)/g,
+                ""
+            )
+            .replace(
+                /\s+([,.!?;:])/g,
+                "$1"
+            )
+            .replace(
+                /\s{2,}/g,
+                " "
+            )
+            .trim();
+    }
+
+
+    function safeArray(
+        value
+    ) {
+
+        return Array.isArray(
+            value
+        )
             ? value
             : [];
     }
 
 
-    function safeUrl(url) {
-
-        if (!url) {
-            return null;
-        }
-
-        try {
-
-            return new URL(url);
-
-        } catch {
-
-            console.warn(
-                "Ogiltig käll-URL hoppades över:",
-                url
-            );
-
-            return null;
-        }
-    }
-
+    // =====================================================
+    // SENASTE NYHET
+    // =====================================================
 
     async function loadLatestNews() {
 
@@ -659,26 +1398,25 @@
                 "fika-badge"
             );
 
+
         const timeText =
             document.getElementById(
                 "fika-time-text"
             );
 
+
         try {
 
-            /*
-             * Viktigt:
-             * cache:no-store + tidsstämpel gör att sidan
-             * alltid frågar efter aktuell latest från Netlify.
-             */
             const response =
                 await fetch(
                     "/.netlify/functions/latest-news?t=" +
                     Date.now(),
                     {
-                        cache: "no-store",
+                        cache:
+                            "no-store",
+
                         headers: {
-                            "Accept":
+                            Accept:
                                 "application/json"
                         }
                     }
@@ -687,18 +1425,8 @@
 
             if (!response.ok) {
 
-                const errorText =
-                    await response.text();
-
-                console.error(
-                    "latest-news HTTP-fel:",
-                    response.status,
-                    errorText
-                );
-
                 throw new Error(
-                    "latest-news svarade " +
-                    response.status
+                    "Kunde inte hämta senaste snackisen."
                 );
             }
 
@@ -707,20 +1435,13 @@
                 await response.json();
 
 
-            console.log(
-                "latest-news:",
-                result
-            );
-
-
             if (
-                !result ||
-                result.success !== true ||
+                !result.success ||
                 !result.latest
             ) {
 
                 throw new Error(
-                    "latest-news saknar latest."
+                    "Ingen sparad snackis hittades."
                 );
             }
 
@@ -729,54 +1450,34 @@
                 result.latest;
 
 
-            if (
-                !latest.article ||
-                typeof latest.article !== "object"
-            ) {
-
-                throw new Error(
-                    "Latest saknar article."
-                );
-            }
-
-
             const article =
-                latest.article;
+                latest.article ||
+                {};
 
 
             window.currentLatestId =
-                latest.id || null;
+                latest.id ||
+                null;
 
 
-            /*
-             * RUBRIK OCH KATEGORI
-             */
+            // =================================================
+            // KATEGORI
+            // =================================================
 
             if (badge) {
 
                 badge.textContent =
                     "☕ " +
-                    cleanText(
+                    cleanReaderText(
                         article.category ||
                         "Dagens snackis"
                     );
             }
 
 
-            document
-                .getElementById(
-                    "article-title"
-                )
-                .textContent =
-                    cleanText(
-                        article.title ||
-                        "Dagens snackis"
-                    );
-
-
-            /*
-             * PUBLICERINGSTID
-             */
+            // =================================================
+            // TID
+            // =================================================
 
             if (timeText) {
 
@@ -788,41 +1489,75 @@
             }
 
 
-            /*
-             * SAMMANFATTNING
-             */
+            // =================================================
+            // RUBRIK
+            // =================================================
+
+            const titleElement =
+                document.getElementById(
+                    "article-title"
+                );
+
+
+            if (titleElement) {
+
+                titleElement.textContent =
+                    cleanReaderText(
+                        article.title ||
+                        "Dagens snackis"
+                    );
+            }
+
+
+            // =================================================
+            // SNABBÖVERSIKT
+            // =================================================
 
             const summaryBox =
                 document.getElementById(
                     "summary-box"
                 );
 
-            const articleSummary =
+
+            const summaryText =
                 document.getElementById(
                     "article-summary"
                 );
 
 
-            if (article.summary) {
+            if (
+                article.summary &&
+                summaryBox &&
+                summaryText
+            ) {
 
                 summaryBox.style.display =
                     "block";
 
-                articleSummary.textContent =
-                    cleanText(
+
+                summaryText.textContent =
+                    cleanReaderText(
                         article.summary
                     );
 
-            } else {
+            } else if (
+                summaryBox
+            ) {
 
                 summaryBox.style.display =
                     "none";
             }
 
 
-            /*
-             * FÄRSK NYHETSTRIGGER
-             */
+            // =================================================
+            // DET NYA
+            //
+            // VIKTIG ÄNDRING:
+            // Använd article.freshTrigger.
+            //
+            // Vi visar INTE längre den råa
+            // verifiedTrigger.description.
+            // =================================================
 
             const freshInfo =
                 document.getElementById(
@@ -830,29 +1565,35 @@
                 );
 
 
-            if (
-                latest.verifiedTrigger &&
-                latest.verifiedTrigger.description
-            ) {
+            if (freshInfo) {
 
-                freshInfo.textContent =
-                    "🔥 Det nya: " +
-                    cleanText(
-                        latest
-                            .verifiedTrigger
-                            .description
-                    );
-
-            } else {
-
-                freshInfo.textContent =
+                const freshTrigger =
+                    article.freshTrigger ||
                     "";
+
+
+                if (freshTrigger) {
+
+                    freshInfo.textContent =
+                        "🔥 Det nya: " +
+                        cleanReaderText(
+                            freshTrigger
+                        );
+
+                    freshInfo.style.display =
+                        "block";
+
+                } else {
+
+                    freshInfo.style.display =
+                        "none";
+                }
             }
 
 
-            /*
-             * ARTIKELTEXT
-             */
+            // =================================================
+            // BRÖDTEXT
+            // =================================================
 
             const textBox =
                 document.getElementById(
@@ -860,74 +1601,75 @@
                 );
 
 
-            textBox.innerHTML =
-                "";
+            if (textBox) {
+
+                textBox.innerHTML =
+                    "";
 
 
-            const paragraphs =
-                safeArray(
-                    article.paragraphs
-                );
+                const paragraphs =
+                    safeArray(
+                        article.paragraphs
+                    );
 
-
-            if (paragraphs.length) {
 
                 for (
                     const paragraph
                     of paragraphs
                 ) {
 
+                    const cleaned =
+                        cleanReaderText(
+                            paragraph
+                        );
+
+
+                    if (!cleaned) {
+                        continue;
+                    }
+
+
                     const p =
                         document.createElement(
                             "p"
                         );
 
+
                     p.textContent =
-                        cleanText(
-                            paragraph
-                        );
+                        cleaned;
+
 
                     textBox.appendChild(
                         p
                     );
                 }
 
-            } else if (article.summary) {
 
-                const p =
-                    document.createElement(
-                        "p"
-                    );
+                if (
+                    textBox.children.length === 0
+                ) {
 
-                p.textContent =
-                    cleanText(
-                        article.summary
-                    );
-
-                textBox.appendChild(
-                    p
-                );
-
-            } else {
-
-                textBox.innerHTML =
-                    "<p>Artikeln saknar brödtext.</p>";
+                    textBox.innerHTML =
+                        "<p>Redaktionen laddar kaffet och texten...</p>";
+                }
             }
 
 
-            /*
-             * VARFÖR PRATA OM DET?
-             */
+            // =================================================
+            // VARFÖR PÅ FIKAT
+            // =================================================
 
             const whyBox =
                 document.getElementById(
                     "why-box"
                 );
 
-            const whyList =
+
+            const list =
                 document.getElementById(
                     "why-list"
                 );
+
 
             const reasons =
                 safeArray(
@@ -935,14 +1677,18 @@
                 );
 
 
-            whyList.innerHTML =
-                "";
-
-
-            if (reasons.length) {
+            if (
+                whyBox &&
+                list &&
+                reasons.length
+            ) {
 
                 whyBox.style.display =
                     "block";
+
+
+                list.innerHTML =
+                    "";
 
 
                 for (
@@ -950,31 +1696,92 @@
                     of reasons
                 ) {
 
+                    const cleaned =
+                        cleanReaderText(
+                            reason
+                        );
+
+
+                    if (!cleaned) {
+                        continue;
+                    }
+
+
                     const li =
                         document.createElement(
                             "li"
                         );
 
-                    li.textContent =
-                        cleanText(
-                            reason
-                        );
 
-                    whyList.appendChild(
+                    li.textContent =
+                        cleaned;
+
+
+                    list.appendChild(
                         li
                     );
                 }
 
-            } else {
+
+            } else if (
+                whyBox
+            ) {
 
                 whyBox.style.display =
                     "none";
             }
 
 
-            /*
-             * FIKAFRÅGA
-             */
+            // =================================================
+            // SIGNATUR
+            // =================================================
+
+            const bylineBox =
+                document.getElementById(
+                    "article-byline"
+                );
+
+
+            const bylineName =
+                document.getElementById(
+                    "article-byline-name"
+                );
+
+
+            const byline =
+                cleanReaderText(
+                    latest.byline ||
+                    article.byline ||
+                    ""
+                );
+
+
+            if (
+                byline &&
+                bylineBox &&
+                bylineName
+            ) {
+
+                bylineName.textContent =
+                    byline;
+
+
+                bylineBox.style.display =
+                    "block";
+
+            } else if (
+                bylineBox
+            ) {
+
+                // Gamla artiklar saknar skribent.
+                bylineBox.style.display =
+                    "none";
+            }
+
+
+            // =================================================
+            // FIKAFRÅGA
+            // =================================================
 
             const pollQuestion =
                 document.getElementById(
@@ -982,11 +1789,16 @@
                 );
 
 
-            pollQuestion.textContent =
-                cleanText(
-                    article.pollQuestion ||
-                    "Vad tycker du om dagens snackis?"
-                );
+            if (
+                pollQuestion
+            ) {
+
+                pollQuestion.textContent =
+                    cleanReaderText(
+                        article.pollQuestion ||
+                        "Vad säger fikabordet?"
+                    );
+            }
 
 
             const pollBox =
@@ -995,216 +1807,124 @@
                 );
 
 
-            pollBox.innerHTML =
-                "";
+            if (
+                pollBox
+            ) {
+
+                pollBox.innerHTML =
+                    "";
 
 
-            let pollOptions =
                 safeArray(
                     article.pollOptions
-                );
+                )
+                .forEach(
+                    (
+                        option,
+                        index
+                    ) => {
+
+                        const label =
+                            document.createElement(
+                                "label"
+                            );
 
 
-            if (
-                pollOptions.length < 2
-            ) {
-
-                pollOptions =
-                    [
-                        "Ja",
-                        "Nej"
-                    ];
-            }
+                        label.className =
+                            "poll-option";
 
 
-            pollOptions.forEach(
-                (option, index) => {
+                        const radio =
+                            document.createElement(
+                                "input"
+                            );
 
-                    const label =
-                        document.createElement(
-                            "label"
+
+                        radio.type =
+                            "radio";
+
+
+                        radio.name =
+                            "poll";
+
+
+                        radio.value =
+                            String(
+                                index + 1
+                            );
+
+
+                        label.appendChild(
+                            radio
                         );
 
-                    label.className =
-                        "poll-option";
 
-
-                    const radio =
-                        document.createElement(
-                            "input"
-                        );
-
-                    radio.type =
-                        "radio";
-
-                    radio.name =
-                        "poll";
-
-                    radio.value =
-                        String(
-                            index + 1
+                        label.append(
+                            " " +
+                            cleanReaderText(
+                                option
+                            )
                         );
 
 
-                    label.appendChild(
-                        radio
-                    );
-
-                    label.append(
-                        " " +
-                        cleanText(
-                            option
-                        )
-                    );
-
-
-                    pollBox.appendChild(
-                        label
-                    );
-                }
-            );
-
-
-            /*
-             * KÄLLOR
-             *
-             * Viktig förändring:
-             * En trasig URL får INTE längre krascha
-             * hela artikelvisningen.
-             */
-
-            const sourceList =
-                document.getElementById(
-                    "article-sources"
-                );
-
-
-            sourceList.innerHTML =
-                "";
-
-
-            const sources =
-                safeArray(
-                    latest.sources
-                );
-
-
-            for (
-                const source
-                of sources
-            ) {
-
-                if (!source) {
-                    continue;
-                }
-
-
-                const parsedUrl =
-                    safeUrl(
-                        source.url
-                    );
-
-
-                if (!parsedUrl) {
-                    continue;
-                }
-
-
-                const li =
-                    document.createElement(
-                        "li"
-                    );
-
-
-                const link =
-                    document.createElement(
-                        "a"
-                    );
-
-
-                link.href =
-                    parsedUrl.href;
-
-                link.target =
-                    "_blank";
-
-                link.rel =
-                    "noopener noreferrer";
-
-
-                link.textContent =
-                    "🔗 " +
-                    cleanText(
-                        source.title ||
-                        parsedUrl.hostname
-                    );
-
-
-                li.appendChild(
-                    link
-                );
-
-                sourceList.appendChild(
-                    li
+                        pollBox.appendChild(
+                            label
+                        );
+                    }
                 );
             }
 
 
-            if (
-                sourceList.children.length === 0
-            ) {
-
-                sourceList.innerHTML =
-                    "<li>Källor saknas.</li>";
-            }
-
-
-            console.log(
-                "Dagens snackis renderad:",
-                article.title
-            );
+            // =================================================
+            // KÄLLOR
+            //
+            // Medvetet ingen renderingskod här längre.
+            //
+            // latest.sources finns kvar i datan men är
+            // inte en publik del av artikeln.
+            // =================================================
 
 
-        } catch (error) {
+        } catch (
+            error
+        ) {
 
             console.error(
-                "Kunde inte visa latest:",
                 error
             );
 
 
-            document
-                .getElementById(
+            const title =
+                document.getElementById(
                     "article-title"
-                )
-                .textContent =
+                );
+
+
+            if (title) {
+
+                title.textContent =
                     "Kaffet är klart – snackisen dröjer lite";
+            }
 
 
-            document
-                .getElementById(
+            const text =
+                document.getElementById(
                     "article-text"
-                )
-                .innerHTML =
+                );
+
+
+            if (text) {
+
+                text.innerHTML =
                     "<p>Redaktionen kunde inte hämta den senaste snackisen just nu. Testa att ladda om sidan om en liten stund.</p>";
-
-
-            document
-                .getElementById(
-                    "article-sources"
-                )
-                .innerHTML =
-                    "<li>Inga källor kunde hämtas.</li>";
-
-
-            if (timeText) {
-
-                timeText.textContent =
-                    "Kunde inte läsa senaste snackisen";
             }
         }
     }
 
+
+    // =====================================================
+    // ARKIV
+    // =====================================================
 
     async function loadArchive() {
 
@@ -1212,6 +1932,11 @@
             document.getElementById(
                 "archive-list"
             );
+
+
+        if (!archiveList) {
+            return;
+        }
 
 
         try {
@@ -1222,7 +1947,12 @@
                     Date.now(),
                     {
                         cache:
-                            "no-store"
+                            "no-store",
+
+                        headers: {
+                            Accept:
+                                "application/json"
+                        }
                     }
                 );
 
@@ -1258,6 +1988,7 @@
 
             const articles =
                 result.articles
+
                     .filter(
                         item =>
                             item &&
@@ -1265,13 +1996,16 @@
                             item.id !==
                                 window.currentLatestId
                     )
+
                     .slice(
                         0,
                         5
                     );
 
 
-            if (!articles.length) {
+            if (
+                !articles.length
+            ) {
 
                 archiveList.innerHTML =
                     "<p class='coming-soon'>Här dyker tidigare snackisar upp efter nästa publicering.</p>";
@@ -1286,13 +2020,15 @@
             ) {
 
                 const article =
-                    item.article;
+                    item.article ||
+                    {};
 
 
                 const details =
                     document.createElement(
                         "details"
                     );
+
 
                 details.className =
                     "archive-item";
@@ -1304,10 +2040,15 @@
                     );
 
 
+                // =============================================
+                // META
+                // =============================================
+
                 const meta =
                     document.createElement(
                         "div"
                     );
+
 
                 meta.className =
                     "archive-meta";
@@ -1315,7 +2056,7 @@
 
                 meta.textContent =
                     [
-                        cleanText(
+                        cleanReaderText(
                             article.category
                         ),
 
@@ -1323,45 +2064,67 @@
                             item.createdAt
                         )
                     ]
-                    .filter(Boolean)
-                    .join(" · ");
+                    .filter(
+                        Boolean
+                    )
+                    .join(
+                        " · "
+                    );
 
+
+                // =============================================
+                // RUBRIK
+                // =============================================
 
                 const title =
                     document.createElement(
                         "span"
                     );
 
+
                 title.className =
                     "archive-title";
 
+
                 title.textContent =
-                    cleanText(
+                    cleanReaderText(
                         article.title
                     );
 
+
+                // =============================================
+                // SUMMARY
+                // =============================================
 
                 const intro =
                     document.createElement(
                         "p"
                     );
 
+
                 intro.className =
                     "archive-summary";
 
+
                 intro.textContent =
-                    cleanText(
+                    cleanReaderText(
                         article.summary
                     );
 
+
+                // =============================================
+                // LÄS MER
+                // =============================================
 
                 const open =
                     document.createElement(
                         "span"
                     );
 
+
                 open.className =
                     "archive-open";
+
 
                 open.textContent =
                     "Läs snackisen ↓";
@@ -1371,13 +2134,16 @@
                     meta
                 );
 
+
                 summary.appendChild(
                     title
                 );
 
+
                 summary.appendChild(
                     intro
                 );
+
 
                 summary.appendChild(
                     open
@@ -1389,10 +2155,15 @@
                 );
 
 
+                // =============================================
+                // INNEHÅLL
+                // =============================================
+
                 const content =
                     document.createElement(
                         "div"
                     );
+
 
                 content.className =
                     "archive-content";
@@ -1405,15 +2176,26 @@
                     )
                 ) {
 
+                    const cleaned =
+                        cleanReaderText(
+                            paragraph
+                        );
+
+
+                    if (!cleaned) {
+                        continue;
+                    }
+
+
                     const p =
                         document.createElement(
                             "p"
                         );
 
+
                     p.textContent =
-                        cleanText(
-                            paragraph
-                        );
+                        cleaned;
+
 
                     content.appendChild(
                         p
@@ -1421,110 +2203,50 @@
                 }
 
 
+                // =============================================
+                // ARKIVSIGNATUR
+                // =============================================
+
+                const archiveByline =
+                    cleanReaderText(
+                        item.byline ||
+                        article.byline ||
+                        ""
+                    );
+
+
                 if (
-                    Array.isArray(
-                        item.sources
-                    ) &&
-                    item.sources.length
+                    archiveByline
                 ) {
 
-                    const sourcesDiv =
+                    const signature =
                         document.createElement(
                             "div"
                         );
 
-                    sourcesDiv.className =
-                        "archive-sources";
+
+                    signature.className =
+                        "archive-byline";
 
 
-                    const strong =
-                        document.createElement(
-                            "strong"
-                        );
-
-                    strong.textContent =
-                        "Källor:";
+                    signature.textContent =
+                        "Skrivet av " +
+                        archiveByline +
+                        " ☕";
 
 
-                    sourcesDiv.appendChild(
-                        strong
+                    content.appendChild(
+                        signature
                     );
-
-
-                    const ul =
-                        document.createElement(
-                            "ul"
-                        );
-
-
-                    for (
-                        const source
-                        of item.sources
-                    ) {
-
-                        const parsedUrl =
-                            safeUrl(
-                                source?.url
-                            );
-
-
-                        if (!parsedUrl) {
-                            continue;
-                        }
-
-
-                        const li =
-                            document.createElement(
-                                "li"
-                            );
-
-
-                        const a =
-                            document.createElement(
-                                "a"
-                            );
-
-
-                        a.href =
-                            parsedUrl.href;
-
-                        a.target =
-                            "_blank";
-
-                        a.rel =
-                            "noopener noreferrer";
-
-
-                        a.textContent =
-                            cleanText(
-                                source.title ||
-                                parsedUrl.hostname
-                            );
-
-
-                        li.appendChild(
-                            a
-                        );
-
-                        ul.appendChild(
-                            li
-                        );
-                    }
-
-
-                    if (
-                        ul.children.length
-                    ) {
-
-                        sourcesDiv.appendChild(
-                            ul
-                        );
-
-                        content.appendChild(
-                            sourcesDiv
-                        );
-                    }
                 }
+
+
+                // =============================================
+                // KÄLLOR VISAS INTE.
+                //
+                // item.sources ligger kvar i datan och
+                // används av redaktionen bakom kulisserna.
+                // =============================================
 
 
                 details.appendChild(
@@ -1538,10 +2260,11 @@
             }
 
 
-        } catch (error) {
+        } catch (
+            error
+        ) {
 
             console.error(
-                "Arkivfel:",
                 error
             );
 
@@ -1551,6 +2274,10 @@
         }
     }
 
+
+    // =====================================================
+    // DATUM
+    // =====================================================
 
     function formatPublishedTime(
         isoDate
@@ -1634,12 +2361,17 @@
     }
 
 
-    function voteThumb(id) {
+    // =====================================================
+    // TUMMAR
+    // =====================================================
+
+    function voteThumb(
+        id
+    ) {
 
         if (
             votes[id]
         ) {
-
             return;
         }
 
@@ -1654,7 +2386,9 @@
             );
 
 
-        if (element) {
+        if (
+            element
+        ) {
 
             element.textContent =
                 Number(
@@ -1663,6 +2397,10 @@
         }
     }
 
+
+    // =====================================================
+    // DELA
+    // =====================================================
 
     async function copyLink() {
 
@@ -1689,6 +2427,10 @@
     }
 
 
+    // =====================================================
+    // POLL
+    // =====================================================
+
     function submitPoll() {
 
         const selected =
@@ -1697,7 +2439,9 @@
             );
 
 
-        if (!selected) {
+        if (
+            !selected
+        ) {
 
             alert(
                 "Välj ett alternativ först!"
@@ -1707,22 +2451,40 @@
         }
 
 
-        document
-            .getElementById(
+        const form =
+            document.getElementById(
                 "poll-form"
-            )
-            .style.display =
-                "none";
+            );
 
 
-        document
-            .getElementById(
+        const results =
+            document.getElementById(
                 "poll-results"
-            )
-            .style.display =
+            );
+
+
+        if (
+            form
+        ) {
+
+            form.style.display =
+                "none";
+        }
+
+
+        if (
+            results
+        ) {
+
+            results.style.display =
                 "block";
+        }
     }
 
+
+    // =====================================================
+    // KOMMENTAR
+    // =====================================================
 
     function addComment() {
 
@@ -1738,6 +2500,14 @@
             );
 
 
+        if (
+            !nameInput ||
+            !textInput
+        ) {
+            return;
+        }
+
+
         const name =
             nameInput.value.trim() ||
             "Anonym kollega";
@@ -1747,7 +2517,9 @@
             textInput.value.trim();
 
 
-        if (!text) {
+        if (
+            !text
+        ) {
 
             alert(
                 "Skriv en kommentar först!"
@@ -1761,6 +2533,11 @@
             document.getElementById(
                 "comments-list"
             );
+
+
+        if (!list) {
+            return;
+        }
 
 
         const commentDiv =
@@ -1809,15 +2586,14 @@
     }
 
 
+    // =====================================================
+    // START
+    // =====================================================
+
     async function startKafferasten() {
 
-        /*
-         * Latest först.
-         *
-         * Då känner arkivet till vilket ID
-         * som just nu ligger som huvudartikel
-         * och kan filtrera bort den.
-         */
+        // Senaste artikeln först.
+        // Då vet arkivet vilket ID som ska filtreras bort.
 
         await loadLatestNews();
 
@@ -1829,5 +2605,7 @@
 
 </script>
 
+
 </body>
+
 </html>
