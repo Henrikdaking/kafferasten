@@ -1,816 +1,4003 @@
-import { getStore } from "@netlify/blobs";
+<!DOCTYPE html>
+<html lang="sv">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="theme-color"
+        content="#2D1A17"
+    >
+
+    <meta
+        name="description"
+        content="Kafferasten.se serverar en ny snackis varje vardag inför 09-fikat och 15-rasten."
+    >
+
+    <title>
+        Kafferasten.se – Dagens snackis till fikat
+    </title>
 
 
-const STORE_NAME =
-  "kafferasten-news";
+    <style>
 
+        :root {
 
-const MAX_COMMENTS =
-  10;
+            --bg-color: #F8F4EE;
+            --card-bg: #FFFFFF;
+            --primary-color: #2D1A17;
+            --accent-color: #C86D3B;
+            --accent-hover: #A85528;
+            --text-color: #2C221E;
+            --text-muted: #74635B;
+            --border-color: #E2D7CD;
+            --highlight-bg: #EFE4D8;
+            --soft-accent: #F5E7DD;
+            --green: #2E9D55;
 
-
-const MAX_NAME_LENGTH =
-  50;
-
-
-const MAX_COMMENT_LENGTH =
-  500;
-
-
-export default async (request) => {
-
-  const store =
-    getStore(
-      STORE_NAME
-    );
-
-
-  try {
-
-    const url =
-      new URL(
-        request.url
-      );
-
-
-    const method =
-      request.method
-        .toUpperCase();
-
-
-    /* =====================================================
-       GET – HÄMTA FIKARUMMET
-    ===================================================== */
-
-
-    if (
-      method === "GET"
-    ) {
-
-      const articleId =
-        sanitizeArticleId(
-          url.searchParams.get(
-            "articleId"
-          )
-        );
-
-
-      if (!articleId) {
-
-        return jsonResponse(
-          {
-            success: false,
-            error:
-              "articleId saknas."
-          },
-          400
-        );
-      }
-
-
-      const engagement =
-        await readEngagement(
-          store,
-          articleId
-        );
-
-
-      return jsonResponse(
-        {
-          success: true,
-          engagement
+            --shadow:
+                0 10px 30px
+                rgba(
+                    45,
+                    26,
+                    23,
+                    0.055
+                );
         }
-      );
-    }
 
 
-    /* =====================================================
-       POST – SPARA INTERAKTION
-    ===================================================== */
+        * {
+            box-sizing: border-box;
+        }
 
 
-    if (
-      method === "POST"
-    ) {
-
-      let body;
+        html {
+            scroll-behavior: smooth;
+        }
 
 
-      try {
+        body {
 
-        body =
-          await request.json();
+            font-family:
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                Roboto,
+                Helvetica,
+                Arial,
+                sans-serif;
 
-      } catch {
+            background-color:
+                var(--bg-color);
 
-        return jsonResponse(
-          {
-            success: false,
-            error:
-              "Ogiltig JSON."
-          },
-          400
-        );
-      }
-
-
-      const articleId =
-        sanitizeArticleId(
-          body.articleId
-        );
-
-
-      const action =
-        String(
-          body.action ||
-          ""
-        )
-          .trim()
-          .toLowerCase();
-
-
-      if (!articleId) {
-
-        return jsonResponse(
-          {
-            success: false,
-            error:
-              "articleId saknas."
-          },
-          400
-        );
-      }
-
-
-      if (
-        ![
-          "thumb",
-          "poll",
-          "comment"
-        ].includes(
-          action
-        )
-      ) {
-
-        return jsonResponse(
-          {
-            success: false,
-            error:
-              "Ogiltig action."
-          },
-          400
-        );
-      }
-
-
-      const result =
-        await withArticleLock({
-          store,
-          articleId,
-
-          task:
-            async () => {
-
-              const current =
-                await readEngagement(
-                  store,
-                  articleId
+            background-image:
+                radial-gradient(
+                    #E2D7CD 0.7px,
+                    transparent 0.7px
                 );
 
+            background-size:
+                16px 16px;
 
-              /* ===========================================
-                 TUMME
-              =========================================== */
+            color:
+                var(--text-color);
 
+            line-height:
+                1.65;
 
-              if (
-                action === "thumb"
-              ) {
-
-                const value =
-                  String(
-                    body.value ||
-                    ""
-                  )
-                    .trim()
-                    .toLowerCase();
+            margin:
+                0;
+        }
 
 
-                if (
-                  ![
-                    "up",
-                    "down"
-                  ].includes(
-                    value
-                  )
-                ) {
-
-                  throw new PublicError(
-                    "Ogiltig röst.",
-                    400
-                  );
-                }
+        button,
+        input,
+        textarea {
+            font: inherit;
+        }
 
 
-                if (
-                  value === "up"
-                ) {
+        header {
 
-                  current.thumbs.up +=
-                    1;
+            position: relative;
 
-                } else {
+            overflow: hidden;
 
-                  current.thumbs.down +=
-                    1;
-                }
-              }
-
-
-              /* ===========================================
-                 OMRÖSTNING
-              =========================================== */
-
-
-              if (
-                action === "poll"
-              ) {
-
-                const option =
-                  Number(
-                    body.option
-                  );
-
-
-                if (
-                  option !== 0 &&
-                  option !== 1
-                ) {
-
-                  throw new PublicError(
-                    "Ogiltigt svarsalternativ.",
-                    400
-                  );
-                }
-
-
-                current.poll[
-                  option
-                ] += 1;
-              }
-
-
-              /* ===========================================
-                 KOMMENTAR
-              =========================================== */
-
-
-              if (
-                action === "comment"
-              ) {
-
-                const name =
-                  sanitizePlainText(
-                    body.name,
-                    MAX_NAME_LENGTH
-                  )
-                  ||
-                  "Anonym kollega";
-
-
-                const text =
-                  sanitizePlainText(
-                    body.text,
-                    MAX_COMMENT_LENGTH
-                  );
-
-
-                if (!text) {
-
-                  throw new PublicError(
-                    "Kommentaren är tom.",
-                    400
-                  );
-                }
-
-
-                current.comments.unshift(
-                  {
-                    id:
-                      createCommentId(),
-
-                    name,
-
-                    text,
-
-                    createdAt:
-                      new Date()
-                        .toISOString()
-                  }
+            background:
+                linear-gradient(
+                    145deg,
+                    #281714 0%,
+                    #3B211C 100%
                 );
 
+            color: white;
 
-                current.comments =
-                  current.comments.slice(
-                    0,
-                    MAX_COMMENTS
-                  );
-              }
+            padding:
+                2.35rem 1rem 2.05rem;
 
+            text-align: center;
 
-              current.updatedAt =
-                new Date()
-                  .toISOString();
-
-
-              await store.setJSON(
-                engagementKey(
-                  articleId
-                ),
-                current
-              );
+            border-bottom:
+                4px solid
+                var(--accent-color);
+        }
 
 
-              return current;
+        .brand {
+
+            display: inline-flex;
+
+            align-items: center;
+
+            gap: 0.75rem;
+
+            color: white;
+
+            text-decoration: none;
+        }
+
+
+        .brand h1 {
+
+            margin: 0;
+
+            font-size: 2.55rem;
+
+            font-weight: 900;
+
+            letter-spacing: -1.2px;
+        }
+
+
+        .coffee-mark {
+
+            position: relative;
+
+            width: 42px;
+            height: 48px;
+
+            display: inline-grid;
+
+            place-items: end center;
+        }
+
+
+        .coffee-cup {
+
+            font-size: 2rem;
+        }
+
+
+        .steam {
+
+            position: absolute;
+
+            width: 3px;
+            height: 17px;
+
+            border-radius: 50%;
+
+            background:
+                rgba(
+                    255,
+                    255,
+                    255,
+                    0.64
+                );
+
+            top: 0;
+
+            opacity: 0;
+
+            animation:
+                steam-rise
+                2.7s
+                ease-in-out
+                infinite;
+        }
+
+
+        .steam.s1 {
+
+            left: 13px;
+
+            animation-delay: 0s;
+        }
+
+
+        .steam.s2 {
+
+            left: 21px;
+
+            animation-delay: 0.7s;
+
+            height: 20px;
+        }
+
+
+        .steam.s3 {
+
+            left: 29px;
+
+            animation-delay: 1.35s;
+        }
+
+
+        @keyframes steam-rise {
+
+            0% {
+
+                transform:
+                    translateY(8px);
+
+                opacity: 0;
             }
-        });
 
 
-      return jsonResponse(
-        {
-          success: true,
-          engagement:
-            result
+            30% {
+                opacity: 0.75;
+            }
+
+
+            100% {
+
+                transform:
+                    translateY(-10px)
+                    translateX(3px);
+
+                opacity: 0;
+            }
         }
-      );
-    }
 
 
-    return jsonResponse(
-      {
-        success: false,
-        error:
-          "Metoden stöds inte."
-      },
-      405
-    );
+        header p {
+
+            margin:
+                0.65rem 0 0;
+
+            color:
+                #E4D7CF;
+        }
 
 
-  } catch (error) {
+        .schedule-banner {
 
-    if (
-      error instanceof
-      PublicError
-    ) {
+            background:
+                #EFE4D8;
 
-      return jsonResponse(
-        {
-          success: false,
-          error:
-            error.message
-        },
-        error.status
-      );
-    }
+            border-bottom:
+                1px solid
+                var(--border-color);
+
+            text-align: center;
+
+            padding:
+                0.72rem 1rem;
+        }
 
 
-    console.error(
-      "Engagement-fel:",
-      error
-    );
+        .schedule-line {
+
+            display: flex;
+
+            justify-content: center;
+            align-items: center;
+
+            gap: 0.7rem;
+
+            flex-wrap: wrap;
+
+            font-size: 0.9rem;
+
+            font-weight: 650;
+        }
 
 
-    return jsonResponse(
-      {
-        success: false,
-        error:
-          "Fikarummet kunde inte uppdateras."
-      },
-      500
-    );
-  }
-};
+        .brew-note {
+
+            margin-top: 0.18rem;
+
+            font-size: 0.77rem;
+
+            color:
+                var(--text-muted);
+        }
 
 
-/* =========================================================
-   DATA
-========================================================= */
+        .status-badge {
+
+            background:
+                var(--green);
+
+            color: white;
+
+            padding:
+                0.18rem 0.65rem;
+
+            border-radius: 999px;
+
+            font-size: 0.75rem;
+
+            font-weight: 850;
+        }
 
 
-function emptyEngagement(
-  articleId
-) {
+        .container {
 
-  return {
+            max-width: 1060px;
 
-    articleId,
+            margin:
+                1.7rem auto;
 
-    thumbs: {
-      up: 0,
-      down: 0
-    },
+            padding:
+                0 1rem;
 
-    poll: [
-      0,
-      0
-    ],
+            display: grid;
 
-    comments: [],
+            grid-template-columns:
+                minmax(0, 2fr)
+                minmax(250px, 1fr);
 
-    updatedAt:
-      null
-  };
+            gap: 1.45rem;
+
+            align-items: start;
+        }
+
+
+        .card {
+
+            background:
+                rgba(
+                    255,
+                    255,
+                    255,
+                    0.97
+                );
+
+            border:
+                1px solid
+                var(--border-color);
+
+            border-radius: 20px;
+
+            padding: 1.7rem;
+
+            margin-bottom: 1.25rem;
+
+            box-shadow:
+                var(--shadow);
+        }
+
+
+        .article-topline {
+
+            display: flex;
+
+            justify-content:
+                space-between;
+
+            align-items: center;
+
+            gap: 0.75rem;
+
+            margin-bottom:
+                0.82rem;
+        }
+
+
+        .tag {
+
+            display: inline-flex;
+
+            background:
+                var(--accent-color);
+
+            color: white;
+
+            padding:
+                0.28rem 0.75rem;
+
+            border-radius: 999px;
+
+            font-size: 0.72rem;
+
+            font-weight: 850;
+
+            text-transform: uppercase;
+        }
+
+
+        .read-time {
+
+            color:
+                var(--text-muted);
+
+            font-size: 0.76rem;
+
+            font-weight: 650;
+        }
+
+
+        h2 {
+
+            color:
+                var(--primary-color);
+
+            margin:
+                0 0 1.15rem;
+
+            font-family:
+                Georgia,
+                serif;
+
+            font-size: 2.15rem;
+
+            line-height: 1.12;
+        }
+
+
+        h3 {
+
+            color:
+                var(--primary-color);
+
+            margin:
+                0 0 0.9rem;
+        }
+
+
+        .article-hero-img {
+
+            width: 100%;
+
+            height: 310px;
+
+            object-fit: cover;
+
+            border-radius: 15px;
+        }
+
+
+        .photo-credit,
+        .side-photo-credit {
+
+            display: none;
+
+            color:
+                var(--text-muted);
+
+            text-align: right;
+
+            font-size: 0.68rem;
+        }
+
+
+        .photo-credit a,
+        .side-photo-credit a {
+
+            color: inherit;
+        }
+
+
+        .summary-box {
+
+            background:
+                #F6EEE7;
+
+            border-left:
+                4px solid
+                var(--accent-color);
+
+            padding:
+                1.08rem 1.2rem;
+
+            margin:
+                1.3rem 0 1.55rem;
+
+            border-radius:
+                0 15px 15px 0;
+        }
+
+
+        .summary-box strong {
+
+            display: block;
+
+            margin-bottom: 0.35rem;
+        }
+
+
+        .article-content p {
+
+            font-family:
+                Georgia,
+                serif;
+
+            font-size: 1.06rem;
+
+            line-height: 1.7;
+
+            margin:
+                0 0 1.25rem;
+        }
+
+
+        .why-box {
+
+            background:
+                var(--highlight-bg);
+
+            padding:
+                1.2rem 1.25rem;
+
+            border-radius: 15px;
+
+            margin:
+                1.5rem 0;
+        }
+
+
+        .article-meta-box {
+
+            margin-top: 1.4rem;
+
+            padding: 1rem 0;
+
+            border-top:
+                1px solid
+                var(--border-color);
+
+            border-bottom:
+                1px solid
+                var(--border-color);
+        }
+
+
+        .byline {
+
+            display: none;
+
+            align-items: center;
+
+            gap: 0.7rem;
+        }
+
+
+        .byline-avatar {
+
+            width: 39px;
+            height: 39px;
+
+            display: grid;
+
+            place-items: center;
+
+            border-radius: 50%;
+
+            background:
+                var(--soft-accent);
+        }
+
+
+        .byline-copy {
+
+            font-size: 0.77rem;
+
+            color:
+                var(--text-muted);
+        }
+
+
+        .byline-name {
+
+            display: block;
+
+            color:
+                var(--primary-color);
+
+            font-size: 0.97rem;
+
+            font-weight: 850;
+        }
+
+
+        .source-row {
+
+            display: none;
+
+            gap: 0.45rem;
+
+            flex-wrap: wrap;
+
+            margin-top: 0.8rem;
+
+            padding-top: 0.7rem;
+
+            border-top:
+                1px dashed
+                var(--border-color);
+
+            font-size: 0.75rem;
+        }
+
+
+        .source-links {
+
+            display: inline-flex;
+
+            flex-wrap: wrap;
+
+            gap: 0.35rem;
+        }
+
+
+        .source-link {
+
+            color:
+                var(--accent-color);
+
+            font-weight: 750;
+
+            text-decoration: none;
+        }
+
+
+        /* ==================================================
+           FEEDBACK
+        ================================================== */
+
+
+        .feedback {
+
+            margin-top: 1rem;
+
+            padding: 0.9rem;
+
+            border:
+                1px solid
+                var(--border-color);
+
+            border-radius: 14px;
+
+            background:
+                #FBF8F4;
+        }
+
+
+        .feedback-title {
+
+            display: block;
+
+            margin-bottom: 0.5rem;
+
+            font-weight: 800;
+        }
+
+
+        .btn-group {
+
+            display: flex;
+
+            gap: 0.45rem;
+
+            flex-wrap: wrap;
+        }
+
+
+        .btn {
+
+            border:
+                1px solid
+                var(--border-color);
+
+            background:
+                var(--bg-color);
+
+            color:
+                var(--text-color);
+
+            padding:
+                0.58rem 0.85rem;
+
+            border-radius: 10px;
+
+            cursor: pointer;
+
+            font-weight: 700;
+        }
+
+
+        .btn:disabled {
+
+            opacity: 0.58;
+
+            cursor: default;
+        }
+
+
+        .btn-primary {
+
+            background:
+                var(--accent-color);
+
+            color: white;
+
+            border-color:
+                var(--accent-color);
+        }
+
+
+        .share-row {
+
+            display: flex;
+
+            justify-content:
+                space-between;
+
+            align-items: center;
+
+            margin-top: 0.75rem;
+
+            padding-top: 0.7rem;
+
+            border-top:
+                1px solid
+                var(--border-color);
+        }
+
+
+        .share-label {
+
+            margin: 0;
+
+            color:
+                var(--text-muted);
+
+            font-size: 0.78rem;
+        }
+
+
+        /* ==================================================
+           POLL
+        ================================================== */
+
+
+        .section-kicker {
+
+            color:
+                var(--accent-color);
+
+            text-transform: uppercase;
+
+            font-size: 0.72rem;
+
+            font-weight: 850;
+
+            letter-spacing: 0.7px;
+        }
+
+
+        .poll-question {
+
+            font-family:
+                Georgia,
+                serif;
+
+            font-size: 1.25rem;
+
+            color:
+                var(--primary-color);
+        }
+
+
+        .poll-option {
+
+            display: flex;
+
+            gap: 0.6rem;
+
+            background:
+                var(--bg-color);
+
+            padding:
+                0.8rem;
+
+            border:
+                1px solid
+                var(--border-color);
+
+            border-radius: 11px;
+
+            margin-bottom: 0.55rem;
+
+            cursor: pointer;
+        }
+
+
+        .poll-option input {
+
+            accent-color:
+                var(--accent-color);
+        }
+
+
+        .poll-results {
+
+            display: none;
+
+            margin-top: 1rem;
+
+            padding: 1rem;
+
+            background:
+                var(--soft-accent);
+
+            border-radius: 12px;
+        }
+
+
+        .poll-result-row {
+
+            margin-bottom:
+                0.9rem;
+        }
+
+
+        .poll-result-head {
+
+            display: flex;
+
+            justify-content:
+                space-between;
+
+            gap: 1rem;
+
+            margin-bottom:
+                0.3rem;
+
+            font-size: 0.85rem;
+
+            font-weight: 700;
+        }
+
+
+        .poll-bar {
+
+            height: 9px;
+
+            overflow: hidden;
+
+            border-radius: 999px;
+
+            background:
+                #DECFC3;
+        }
+
+
+        .poll-bar-fill {
+
+            height: 100%;
+
+            width: 0;
+
+            border-radius: inherit;
+
+            background:
+                var(--accent-color);
+
+            transition:
+                width 0.35s ease;
+        }
+
+
+        .poll-total {
+
+            margin: 0.7rem 0 0;
+
+            color:
+                var(--text-muted);
+
+            font-size: 0.76rem;
+        }
+
+
+        /* ==================================================
+           KOMMENTARER
+        ================================================== */
+
+
+        .comment-section {
+
+            margin-top: 1.5rem;
+
+            padding-top: 1.25rem;
+
+            border-top:
+                1px solid
+                var(--border-color);
+        }
+
+
+        .comment-helper {
+
+            color:
+                var(--text-muted);
+
+            font-size: 0.8rem;
+        }
+
+
+        .comment-input {
+
+            width: 100%;
+
+            padding: 0.78rem;
+
+            border:
+                1px solid
+                var(--border-color);
+
+            border-radius: 11px;
+
+            margin-bottom: 0.65rem;
+
+            background:
+                #FCF9F5;
+        }
+
+
+        textarea.comment-input {
+
+            min-height: 90px;
+
+            resize: vertical;
+        }
+
+
+        .comments-heading {
+
+            margin:
+                1.25rem 0 0.55rem;
+
+            font-size: 0.84rem;
+
+            color:
+                var(--text-muted);
+
+            font-weight: 800;
+        }
+
+
+        .comment-item {
+
+            padding:
+                0.8rem 0;
+
+            border-top:
+                1px solid
+                var(--border-color);
+        }
+
+
+        .comment-name {
+
+            font-weight: 800;
+
+            color:
+                var(--primary-color);
+        }
+
+
+        .comment-date {
+
+            margin-left:
+                0.35rem;
+
+            color:
+                var(--text-muted);
+
+            font-size: 0.7rem;
+        }
+
+
+        .comment-body {
+
+            margin:
+                0.25rem 0 0;
+
+            font-size:
+                0.9rem;
+        }
+
+
+        .empty-comments {
+
+            color:
+                var(--text-muted);
+
+            font-size: 0.83rem;
+        }
+
+
+        /* ==================================================
+           SIDAN
+        ================================================== */
+
+
+        .side-visual {
+
+            height: 160px;
+
+            display: grid;
+
+            place-items: center;
+
+            overflow: hidden;
+
+            border-radius: 14px;
+
+            background:
+                var(--highlight-bg);
+        }
+
+
+        .side-image {
+
+            display: none;
+
+            width: 100%;
+
+            height: 100%;
+
+            object-fit: cover;
+        }
+
+
+        .visual-emoji {
+
+            font-size: 4.5rem;
+        }
+
+
+        .side-kicker {
+
+            margin:
+                0.8rem 0 0.25rem;
+
+            color:
+                var(--accent-color);
+
+            font-size: 0.7rem;
+
+            font-weight: 850;
+
+            text-transform: uppercase;
+        }
+
+
+        .side-title {
+
+            margin:
+                0 0 0.4rem;
+
+            font-family:
+                Georgia,
+                serif;
+
+            font-weight: 800;
+        }
+
+
+        .side-text {
+
+            margin: 0;
+
+            font-size: 0.88rem;
+        }
+
+
+        /* ==================================================
+           ARKIV
+        ================================================== */
+
+
+        .archive-subtitle {
+
+            color:
+                var(--text-muted);
+
+            font-size: 0.82rem;
+        }
+
+
+        .archive-grid {
+
+            display: grid;
+
+            gap: 0.75rem;
+        }
+
+
+        .archive-item {
+
+            background:
+                #FBF8F4;
+
+            border:
+                1px solid
+                var(--border-color);
+
+            border-radius: 13px;
+
+            padding: 0.95rem;
+        }
+
+
+        .archive-meta {
+
+            color:
+                var(--accent-color);
+
+            font-size: 0.7rem;
+
+            font-weight: 800;
+
+            text-transform: uppercase;
+        }
+
+
+        .archive-title {
+
+            display: block;
+
+            margin:
+                0.25rem 0;
+
+            font-family:
+                Georgia,
+                serif;
+
+            font-size: 1.05rem;
+
+            font-weight: 800;
+        }
+
+
+        .archive-summary {
+
+            margin: 0;
+
+            font-size: 0.85rem;
+        }
+
+
+        .archive-open {
+
+            margin-top: 0.5rem;
+
+            padding: 0;
+
+            border: 0;
+
+            background: none;
+
+            color:
+                var(--accent-color);
+
+            cursor: pointer;
+
+            font-weight: 800;
+        }
+
+
+        .archive-reader {
+
+            display: none;
+
+            margin-top: 1rem;
+
+            padding: 1rem;
+
+            border:
+                1px solid
+                var(--border-color);
+
+            border-radius: 14px;
+
+            background: white;
+        }
+
+
+        .archive-reader.is-open {
+            display: block;
+        }
+
+
+        .archive-reader h4 {
+
+            font-family:
+                Georgia,
+                serif;
+
+            font-size: 1.25rem;
+        }
+
+
+        footer {
+
+            text-align: center;
+
+            padding: 2rem 1rem;
+
+            border-top:
+                1px solid
+                var(--border-color);
+
+            color:
+                var(--text-muted);
+
+            font-size: 0.82rem;
+        }
+
+
+        /* ==================================================
+           MOBIL
+        ================================================== */
+
+
+        @media (
+            max-width: 768px
+        ) {
+
+            header {
+
+                padding:
+                    1.5rem 1rem;
+            }
+
+
+            .brand h1 {
+
+                font-size:
+                    1.95rem;
+            }
+
+
+            header p {
+
+                font-size:
+                    0.86rem;
+            }
+
+
+            .container {
+
+                grid-template-columns:
+                    1fr;
+
+                margin:
+                    0.85rem auto 0;
+
+                padding:
+                    0 0.72rem;
+            }
+
+
+            .card {
+
+                border-radius: 17px;
+
+                padding: 1.15rem;
+
+                margin-bottom: 0.9rem;
+            }
+
+
+            h2 {
+
+                font-size: 1.7rem;
+            }
+
+
+            .article-hero-img {
+
+                height: auto;
+
+                aspect-ratio:
+                    16 / 10;
+            }
+
+
+            .article-content p {
+
+                font-size: 0.97rem;
+
+                line-height: 1.62;
+            }
+
+
+            .btn-group {
+
+                display: grid;
+
+                grid-template-columns:
+                    1fr 1fr;
+            }
+
+
+            .btn {
+
+                font-size: 0.81rem;
+            }
+
+
+            .side-visual {
+
+                height: auto;
+
+                aspect-ratio:
+                    16 / 9;
+            }
+        }
+
+
+        @media (
+            max-width: 390px
+        ) {
+
+            h2 {
+
+                font-size: 1.56rem;
+            }
+
+
+            .brand h1 {
+
+                font-size: 1.72rem;
+            }
+
+
+            .btn-group {
+
+                grid-template-columns:
+                    1fr;
+            }
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<header>
+
+    <a
+        class="brand"
+        href="/"
+    >
+
+        <span class="coffee-mark">
+
+            <span class="steam s1"></span>
+            <span class="steam s2"></span>
+            <span class="steam s3"></span>
+
+            <span class="coffee-cup">
+                ☕
+            </span>
+
+        </span>
+
+
+        <h1>
+            Kafferasten.se
+        </h1>
+
+    </a>
+
+
+    <p>
+        En färsk snackis när kaffet behöver lite sällskap.
+    </p>
+
+</header>
+
+
+<div class="schedule-banner">
+
+    <div class="schedule-line">
+
+        ⏰
+
+        <strong>
+            RYKANDE FÄRSKT:
+        </strong>
+
+        <span id="fika-time-text">
+            Hämtar...
+        </span>
+
+
+        <span class="status-badge">
+            ☕ Nybryggt
+        </span>
+
+    </div>
+
+
+    <div class="brew-note">
+        Nya snackisar bryggs varje vardag inför 09-fikat och 15-rasten.
+    </div>
+
+</div>
+
+
+<div class="container">
+
+
+<main>
+
+
+<article class="card">
+
+
+    <div class="article-topline">
+
+        <span
+            class="tag"
+            id="fika-badge"
+        >
+            ☕ DAGENS SNACKIS
+        </span>
+
+
+        <span
+            class="read-time"
+            id="read-time"
+        >
+            ☕ 1 minuts läsning
+        </span>
+
+    </div>
+
+
+    <h2 id="article-title">
+        Brygger dagens snackis...
+    </h2>
+
+
+    <img
+        id="article-img"
+        src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=1400&q=82"
+        alt="Kaffe"
+        class="article-hero-img"
+    >
+
+
+    <div
+        id="photo-credit"
+        class="photo-credit"
+    >
+    </div>
+
+
+    <div
+        id="summary-box"
+        class="summary-box"
+        style="display:none;"
+    >
+
+        <strong>
+            ⚡ Snabböversikt
+        </strong>
+
+        <span id="article-summary">
+        </span>
+
+    </div>
+
+
+    <div
+        id="article-text"
+        class="article-content"
+    >
+    </div>
+
+
+    <div
+        id="why-box"
+        class="why-box"
+        style="display:none;"
+    >
+
+        <strong>
+            ☕ Därför passar den på fikat
+        </strong>
+
+        <ul id="why-list">
+        </ul>
+
+    </div>
+
+
+    <div class="article-meta-box">
+
+        <div
+            id="article-byline"
+            class="byline"
+        >
+
+            <div
+                id="article-byline-avatar"
+                class="byline-avatar"
+            >
+                ✍️
+            </div>
+
+
+            <div class="byline-copy">
+
+                Dagens snackis är serverad av
+
+                <span
+                    id="article-byline-name"
+                    class="byline-name"
+                >
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div
+            id="source-row"
+            class="source-row"
+        >
+
+            <strong>
+                🔎 Lästs in från:
+            </strong>
+
+            <span
+                id="source-links"
+                class="source-links"
+            >
+            </span>
+
+        </div>
+
+    </div>
+
+
+    <div class="feedback">
+
+        <span class="feedback-title">
+            Hur smakade dagens snackis?
+        </span>
+
+
+        <div class="btn-group">
+
+            <button
+                id="thumb-up-button"
+                class="btn"
+                onclick="voteThumb('up')"
+            >
+                👍 Bra snack
+                (<span id="count-main-up">0</span>)
+            </button>
+
+
+            <button
+                id="thumb-down-button"
+                class="btn"
+                onclick="voteThumb('down')"
+            >
+                🥱 Segt ämne
+                (<span id="count-main-down">0</span>)
+            </button>
+
+        </div>
+
+
+        <div class="share-row">
+
+            <p class="share-label">
+                Skicka vidare till fikagänget.
+            </p>
+
+
+            <button
+                class="btn"
+                onclick="copyLink()"
+            >
+                🔗 Kopiera länk
+            </button>
+
+        </div>
+
+    </div>
+
+
+</article>
+
+
+<section class="card">
+
+    <div class="section-kicker">
+        Fikabordets stora fråga
+    </div>
+
+
+    <h3>
+        💬 Dagens fikafråga
+    </h3>
+
+
+    <p
+        id="poll-question"
+        class="poll-question"
+    >
+    </p>
+
+
+    <div id="poll-form">
+
+        <div id="poll-options-container">
+        </div>
+
+
+        <button
+            id="poll-submit-button"
+            onclick="submitPoll()"
+            class="btn btn-primary"
+        >
+            Skicka din röst
+        </button>
+
+    </div>
+
+
+    <div
+        id="poll-results"
+        class="poll-results"
+    >
+
+        <div
+            id="poll-result-0"
+            class="poll-result-row"
+        >
+        </div>
+
+
+        <div
+            id="poll-result-1"
+            class="poll-result-row"
+        >
+        </div>
+
+
+        <p
+            id="poll-total"
+            class="poll-total"
+        >
+        </p>
+
+    </div>
+
+
+    <div class="comment-section">
+
+        <h4>
+            💭 Vad sägs i ert fikarum?
+        </h4>
+
+
+        <p class="comment-helper">
+            Här ser alla besökare samma fikarum.
+        </p>
+
+
+        <input
+            id="comment-name"
+            class="comment-input"
+            maxlength="50"
+            placeholder="Namn eller avdelning – frivilligt"
+        >
+
+
+        <textarea
+            id="comment-text"
+            class="comment-input"
+            maxlength="500"
+            placeholder="Vad säger fikabordet?"
+        ></textarea>
+
+
+        <button
+            id="comment-submit-button"
+            class="btn btn-primary"
+            onclick="addComment()"
+        >
+            Skicka kommentar
+        </button>
+
+
+        <div class="comments-heading">
+            Senaste från fikarummet
+        </div>
+
+
+        <div id="comments-list">
+
+            <div class="empty-comments">
+                Inga kommentarer ännu. Du kan bli först.
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<section class="card">
+
+    <h3>
+        📜 Tidigare snackisar
+    </h3>
+
+
+    <p class="archive-subtitle">
+        Missade du fikat? Här ligger de senaste ämnena kvar.
+    </p>
+
+
+    <div
+        id="archive-list"
+        class="archive-grid"
+    >
+        Hämtar tidigare snackisar...
+    </div>
+
+
+    <div
+        id="archive-reader"
+        class="archive-reader"
+    >
+
+        <div id="archive-reader-meta">
+        </div>
+
+
+        <h4 id="archive-reader-title">
+        </h4>
+
+
+        <div id="archive-reader-content">
+        </div>
+
+
+        <div id="archive-reader-byline">
+        </div>
+
+
+        <button
+            class="btn"
+            onclick="closeArchiveReader()"
+        >
+            ↑ Stäng snackisen
+        </button>
+
+    </div>
+
+</section>
+
+
+</main>
+
+
+<aside>
+
+
+<div class="card">
+
+    <h3>
+        🥐 Dagens fikatips
+    </h3>
+
+
+    <div class="side-visual">
+
+        <img
+            id="fika-tip-image"
+            class="side-image"
+            loading="lazy"
+            alt=""
+        >
+
+
+        <span
+            id="fika-tip-emoji"
+            class="visual-emoji"
+        >
+            🥐
+        </span>
+
+    </div>
+
+
+    <div
+        id="fika-tip-credit"
+        class="side-photo-credit"
+    >
+    </div>
+
+
+    <p
+        id="fika-tip-kicker"
+        class="side-kicker"
+    >
+    </p>
+
+
+    <p
+        id="fika-tip-title"
+        class="side-title"
+    >
+    </p>
+
+
+    <p
+        id="fika-tip-text"
+        class="side-text"
+    >
+    </p>
+
+</div>
+
+
+<div class="card">
+
+    <h3>
+        💡 Fikarast-fakta
+    </h3>
+
+
+    <div class="side-visual">
+
+        <img
+            id="fika-fact-image"
+            class="side-image"
+            loading="lazy"
+            alt=""
+        >
+
+
+        <span
+            id="fika-fact-emoji"
+            class="visual-emoji"
+        >
+            ☕
+        </span>
+
+    </div>
+
+
+    <div
+        id="fika-fact-credit"
+        class="side-photo-credit"
+    >
+    </div>
+
+
+    <p
+        id="fika-fact-kicker"
+        class="side-kicker"
+    >
+    </p>
+
+
+    <p
+        id="fika-fact-title"
+        class="side-title"
+    >
+    </p>
+
+
+    <p
+        id="fika-fact-text"
+        class="side-text"
+    >
+    </p>
+
+</div>
+
+
+</aside>
+
+
+</div>
+
+
+<footer>
+    Kafferasten.se – något att prata om när kaffet är klart. ☕
+</footer>
+
+
+<script>
+
+
+let currentLatest =
+    null;
+
+
+let currentEngagement =
+    null;
+
+
+let archiveArticles =
+    [];
+
+
+let currentPollOptions =
+    [];
+
+
+/* =====================================================
+   GENERELLA HJÄLPARE
+===================================================== */
+
+
+function safeArray(value) {
+
+    return Array.isArray(value)
+        ? value
+        : [];
 }
 
 
-async function readEngagement(
-  store,
-  articleId
-) {
+function cleanReaderText(text) {
 
-  const saved =
-    await store.get(
-      engagementKey(
-        articleId
-      ),
-      {
-        type:
-          "json",
-
-        consistency:
-          "strong"
-      }
-    );
+    if (!text) {
+        return "";
+    }
 
 
-  if (!saved) {
+    return String(text)
 
-    return emptyEngagement(
-      articleId
-    );
-  }
+        .replace(
+            /[\uE000-\uF8FF]/g,
+            ""
+        )
+
+        .replace(
+            /\[[^\]]*\]\(\s*https?:\/\/[^)]*\)/gi,
+            ""
+        )
+
+        .replace(
+            /https?:\/\/\S+/gi,
+            ""
+        )
+
+        .replace(
+            /\s{2,}/g,
+            " "
+        )
+
+        .trim();
+}
 
 
-  return {
+function safeHttpUrl(value) {
 
-    articleId,
+    try {
 
-    thumbs: {
+        const url =
+            new URL(value);
 
-      up:
-        safeNumber(
-          saved.thumbs?.up
+
+        if (
+            url.protocol === "https:"
+            ||
+            url.protocol === "http:"
+        ) {
+
+            return url.toString();
+        }
+
+
+        return null;
+
+
+    } catch {
+
+        return null;
+    }
+}
+
+
+/* =====================================================
+   LÄSTID
+===================================================== */
+
+
+function renderReadTime(article) {
+
+    const text = [
+
+        article.summary,
+
+        ...safeArray(
+            article.paragraphs
         ),
 
-      down:
-        safeNumber(
-          saved.thumbs?.down
+        ...safeArray(
+            article.whyTalkAboutIt
         )
-    },
 
-    poll: [
+    ]
+        .filter(Boolean)
+        .join(" ");
 
-      safeNumber(
-        saved.poll?.[0]
-      ),
 
-      safeNumber(
-        saved.poll?.[1]
-      )
-    ],
+    const words =
+        text
+            .trim()
+            .split(/\s+/)
+            .filter(Boolean)
+            .length;
 
-    comments:
-      Array.isArray(
-        saved.comments
-      )
-        ? saved.comments
-            .slice(
-              0,
-              MAX_COMMENTS
+
+    const minutes =
+        Math.max(
+            1,
+            Math.ceil(
+                words /
+                200
             )
-        : [],
-
-    updatedAt:
-      saved.updatedAt ||
-      null
-  };
-}
-
-
-function engagementKey(
-  articleId
-) {
-
-  return (
-    "engagement/"
-    +
-    articleId
-  );
-}
-
-
-/* =========================================================
-   LÅS – SKYDD MOT SAMTIDIGA RÖSTER
-========================================================= */
-
-
-async function withArticleLock({
-  store,
-  articleId,
-  task
-}) {
-
-  const lockKey =
-    `_locks/engagement-${articleId}`;
-
-
-  const token =
-    `${Date.now()}-${Math.random()
-      .toString(36)
-      .slice(2)}`;
-
-
-  const timeoutAt =
-    Date.now() +
-    5000;
-
-
-  while (
-    Date.now() <
-    timeoutAt
-  ) {
-
-    const existing =
-      await store.get(
-        lockKey,
-        {
-          type:
-            "json",
-
-          consistency:
-            "strong"
-        }
-      );
-
-
-    if (
-      existing?.startedAt
-    ) {
-
-      const age =
-        Date.now()
-        -
-        new Date(
-          existing.startedAt
-        )
-          .getTime();
-
-
-      if (
-        Number.isFinite(
-          age
-        )
-        &&
-        age >
-          8000
-      ) {
-
-        await store.delete(
-          lockKey
         );
-      }
-    }
 
 
-    const lockResult =
-      await store.setJSON(
-        lockKey,
-        {
-          token,
+    document
+        .getElementById(
+            "read-time"
+        )
+        .textContent =
+            `☕ ${minutes} ${
+                minutes === 1
+                    ? "minuts"
+                    : "minuters"
+            } läsning`;
+}
 
-          startedAt:
-            new Date()
-              .toISOString()
-        },
-        {
-          onlyIfNew:
-            true
-        }
-      );
+
+/* =====================================================
+   FOTO
+===================================================== */
+
+
+function renderPhotoCredit(
+    element,
+    photo
+) {
+
+    element.innerHTML =
+        "";
 
 
     if (
-      lockResult.modified
+        photo?.provider !== "pexels"
+        ||
+        !photo.photographerName
     ) {
 
-      try {
+        element.style.display =
+            "none";
 
-        return await task();
+        return;
+    }
 
-      } finally {
 
-        try {
+    const photographer =
+        document.createElement(
+            "a"
+        );
 
-          const current =
-            await store.get(
-              lockKey,
-              {
-                type:
-                  "json",
 
-                consistency:
-                  "strong"
-              }
+    photographer.href =
+        safeHttpUrl(
+            photo.photoUrl ||
+            photo.photographerUrl
+        )
+        ||
+        "https://www.pexels.com/";
+
+
+    photographer.target =
+        "_blank";
+
+
+    photographer.rel =
+        "noopener noreferrer";
+
+
+    photographer.textContent =
+        photo.photographerName;
+
+
+    const pexels =
+        document.createElement(
+            "a"
+        );
+
+
+    pexels.href =
+        "https://www.pexels.com/";
+
+
+    pexels.target =
+        "_blank";
+
+
+    pexels.rel =
+        "noopener noreferrer";
+
+
+    pexels.textContent =
+        "Pexels";
+
+
+    element.append(
+        "Foto: ",
+        photographer,
+        " / ",
+        pexels
+    );
+
+
+    element.style.display =
+        "block";
+}
+
+
+/* =====================================================
+   SIDOINNEHÅLL
+===================================================== */
+
+
+function renderSideCard(
+    item,
+    prefix
+) {
+
+    if (!item) {
+        return;
+    }
+
+
+    document
+        .getElementById(
+            `${prefix}-kicker`
+        )
+        .textContent =
+            item.kicker ||
+            "";
+
+
+    document
+        .getElementById(
+            `${prefix}-title`
+        )
+        .textContent =
+            item.title ||
+            "";
+
+
+    document
+        .getElementById(
+            `${prefix}-text`
+        )
+        .textContent =
+            item.text ||
+            "";
+
+
+    const image =
+        document.getElementById(
+            `${prefix}-image`
+        );
+
+
+    const emoji =
+        document.getElementById(
+            `${prefix}-emoji`
+        );
+
+
+    if (
+        item.image?.provider === "pexels"
+        &&
+        (
+            item.image.smallUrl ||
+            item.image.url
+        )
+    ) {
+
+        image.src =
+            item.image.smallUrl ||
+            item.image.url;
+
+
+        image.style.display =
+            "block";
+
+
+        emoji.style.display =
+            "none";
+
+
+        renderPhotoCredit(
+            document.getElementById(
+                `${prefix}-credit`
+            ),
+            item.image
+        );
+
+
+    } else {
+
+        image.style.display =
+            "none";
+
+
+        emoji.style.display =
+            "block";
+
+
+        emoji.textContent =
+            item.emoji ||
+            "☕";
+    }
+}
+
+
+/* =====================================================
+   KÄLLOR
+===================================================== */
+
+
+function sourceDisplayName(
+    source
+) {
+
+    try {
+
+        const domain =
+            new URL(
+                source.url
+            )
+                .hostname
+                .replace(
+                    /^www\./,
+                    ""
+                );
+
+
+        const known = {
+
+            "svt.se":
+                "SVT",
+
+            "sverigesradio.se":
+                "Sveriges Radio",
+
+            "tv4.se":
+                "TV4",
+
+            "reuters.com":
+                "Reuters",
+
+            "apnews.com":
+                "AP",
+
+            "bbc.com":
+                "BBC",
+
+            "cnn.com":
+                "CNN",
+
+            "theguardian.com":
+                "The Guardian",
+
+            "dn.se":
+                "Dagens Nyheter",
+
+            "svd.se":
+                "Svenska Dagbladet",
+
+            "aftonbladet.se":
+                "Aftonbladet",
+
+            "expressen.se":
+                "Expressen"
+        };
+
+
+        return (
+            known[domain]
+            ||
+            cleanReaderText(
+                source.title
+            )
+            ||
+            domain
+        );
+
+
+    } catch {
+
+        return (
+            cleanReaderText(
+                source.title
+            )
+            ||
+            "Källa"
+        );
+    }
+}
+
+
+function renderSources(
+    sources
+) {
+
+    const row =
+        document.getElementById(
+            "source-row"
+        );
+
+
+    const box =
+        document.getElementById(
+            "source-links"
+        );
+
+
+    box.innerHTML =
+        "";
+
+
+    const valid =
+        safeArray(sources)
+
+            .filter(
+                source =>
+                    safeHttpUrl(
+                        source.url
+                    )
+            )
+
+            .slice(
+                0,
+                3
             );
 
 
-          if (
-            current?.token ===
-            token
-          ) {
+    if (!valid.length) {
 
-            await store.delete(
-              lockKey
+        row.style.display =
+            "none";
+
+        return;
+    }
+
+
+    valid.forEach(
+        (
+            source,
+            index
+        ) => {
+
+            if (
+                index
+            ) {
+
+                box.append(
+                    " · "
+                );
+            }
+
+
+            const link =
+                document.createElement(
+                    "a"
+                );
+
+
+            link.className =
+                "source-link";
+
+
+            link.href =
+                source.url;
+
+
+            link.target =
+                "_blank";
+
+
+            link.rel =
+                "noopener noreferrer";
+
+
+            link.textContent =
+                sourceDisplayName(
+                    source
+                );
+
+
+            box.appendChild(
+                link
             );
-          }
-
-        } catch {
-          // Låt aldrig upplåsningen krascha svaret.
         }
-      }
+    );
+
+
+    row.style.display =
+        "flex";
+}
+
+
+/* =====================================================
+   SENASTE ARTIKEL
+===================================================== */
+
+
+async function loadLatestNews() {
+
+    const response =
+        await fetch(
+            "/.netlify/functions/latest-news?t="
+            +
+            Date.now(),
+            {
+                cache:
+                    "no-store"
+            }
+        );
+
+
+    if (!response.ok) {
+
+        throw new Error(
+            "Kunde inte hämta senaste snackisen."
+        );
     }
 
 
-    await sleep(
-      120
-    );
-  }
+    const result =
+        await response.json();
 
 
-  throw new PublicError(
-    "Fikarummet är extra populärt just nu. Försök igen om en sekund.",
-    409
-  );
-}
+    currentLatest =
+        result.latest;
 
 
-/* =========================================================
-   HJÄLPFUNKTIONER
-========================================================= */
+    const article =
+        currentLatest.article;
 
 
-class PublicError
-  extends Error {
-
-  constructor(
-    message,
-    status
-  ) {
-
-    super(
-      message
-    );
-
-    this.status =
-      status;
-  }
-}
+    document
+        .getElementById(
+            "fika-time-text"
+        )
+        .textContent =
+            "Senast uppdaterad "
+            +
+            formatPublishedTime(
+                currentLatest.createdAt
+            );
 
 
-function sanitizeArticleId(
-  value
-) {
-
-  const text =
-    String(
-      value ||
-      ""
-    )
-      .trim();
+    document
+        .getElementById(
+            "fika-badge"
+        )
+        .textContent =
+            "☕ "
+            +
+            article.category;
 
 
-  if (
-    !/^[a-zA-Z0-9_-]{4,80}$/.test(
-      text
-    )
-  ) {
-
-    return null;
-  }
-
-
-  return text;
-}
+    document
+        .getElementById(
+            "article-title"
+        )
+        .textContent =
+            cleanReaderText(
+                article.title
+            );
 
 
-function sanitizePlainText(
-  value,
-  maxLength
-) {
-
-  return String(
-    value ||
-    ""
-  )
-
-    .replace(
-      /[\u0000-\u001F\u007F]/g,
-      " "
-    )
-
-    .replace(
-      /\s+/g,
-      " "
-    )
-
-    .trim()
-
-    .slice(
-      0,
-      maxLength
-    );
-}
-
-
-function safeNumber(
-  value
-) {
-
-  const number =
-    Number(
-      value
+    renderReadTime(
+        article
     );
 
 
-  if (
-    !Number.isFinite(
-      number
-    )
-    ||
-    number < 0
-  ) {
+    if (
+        currentLatest.heroImage?.url
+    ) {
 
-    return 0;
-  }
+        const image =
+            document.getElementById(
+                "article-img"
+            );
 
 
-  return Math.floor(
-    number
-  );
-}
+        image.src =
+            currentLatest
+                .heroImage
+                .url;
 
 
-function createCommentId() {
-
-  return (
-    Date.now()
-      .toString(36)
-    +
-    "-"
-    +
-    Math.random()
-      .toString(36)
-      .slice(2, 8)
-  );
-}
-
-
-function sleep(
-  milliseconds
-) {
-
-  return new Promise(
-    resolve =>
-      setTimeout(
-        resolve,
-        milliseconds
-      )
-  );
-}
-
-
-function jsonResponse(
-  data,
-  status = 200
-) {
-
-  return new Response(
-    JSON.stringify(
-      data,
-      null,
-      2
-    ),
-    {
-      status,
-
-      headers: {
-
-        "Content-Type":
-          "application/json; charset=utf-8",
-
-        "Cache-Control":
-          "no-store"
-      }
+        image.alt =
+            currentLatest
+                .heroImage
+                .alt
+            ||
+            "";
     }
-  );
+
+
+    renderPhotoCredit(
+        document.getElementById(
+            "photo-credit"
+        ),
+        currentLatest.heroImage
+    );
+
+
+    if (
+        article.summary
+    ) {
+
+        document
+            .getElementById(
+                "summary-box"
+            )
+            .style.display =
+                "block";
+
+
+        document
+            .getElementById(
+                "article-summary"
+            )
+            .textContent =
+                cleanReaderText(
+                    article.summary
+                );
+    }
+
+
+    const articleText =
+        document.getElementById(
+            "article-text"
+        );
+
+
+    articleText.innerHTML =
+        "";
+
+
+    safeArray(
+        article.paragraphs
+    )
+        .forEach(
+            paragraph => {
+
+                const p =
+                    document.createElement(
+                        "p"
+                    );
+
+
+                p.textContent =
+                    cleanReaderText(
+                        paragraph
+                    );
+
+
+                articleText.appendChild(
+                    p
+                );
+            }
+        );
+
+
+    const why =
+        safeArray(
+            article.whyTalkAboutIt
+        );
+
+
+    if (
+        why.length
+    ) {
+
+        document
+            .getElementById(
+                "why-box"
+            )
+            .style.display =
+                "block";
+
+
+        const list =
+            document.getElementById(
+                "why-list"
+            );
+
+
+        list.innerHTML =
+            "";
+
+
+        why.forEach(
+            value => {
+
+                const li =
+                    document.createElement(
+                        "li"
+                    );
+
+
+                li.textContent =
+                    cleanReaderText(
+                        value
+                    );
+
+
+                list.appendChild(
+                    li
+                );
+            }
+        );
+    }
+
+
+    const byline =
+        currentLatest.byline
+        ||
+        article.byline;
+
+
+    if (
+        byline
+    ) {
+
+        document
+            .getElementById(
+                "article-byline"
+            )
+            .style.display =
+                "flex";
+
+
+        document
+            .getElementById(
+                "article-byline-name"
+            )
+            .textContent =
+                byline;
+
+
+        document
+            .getElementById(
+                "article-byline-avatar"
+            )
+            .textContent =
+                byline === "Camille"
+                    ? "✨"
+                    : byline === "Bettan"
+                        ? "☕"
+                        : "📰";
+    }
+
+
+    renderSources(
+        currentLatest.sources
+    );
+
+
+    currentPollOptions =
+        safeArray(
+            article.pollOptions
+        );
+
+
+    document
+        .getElementById(
+            "poll-question"
+        )
+        .textContent =
+            article.pollQuestion
+            ||
+            "Vad säger fikabordet?";
+
+
+    renderPollOptions();
+
+
+    if (
+        currentLatest.sidebarContent
+    ) {
+
+        renderSideCard(
+            currentLatest
+                .sidebarContent
+                .tip,
+            "fika-tip"
+        );
+
+
+        renderSideCard(
+            currentLatest
+                .sidebarContent
+                .fact,
+            "fika-fact"
+        );
+    }
+
+
+    await loadEngagement();
 }
+
+
+/* =====================================================
+   ENGAGEMENT
+===================================================== */
+
+
+async function loadEngagement() {
+
+    if (
+        !currentLatest?.id
+    ) {
+        return;
+    }
+
+
+    try {
+
+        const response =
+            await fetch(
+                "/.netlify/functions/engagement?articleId="
+                +
+                encodeURIComponent(
+                    currentLatest.id
+                )
+                +
+                "&t="
+                +
+                Date.now(),
+                {
+                    cache:
+                        "no-store"
+                }
+            );
+
+
+        if (!response.ok) {
+            return;
+        }
+
+
+        const result =
+            await response.json();
+
+
+        currentEngagement =
+            result.engagement;
+
+
+        renderEngagement();
+
+
+    } catch (error) {
+
+        console.error(
+            "Fikarummet kunde inte laddas:",
+            error
+        );
+    }
+}
+
+
+function renderEngagement() {
+
+    if (!currentEngagement) {
+        return;
+    }
+
+
+    document
+        .getElementById(
+            "count-main-up"
+        )
+        .textContent =
+            currentEngagement
+                .thumbs
+                .up;
+
+
+    document
+        .getElementById(
+            "count-main-down"
+        )
+        .textContent =
+            currentEngagement
+                .thumbs
+                .down;
+
+
+    renderComments(
+        currentEngagement.comments
+    );
+
+
+    const voted =
+        localStorage.getItem(
+            thumbStorageKey()
+        );
+
+
+    if (voted) {
+
+        document
+            .getElementById(
+                "thumb-up-button"
+            )
+            .disabled =
+                true;
+
+
+        document
+            .getElementById(
+                "thumb-down-button"
+            )
+            .disabled =
+                true;
+    }
+
+
+    const pollVote =
+        localStorage.getItem(
+            pollStorageKey()
+        );
+
+
+    if (
+        pollVote !== null
+    ) {
+
+        showPollResults();
+    }
+}
+
+
+async function postEngagement(
+    body
+) {
+
+    const response =
+        await fetch(
+            "/.netlify/functions/engagement",
+            {
+                method:
+                    "POST",
+
+                headers: {
+                    "Content-Type":
+                        "application/json"
+                },
+
+                body:
+                    JSON.stringify(
+                        {
+                            articleId:
+                                currentLatest.id,
+
+                            ...body
+                        }
+                    )
+            }
+        );
+
+
+    const result =
+        await response.json();
+
+
+    if (!response.ok) {
+
+        throw new Error(
+            result.error
+            ||
+            "Något gick fel."
+        );
+    }
+
+
+    currentEngagement =
+        result.engagement;
+
+
+    renderEngagement();
+
+
+    return result;
+}
+
+
+/* =====================================================
+   TUMME
+===================================================== */
+
+
+async function voteThumb(
+    direction
+) {
+
+    if (
+        !currentLatest
+    ) {
+        return;
+    }
+
+
+    if (
+        localStorage.getItem(
+            thumbStorageKey()
+        )
+    ) {
+
+        return;
+    }
+
+
+    const up =
+        document.getElementById(
+            "thumb-up-button"
+        );
+
+
+    const down =
+        document.getElementById(
+            "thumb-down-button"
+        );
+
+
+    up.disabled =
+        true;
+
+
+    down.disabled =
+        true;
+
+
+    try {
+
+        await postEngagement(
+            {
+                action:
+                    "thumb",
+
+                value:
+                    direction
+            }
+        );
+
+
+        localStorage.setItem(
+            thumbStorageKey(),
+            direction
+        );
+
+
+    } catch (error) {
+
+        up.disabled =
+            false;
+
+
+        down.disabled =
+            false;
+
+
+        alert(
+            error.message
+        );
+    }
+}
+
+
+/* =====================================================
+   POLL
+===================================================== */
+
+
+function renderPollOptions() {
+
+    const container =
+        document.getElementById(
+            "poll-options-container"
+        );
+
+
+    container.innerHTML =
+        "";
+
+
+    currentPollOptions.forEach(
+        (
+            option,
+            index
+        ) => {
+
+            const label =
+                document.createElement(
+                    "label"
+                );
+
+
+            label.className =
+                "poll-option";
+
+
+            const radio =
+                document.createElement(
+                    "input"
+                );
+
+
+            radio.type =
+                "radio";
+
+
+            radio.name =
+                "poll";
+
+
+            radio.value =
+                String(
+                    index
+                );
+
+
+            const span =
+                document.createElement(
+                    "span"
+                );
+
+
+            span.textContent =
+                cleanReaderText(
+                    option
+                );
+
+
+            label.append(
+                radio,
+                span
+            );
+
+
+            container.appendChild(
+                label
+            );
+        }
+    );
+}
+
+
+async function submitPoll() {
+
+    const selected =
+        document.querySelector(
+            'input[name="poll"]:checked'
+        );
+
+
+    if (!selected) {
+
+        alert(
+            "Välj ett alternativ först!"
+        );
+
+        return;
+    }
+
+
+    if (
+        localStorage.getItem(
+            pollStorageKey()
+        ) !== null
+    ) {
+
+        showPollResults();
+
+        return;
+    }
+
+
+    const button =
+        document.getElementById(
+            "poll-submit-button"
+        );
+
+
+    button.disabled =
+        true;
+
+
+    try {
+
+        const option =
+            Number(
+                selected.value
+            );
+
+
+        await postEngagement(
+            {
+                action:
+                    "poll",
+
+                option
+            }
+        );
+
+
+        localStorage.setItem(
+            pollStorageKey(),
+            String(
+                option
+            )
+        );
+
+
+        showPollResults();
+
+
+    } catch (error) {
+
+        button.disabled =
+            false;
+
+
+        alert(
+            error.message
+        );
+    }
+}
+
+
+function showPollResults() {
+
+    if (
+        !currentEngagement
+    ) {
+        return;
+    }
+
+
+    document
+        .getElementById(
+            "poll-form"
+        )
+        .style.display =
+            "none";
+
+
+    const box =
+        document.getElementById(
+            "poll-results"
+        );
+
+
+    box.style.display =
+        "block";
+
+
+    const votes =
+        currentEngagement.poll;
+
+
+    const total =
+        votes[0]
+        +
+        votes[1];
+
+
+    for (
+        let index = 0;
+        index < 2;
+        index++
+    ) {
+
+        const percentage =
+            total
+                ? Math.round(
+                    (
+                        votes[index]
+                        /
+                        total
+                    )
+                    *
+                    100
+                )
+                : 0;
+
+
+        const row =
+            document.getElementById(
+                `poll-result-${index}`
+            );
+
+
+        row.innerHTML =
+            "";
+
+
+        const head =
+            document.createElement(
+                "div"
+            );
+
+
+        head.className =
+            "poll-result-head";
+
+
+        const optionName =
+            document.createElement(
+                "span"
+            );
+
+
+        optionName.textContent =
+            currentPollOptions[
+                index
+            ]
+            ||
+            `Alternativ ${index + 1}`;
+
+
+        const percent =
+            document.createElement(
+                "span"
+            );
+
+
+        percent.textContent =
+            `${percentage} %`;
+
+
+        head.append(
+            optionName,
+            percent
+        );
+
+
+        const bar =
+            document.createElement(
+                "div"
+            );
+
+
+        bar.className =
+            "poll-bar";
+
+
+        const fill =
+            document.createElement(
+                "div"
+            );
+
+
+        fill.className =
+            "poll-bar-fill";
+
+
+        fill.style.width =
+            `${percentage}%`;
+
+
+        bar.appendChild(
+            fill
+        );
+
+
+        row.append(
+            head,
+            bar
+        );
+    }
+
+
+    document
+        .getElementById(
+            "poll-total"
+        )
+        .textContent =
+            total === 1
+                ? "1 person har tyckt till."
+                : `${total} personer har tyckt till.`;
+}
+
+
+/* =====================================================
+   KOMMENTARER
+===================================================== */
+
+
+async function addComment() {
+
+    const nameInput =
+        document.getElementById(
+            "comment-name"
+        );
+
+
+    const textInput =
+        document.getElementById(
+            "comment-text"
+        );
+
+
+    const text =
+        textInput.value
+            .trim();
+
+
+    if (!text) {
+
+        alert(
+            "Skriv vad fikabordet säger först!"
+        );
+
+        return;
+    }
+
+
+    const button =
+        document.getElementById(
+            "comment-submit-button"
+        );
+
+
+    button.disabled =
+        true;
+
+
+    try {
+
+        await postEngagement(
+            {
+                action:
+                    "comment",
+
+                name:
+                    nameInput.value,
+
+                text
+            }
+        );
+
+
+        nameInput.value =
+            "";
+
+
+        textInput.value =
+            "";
+
+
+    } catch (error) {
+
+        alert(
+            error.message
+        );
+
+
+    } finally {
+
+        button.disabled =
+            false;
+    }
+}
+
+
+function renderComments(
+    comments
+) {
+
+    const list =
+        document.getElementById(
+            "comments-list"
+        );
+
+
+    list.innerHTML =
+        "";
+
+
+    const values =
+        safeArray(
+            comments
+        );
+
+
+    if (!values.length) {
+
+        const empty =
+            document.createElement(
+                "div"
+            );
+
+
+        empty.className =
+            "empty-comments";
+
+
+        empty.textContent =
+            "Inga kommentarer ännu. Du kan bli först.";
+
+
+        list.appendChild(
+            empty
+        );
+
+
+        return;
+    }
+
+
+    values.forEach(
+        comment => {
+
+            const item =
+                document.createElement(
+                    "div"
+                );
+
+
+            item.className =
+                "comment-item";
+
+
+            const name =
+                document.createElement(
+                    "span"
+                );
+
+
+            name.className =
+                "comment-name";
+
+
+            name.textContent =
+                comment.name ||
+                "Anonym kollega";
+
+
+            const date =
+                document.createElement(
+                    "span"
+                );
+
+
+            date.className =
+                "comment-date";
+
+
+            date.textContent =
+                formatCommentTime(
+                    comment.createdAt
+                );
+
+
+            const body =
+                document.createElement(
+                    "p"
+                );
+
+
+            body.className =
+                "comment-body";
+
+
+            body.textContent =
+                comment.text ||
+                "";
+
+
+            item.append(
+                name,
+                date,
+                body
+            );
+
+
+            list.appendChild(
+                item
+            );
+        }
+    );
+}
+
+
+/* =====================================================
+   LOCAL STORAGE
+===================================================== */
+
+
+function thumbStorageKey() {
+
+    return (
+        "kafferasten-thumb-"
+        +
+        currentLatest.id
+    );
+}
+
+
+function pollStorageKey() {
+
+    return (
+        "kafferasten-poll-"
+        +
+        currentLatest.id
+    );
+}
+
+
+/* =====================================================
+   ARKIV
+===================================================== */
+
+
+async function loadArchive() {
+
+    const response =
+        await fetch(
+            "/.netlify/functions/archive-news?t="
+            +
+            Date.now(),
+            {
+                cache:
+                    "no-store"
+            }
+        );
+
+
+    if (!response.ok) {
+        return;
+    }
+
+
+    const result =
+        await response.json();
+
+
+    archiveArticles =
+        safeArray(
+            result.articles
+        )
+
+            .filter(
+                item =>
+                    item.id
+                    !==
+                    currentLatest?.id
+            )
+
+            .slice(
+                0,
+                5
+            );
+
+
+    const list =
+        document.getElementById(
+            "archive-list"
+        );
+
+
+    list.innerHTML =
+        "";
+
+
+    archiveArticles.forEach(
+        (
+            item,
+            index
+        ) => {
+
+            const article =
+                item.article;
+
+
+            const card =
+                document.createElement(
+                    "div"
+                );
+
+
+            card.className =
+                "archive-item";
+
+
+            card.innerHTML =
+                `
+                    <div class="archive-meta">
+                        ${cleanReaderText(
+                            article.category
+                        )}
+                        ·
+                        ${formatArchiveDate(
+                            item.createdAt
+                        )}
+                    </div>
+                `;
+
+
+            const title =
+                document.createElement(
+                    "span"
+                );
+
+
+            title.className =
+                "archive-title";
+
+
+            title.textContent =
+                cleanReaderText(
+                    article.title
+                );
+
+
+            const summary =
+                document.createElement(
+                    "p"
+                );
+
+
+            summary.className =
+                "archive-summary";
+
+
+            summary.textContent =
+                cleanReaderText(
+                    article.summary
+                );
+
+
+            const button =
+                document.createElement(
+                    "button"
+                );
+
+
+            button.className =
+                "archive-open";
+
+
+            button.textContent =
+                "Läs snackisen ↓";
+
+
+            button.onclick =
+                () =>
+                    openArchiveReader(
+                        index
+                    );
+
+
+            card.append(
+                title,
+                summary,
+                button
+            );
+
+
+            list.appendChild(
+                card
+            );
+        }
+    );
+}
+
+
+function openArchiveReader(
+    index
+) {
+
+    const item =
+        archiveArticles[
+            index
+        ];
+
+
+    const reader =
+        document.getElementById(
+            "archive-reader"
+        );
+
+
+    document
+        .getElementById(
+            "archive-reader-meta"
+        )
+        .textContent =
+            `${item.article.category} · ${formatArchiveDate(item.createdAt)}`;
+
+
+    document
+        .getElementById(
+            "archive-reader-title"
+        )
+        .textContent =
+            item.article.title;
+
+
+    const content =
+        document.getElementById(
+            "archive-reader-content"
+        );
+
+
+    content.innerHTML =
+        "";
+
+
+    safeArray(
+        item.article.paragraphs
+    )
+        .forEach(
+            paragraph => {
+
+                const p =
+                    document.createElement(
+                        "p"
+                    );
+
+
+                p.textContent =
+                    cleanReaderText(
+                        paragraph
+                    );
+
+
+                content.appendChild(
+                    p
+                );
+            }
+        );
+
+
+    document
+        .getElementById(
+            "archive-reader-byline"
+        )
+        .textContent =
+            item.byline
+                ? `Serverad av ${item.byline} ☕`
+                : "";
+
+
+    reader.classList.add(
+        "is-open"
+    );
+
+
+    reader.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+    });
+}
+
+
+function closeArchiveReader() {
+
+    document
+        .getElementById(
+            "archive-reader"
+        )
+        .classList.remove(
+            "is-open"
+        );
+}
+
+
+/* =====================================================
+   DATUM
+===================================================== */
+
+
+function formatPublishedTime(
+    isoDate
+) {
+
+    return new Intl.DateTimeFormat(
+        "sv-SE",
+        {
+            timeZone:
+                "Europe/Stockholm",
+
+            day:
+                "numeric",
+
+            month:
+                "long",
+
+            hour:
+                "2-digit",
+
+            minute:
+                "2-digit"
+        }
+    )
+        .format(
+            new Date(
+                isoDate
+            )
+        );
+}
+
+
+function formatArchiveDate(
+    isoDate
+) {
+
+    return new Intl.DateTimeFormat(
+        "sv-SE",
+        {
+            timeZone:
+                "Europe/Stockholm",
+
+            day:
+                "numeric",
+
+            month:
+                "long"
+        }
+    )
+        .format(
+            new Date(
+                isoDate
+            )
+        );
+}
+
+
+function formatCommentTime(
+    isoDate
+) {
+
+    if (!isoDate) {
+        return "";
+    }
+
+
+    return new Intl.DateTimeFormat(
+        "sv-SE",
+        {
+            timeZone:
+                "Europe/Stockholm",
+
+            day:
+                "numeric",
+
+            month:
+                "short",
+
+            hour:
+                "2-digit",
+
+            minute:
+                "2-digit"
+        }
+    )
+        .format(
+            new Date(
+                isoDate
+            )
+        );
+}
+
+
+/* =====================================================
+   DELNING
+===================================================== */
+
+
+async function copyLink() {
+
+    try {
+
+        await navigator
+            .clipboard
+            .writeText(
+                window.location.href
+            );
+
+
+        alert(
+            "Länken är kopierad – skicka den till fikagänget! ☕"
+        );
+
+
+    } catch {
+
+        alert(
+            "Kunde inte kopiera länken."
+        );
+    }
+}
+
+
+/* =====================================================
+   START
+===================================================== */
+
+
+async function startKafferasten() {
+
+    try {
+
+        await loadLatestNews();
+
+        await loadArchive();
+
+
+    } catch (error) {
+
+        console.error(
+            error
+        );
+
+
+        document
+            .getElementById(
+                "article-title"
+            )
+            .textContent =
+                "Kaffet är klart – snackisen dröjer lite";
+    }
+}
+
+
+startKafferasten();
+
+
+</script>
+
+
+</body>
+
+</html>
