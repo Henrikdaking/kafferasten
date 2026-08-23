@@ -15,27 +15,127 @@
         content="#2D1A17"
     >
 
-    <meta
-        name="description"
-        content="Kafferasten.se serverar en ny snackis varje vardag inför 09-fikat och 15-rasten."
-    >
+
+    <!-- ==================================================
+         SEO – GRUND
+    ================================================== -->
+
 
     <title>
-        Kafferasten.se – Dagens snackis till fikat
+        Kafferasten.se – Dagens snackis & samtalsämne till fikat
     </title>
 
 
-    <!--
-        FAVICON
-        Inbyggd direkt i HTML.
-        Ingen separat bildfil behövs.
-    -->
+    <meta
+        name="description"
+        content="Roliga nyheter och aktuella samtalsämnen till fikat på jobbet. Kafferasten.se serverar en ny snackis varje vardag inför 09-fikat och 15-rasten."
+    >
+
+
+    <meta
+        name="robots"
+        content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
+    >
+
+
+    <link
+        rel="canonical"
+        href="https://kafferasten.se/"
+    >
+
+
+    <!-- ==================================================
+         OPEN GRAPH – DELNING
+    ================================================== -->
+
+
+    <meta
+        property="og:locale"
+        content="sv_SE"
+    >
+
+
+    <meta
+        property="og:type"
+        content="website"
+    >
+
+
+    <meta
+        property="og:site_name"
+        content="Kafferasten.se"
+    >
+
+
+    <meta
+        property="og:url"
+        content="https://kafferasten.se/"
+    >
+
+
+    <meta
+        property="og:title"
+        content="Kafferasten.se – Dagens snackis till fikat"
+    >
+
+
+    <meta
+        property="og:description"
+        content="En ny aktuell snackis till fikat på jobbet varje vardag. Något att prata om när kaffet är klart."
+    >
+
+
+    <!-- ==================================================
+         TWITTER / X
+    ================================================== -->
+
+
+    <meta
+        name="twitter:card"
+        content="summary"
+    >
+
+
+    <meta
+        name="twitter:title"
+        content="Kafferasten.se – Dagens snackis till fikat"
+    >
+
+
+    <meta
+        name="twitter:description"
+        content="Roliga nyheter och aktuella samtalsämnen till fikat på jobbet – ny snackis varje vardag."
+    >
+
+
+    <!-- ==================================================
+         FAVICON
+    ================================================== -->
+
 
     <link
         rel="icon"
         type="image/svg+xml"
         href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232D1A17'/%3E%3Ctext x='32' y='45' text-anchor='middle' font-size='38'%3E%E2%98%95%3C/text%3E%3C/svg%3E"
     >
+
+
+    <!-- ==================================================
+         STRUCTURED DATA – WEB SITE
+    ================================================== -->
+
+
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "Kafferasten.se",
+        "alternateName": "Kafferasten",
+        "url": "https://kafferasten.se/",
+        "description": "Roliga nyheter och aktuella samtalsämnen till fikat på jobbet. En ny snackis varje vardag inför 09-fikat och 15-rasten.",
+        "inLanguage": "sv-SE"
+    }
+    </script>
 
 
     <style>
@@ -414,9 +514,6 @@
             font-size: 0.75rem;
 
             font-weight: 850;
-
-            transition:
-                background 0.2s ease;
         }
 
 
@@ -934,7 +1031,6 @@
 
 
         .btn:hover:not(:disabled) {
-
             background: white;
         }
 
@@ -1088,7 +1184,6 @@
 
 
         .poll-option:hover {
-
             background: white;
         }
 
@@ -1351,6 +1446,7 @@
             display: none;
 
             width: 100%;
+
             height: 100%;
 
             object-fit: cover;
@@ -1603,15 +1699,14 @@
 
 
         /* ==================================================
-           FOOTER
+           FOOTER / SEO-TEXT
         ================================================== */
 
 
         footer {
 
-            text-align: center;
-
-            padding: 2rem 1rem;
+            padding:
+                2rem 1rem 2.25rem;
 
             border-top:
                 1px solid
@@ -1620,7 +1715,67 @@
             color:
                 var(--text-muted);
 
+            text-align: center;
+
             font-size: 0.82rem;
+        }
+
+
+        .footer-inner {
+
+            max-width: 720px;
+
+            margin: 0 auto;
+        }
+
+
+        .footer-description {
+
+            margin:
+                0 auto 0.75rem;
+
+            line-height: 1.55;
+        }
+
+
+        .footer-links {
+
+            display: flex;
+
+            justify-content: center;
+
+            align-items: center;
+
+            gap: 0.55rem;
+
+            flex-wrap: wrap;
+        }
+
+
+        .footer-links a {
+
+            color:
+                var(--primary-color);
+
+            font-weight: 700;
+
+            text-decoration: none;
+        }
+
+
+        .footer-links a:hover {
+
+            color:
+                var(--accent-color);
+
+            text-decoration: underline;
+        }
+
+
+        .footer-dot {
+
+            color:
+                #B9A99D;
         }
 
 
@@ -1809,6 +1964,21 @@
 
                 font-size: 0.91rem;
             }
+
+
+            footer {
+
+                padding:
+                    1.7rem 1rem 2rem;
+            }
+
+
+            .footer-description {
+
+                max-width: 500px;
+
+                font-size: 0.78rem;
+            }
         }
 
 
@@ -1875,9 +2045,13 @@
     <a
         class="brand"
         href="/"
+        aria-label="Kafferasten.se – startsidan"
     >
 
-        <span class="coffee-mark">
+        <span
+            class="coffee-mark"
+            aria-hidden="true"
+        >
 
             <span class="steam s1"></span>
             <span class="steam s2"></span>
@@ -1902,11 +2076,6 @@
     </p>
 
 </header>
-
-
-<!-- ==================================================
-     SMART STATUSRAD
-================================================== -->
 
 
 <div class="schedule-banner">
@@ -1945,11 +2114,6 @@
 
 
 <main>
-
-
-<!-- ==================================================
-     DAGENS SNACKIS
-================================================== -->
 
 
 <article class="card">
@@ -2139,11 +2303,6 @@
 </article>
 
 
-<!-- ==================================================
-     FIKAFRÅGA + KOMMENTARER
-================================================== -->
-
-
 <section class="card conversation-card">
 
     <div class="section-kicker">
@@ -2263,11 +2422,6 @@
 </section>
 
 
-<!-- ==================================================
-     ARKIV
-================================================== -->
-
-
 <section class="card">
 
     <h3>
@@ -2328,11 +2482,6 @@
 
 
 </main>
-
-
-<!-- ==================================================
-     SIDOSPALT
-================================================== -->
 
 
 <aside>
@@ -2459,7 +2608,38 @@
 
 
 <footer>
-    Kafferasten.se – något att prata om när kaffet är klart. ☕
+
+    <div class="footer-inner">
+
+        <p class="footer-description">
+            Kafferasten.se bjuder på roliga nyheter, aktuella samtalsämnen
+            och en ny snackis till fikat på jobbet varje vardag. ☕
+        </p>
+
+
+        <div class="footer-links">
+
+            <a href="/">
+                Kafferasten.se
+            </a>
+
+
+            <span
+                class="footer-dot"
+                aria-hidden="true"
+            >
+                ·
+            </span>
+
+
+            <a href="/om.html">
+                Om Kafferasten
+            </a>
+
+        </div>
+
+    </div>
+
 </footer>
 
 
@@ -2667,12 +2847,6 @@ function updateCoffeeClock() {
         "status-badge";
 
 
-    /*
-        Intl med en-GB ger:
-        Mon, Tue, Wed, Thu, Fri, Sat, Sun
-    */
-
-
     const saturday =
         now.weekday === "Sat";
 
@@ -2688,11 +2862,6 @@ function updateCoffeeClock() {
     const weekend =
         saturday ||
         sunday;
-
-
-    /* ===============================================
-       HELG
-    =============================================== */
 
 
     if (
@@ -2720,11 +2889,6 @@ function updateCoffeeClock() {
     }
 
 
-    /* ===============================================
-       TIDIG MORGON
-    =============================================== */
-
-
     if (
         now.hour < 7
     ) {
@@ -2750,11 +2914,6 @@ function updateCoffeeClock() {
     }
 
 
-    /* ===============================================
-       07:00 – 08:59
-    =============================================== */
-
-
     if (
         now.hour < 9
     ) {
@@ -2773,11 +2932,6 @@ function updateCoffeeClock() {
 
         return;
     }
-
-
-    /* ===============================================
-       09:00 – 12:59
-    =============================================== */
 
 
     if (
@@ -2800,11 +2954,6 @@ function updateCoffeeClock() {
     }
 
 
-    /* ===============================================
-       13:00 – 14:59
-    =============================================== */
-
-
     if (
         now.hour < 15
     ) {
@@ -2823,11 +2972,6 @@ function updateCoffeeClock() {
 
         return;
     }
-
-
-    /* ===============================================
-       15:00 – 17:59
-    =============================================== */
 
 
     if (
@@ -2850,11 +2994,6 @@ function updateCoffeeClock() {
 
         return;
     }
-
-
-    /* ===============================================
-       FREDAG KVÄLL
-    =============================================== */
 
 
     if (
@@ -2880,11 +3019,6 @@ function updateCoffeeClock() {
 
         return;
     }
-
-
-    /* ===============================================
-       VARDAGSKVÄLL
-    =============================================== */
 
 
     main.textContent =
@@ -3502,9 +3636,6 @@ async function loadLatestNews() {
     );
 
 
-    /* HERO */
-
-
     if (
         currentLatest.heroImage?.url
     ) {
@@ -3544,9 +3675,6 @@ async function loadLatestNews() {
     );
 
 
-    /* SNABBÖVERSIKT */
-
-
     const summaryBox =
         document.getElementById(
             "summary-box"
@@ -3576,9 +3704,6 @@ async function loadLatestNews() {
         summaryBox.style.display =
             "none";
     }
-
-
-    /* BRÖDTEXT */
 
 
     const articleText =
@@ -3623,9 +3748,6 @@ async function loadLatestNews() {
                 );
             }
         );
-
-
-    /* VARFÖR FIKA */
 
 
     const why =
@@ -3687,9 +3809,6 @@ async function loadLatestNews() {
     }
 
 
-    /* BYLINE */
-
-
     const byline =
         cleanReaderText(
             currentLatest.byline
@@ -3741,15 +3860,9 @@ async function loadLatestNews() {
     }
 
 
-    /* KÄLLOR */
-
-
     renderSources(
         currentLatest.sources
     );
-
-
-    /* POLL */
 
 
     currentPollOptions =
@@ -3773,9 +3886,6 @@ async function loadLatestNews() {
     renderPollOptions();
 
 
-    /* SIDOINNEHÅLL */
-
-
     if (
         currentLatest.sidebarContent
     ) {
@@ -3797,9 +3907,6 @@ async function loadLatestNews() {
             "fika-fact"
         );
     }
-
-
-    /* ENGAGEMANG */
 
 
     await loadEngagement();
@@ -5120,18 +5227,8 @@ async function copyLink() {
 
 async function startKafferasten() {
 
-    /*
-        Kaffeklockan körs direkt.
-        Den behöver alltså inte vänta på backend.
-    */
-
     updateCoffeeClock();
 
-
-    /*
-        Uppdatera statusen varje minut om någon
-        råkar ha Kafferasten öppen länge.
-    */
 
     setInterval(
         updateCoffeeClock,
