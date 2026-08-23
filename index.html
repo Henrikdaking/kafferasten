@@ -25,20 +25,40 @@
     </title>
 
 
+    <!--
+        FAVICON
+        Inbyggd direkt i HTML.
+        Ingen separat bildfil behövs.
+    -->
+
+    <link
+        rel="icon"
+        type="image/svg+xml"
+        href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232D1A17'/%3E%3Ctext x='32' y='45' text-anchor='middle' font-size='38'%3E%E2%98%95%3C/text%3E%3C/svg%3E"
+    >
+
+
     <style>
 
         :root {
 
             --bg-color: #F8F4EE;
             --card-bg: #FFFFFF;
+
             --primary-color: #2D1A17;
+            --primary-soft: #49302B;
+
             --accent-color: #C86D3B;
             --accent-hover: #A85528;
+
             --text-color: #2C221E;
             --text-muted: #74635B;
+
             --border-color: #E2D7CD;
+
             --highlight-bg: #EFE4D8;
             --soft-accent: #F5E7DD;
+
             --green: #2E9D55;
 
             --shadow:
@@ -103,6 +123,17 @@
         }
 
 
+        a {
+            -webkit-tap-highlight-color:
+                transparent;
+        }
+
+
+        /* ==================================================
+           HEADER
+        ================================================== */
+
+
         header {
 
             position: relative;
@@ -129,7 +160,35 @@
         }
 
 
+        header::after {
+
+            content: "";
+
+            position: absolute;
+
+            width: 320px;
+            height: 320px;
+
+            border-radius: 50%;
+
+            right: -190px;
+            top: -210px;
+
+            background:
+                rgba(
+                    255,
+                    255,
+                    255,
+                    0.035
+                );
+        }
+
+
         .brand {
+
+            position: relative;
+
+            z-index: 1;
 
             display: inline-flex;
 
@@ -152,6 +211,8 @@
             font-weight: 900;
 
             letter-spacing: -1.2px;
+
+            line-height: 1;
         }
 
 
@@ -165,12 +226,16 @@
             display: inline-grid;
 
             place-items: end center;
+
+            flex: 0 0 auto;
         }
 
 
         .coffee-cup {
 
             font-size: 2rem;
+
+            line-height: 1;
         }
 
 
@@ -258,12 +323,23 @@
 
         header p {
 
+            position: relative;
+
+            z-index: 1;
+
             margin:
                 0.65rem 0 0;
 
             color:
                 #E4D7CF;
+
+            font-size: 1rem;
         }
+
+
+        /* ==================================================
+           SMART STATUSRAD
+        ================================================== */
 
 
         .schedule-banner {
@@ -278,7 +354,8 @@
             text-align: center;
 
             padding:
-                0.72rem 1rem;
+                0.72rem 1rem
+                0.68rem;
         }
 
 
@@ -299,18 +376,30 @@
         }
 
 
-        .brew-note {
+        .schedule-main {
 
-            margin-top: 0.18rem;
+            color:
+                var(--primary-color);
+        }
 
-            font-size: 0.77rem;
+
+        .schedule-detail {
+
+            margin-top:
+                0.18rem;
 
             color:
                 var(--text-muted);
+
+            font-size: 0.76rem;
         }
 
 
         .status-badge {
+
+            display: inline-flex;
+
+            align-items: center;
 
             background:
                 var(--green);
@@ -325,7 +414,29 @@
             font-size: 0.75rem;
 
             font-weight: 850;
+
+            transition:
+                background 0.2s ease;
         }
+
+
+        .status-badge.weekend {
+
+            background:
+                var(--accent-color);
+        }
+
+
+        .status-badge.resting {
+
+            background:
+                #7F6A60;
+        }
+
+
+        /* ==================================================
+           LAYOUT
+        ================================================== */
 
 
         .container {
@@ -375,6 +486,11 @@
         }
 
 
+        /* ==================================================
+           HUVUDARTIKEL
+        ================================================== */
+
+
         .article-topline {
 
             display: flex;
@@ -410,6 +526,8 @@
             font-weight: 850;
 
             text-transform: uppercase;
+
+            letter-spacing: 0.4px;
         }
 
 
@@ -421,6 +539,8 @@
             font-size: 0.76rem;
 
             font-weight: 650;
+
+            white-space: nowrap;
         }
 
 
@@ -434,11 +554,14 @@
 
             font-family:
                 Georgia,
+                "Times New Roman",
                 serif;
 
             font-size: 2.15rem;
 
             line-height: 1.12;
+
+            letter-spacing: -0.7px;
         }
 
 
@@ -449,10 +572,16 @@
 
             margin:
                 0 0 0.9rem;
+
+            font-size: 1.28rem;
+
+            line-height: 1.25;
         }
 
 
         .article-hero-img {
+
+            display: block;
 
             width: 100%;
 
@@ -461,6 +590,9 @@
             object-fit: cover;
 
             border-radius: 15px;
+
+            background:
+                var(--highlight-bg);
         }
 
 
@@ -473,8 +605,23 @@
                 var(--text-muted);
 
             text-align: right;
+        }
+
+
+        .photo-credit {
+
+            margin-top: 0.35rem;
 
             font-size: 0.68rem;
+        }
+
+
+        .side-photo-credit {
+
+            margin:
+                0.28rem 0 0.7rem;
+
+            font-size: 0.61rem;
         }
 
 
@@ -482,13 +629,21 @@
         .side-photo-credit a {
 
             color: inherit;
+
+            text-decoration: underline;
+
+            text-underline-offset: 2px;
         }
 
 
         .summary-box {
 
             background:
-                #F6EEE7;
+                linear-gradient(
+                    135deg,
+                    #FBF7F2,
+                    #F3EAE1
+                );
 
             border-left:
                 4px solid
@@ -502,6 +657,8 @@
 
             border-radius:
                 0 15px 15px 0;
+
+            font-size: 1rem;
         }
 
 
@@ -509,7 +666,17 @@
 
             display: block;
 
-            margin-bottom: 0.35rem;
+            margin-bottom:
+                0.35rem;
+
+            color:
+                var(--primary-color);
+        }
+
+
+        .article-content {
+
+            max-width: 690px;
         }
 
 
@@ -517,6 +684,7 @@
 
             font-family:
                 Georgia,
+                "Times New Roman",
                 serif;
 
             font-size: 1.06rem;
@@ -541,6 +709,28 @@
             margin:
                 1.5rem 0;
         }
+
+
+        .why-box strong {
+
+            color:
+                var(--primary-color);
+        }
+
+
+        .why-box ul {
+
+            margin:
+                0.6rem 0 0;
+
+            padding-left:
+                1.35rem;
+        }
+
+
+        /* ==================================================
+           SKRIBENT + KÄLLOR
+        ================================================== */
 
 
         .article-meta-box {
@@ -587,16 +777,20 @@
 
         .byline-copy {
 
-            font-size: 0.77rem;
-
             color:
                 var(--text-muted);
+
+            font-size: 0.77rem;
+
+            line-height: 1.3;
         }
 
 
         .byline-name {
 
             display: block;
+
+            margin-top: 0.12rem;
 
             color:
                 var(--primary-color);
@@ -611,6 +805,8 @@
 
             display: none;
 
+            align-items: flex-start;
+
             gap: 0.45rem;
 
             flex-wrap: wrap;
@@ -623,7 +819,17 @@
                 1px dashed
                 var(--border-color);
 
+            color:
+                var(--text-muted);
+
             font-size: 0.75rem;
+        }
+
+
+        .source-row strong {
+
+            color:
+                var(--primary-color);
         }
 
 
@@ -645,6 +851,15 @@
             font-weight: 750;
 
             text-decoration: none;
+        }
+
+
+        .source-link:hover {
+
+            color:
+                var(--accent-hover);
+
+            text-decoration: underline;
         }
 
 
@@ -677,6 +892,9 @@
             margin-bottom: 0.5rem;
 
             font-weight: 800;
+
+            color:
+                var(--primary-color);
         }
 
 
@@ -691,6 +909,8 @@
 
 
         .btn {
+
+            appearance: none;
 
             border:
                 1px solid
@@ -710,6 +930,12 @@
             cursor: pointer;
 
             font-weight: 700;
+        }
+
+
+        .btn:hover:not(:disabled) {
+
+            background: white;
         }
 
 
@@ -733,6 +959,13 @@
         }
 
 
+        .btn-primary:hover:not(:disabled) {
+
+            background:
+                var(--accent-hover);
+        }
+
+
         .share-row {
 
             display: flex;
@@ -741,6 +974,8 @@
                 space-between;
 
             align-items: center;
+
+            gap: 0.8rem;
 
             margin-top: 0.75rem;
 
@@ -764,8 +999,33 @@
 
 
         /* ==================================================
-           POLL
+           FIKAFRÅGA
         ================================================== */
+
+
+        .conversation-card {
+
+            position: relative;
+
+            overflow: hidden;
+        }
+
+
+        .conversation-card::before {
+
+            content: "💬";
+
+            position: absolute;
+
+            right: 1.2rem;
+            top: 0.45rem;
+
+            font-size: 4.7rem;
+
+            opacity: 0.045;
+
+            pointer-events: none;
+        }
 
 
         .section-kicker {
@@ -785,11 +1045,17 @@
 
         .poll-question {
 
+            margin:
+                0.4rem 0 1rem;
+
             font-family:
                 Georgia,
+                "Times New Roman",
                 serif;
 
             font-size: 1.25rem;
+
+            line-height: 1.35;
 
             color:
                 var(--primary-color);
@@ -800,13 +1066,14 @@
 
             display: flex;
 
+            align-items: flex-start;
+
             gap: 0.6rem;
 
             background:
                 var(--bg-color);
 
-            padding:
-                0.8rem;
+            padding: 0.8rem;
 
             border:
                 1px solid
@@ -820,7 +1087,15 @@
         }
 
 
+        .poll-option:hover {
+
+            background: white;
+        }
+
+
         .poll-option input {
+
+            margin-top: 0.28rem;
 
             accent-color:
                 var(--accent-color);
@@ -844,8 +1119,7 @@
 
         .poll-result-row {
 
-            margin-bottom:
-                0.9rem;
+            margin-bottom: 0.9rem;
         }
 
 
@@ -858,8 +1132,7 @@
 
             gap: 1rem;
 
-            margin-bottom:
-                0.3rem;
+            margin-bottom: 0.3rem;
 
             font-size: 0.85rem;
 
@@ -898,7 +1171,8 @@
 
         .poll-total {
 
-            margin: 0.7rem 0 0;
+            margin:
+                0.7rem 0 0;
 
             color:
                 var(--text-muted);
@@ -924,7 +1198,20 @@
         }
 
 
+        .comment-section h4 {
+
+            margin:
+                0 0 0.45rem;
+
+            color:
+                var(--primary-color);
+        }
+
+
         .comment-helper {
+
+            margin:
+                0 0 0.8rem;
 
             color:
                 var(--text-muted);
@@ -949,6 +1236,20 @@
 
             background:
                 #FCF9F5;
+
+            color:
+                var(--text-color);
+
+            outline: none;
+        }
+
+
+        .comment-input:focus {
+
+            background: white;
+
+            border-color:
+                var(--accent-color);
         }
 
 
@@ -965,10 +1266,10 @@
             margin:
                 1.25rem 0 0.55rem;
 
-            font-size: 0.84rem;
-
             color:
                 var(--text-muted);
+
+            font-size: 0.84rem;
 
             font-weight: 800;
         }
@@ -996,8 +1297,7 @@
 
         .comment-date {
 
-            margin-left:
-                0.35rem;
+            margin-left: 0.35rem;
 
             color:
                 var(--text-muted);
@@ -1011,8 +1311,7 @@
             margin:
                 0.25rem 0 0;
 
-            font-size:
-                0.9rem;
+            font-size: 0.9rem;
         }
 
 
@@ -1026,7 +1325,7 @@
 
 
         /* ==================================================
-           SIDAN
+           SIDOKORT
         ================================================== */
 
 
@@ -1052,7 +1351,6 @@
             display: none;
 
             width: 100%;
-
             height: 100%;
 
             object-fit: cover;
@@ -1078,6 +1376,8 @@
             font-weight: 850;
 
             text-transform: uppercase;
+
+            letter-spacing: 0.45px;
         }
 
 
@@ -1086,11 +1386,19 @@
             margin:
                 0 0 0.4rem;
 
+            color:
+                var(--primary-color);
+
             font-family:
                 Georgia,
+                "Times New Roman",
                 serif;
 
+            font-size: 1.08rem;
+
             font-weight: 800;
+
+            line-height: 1.25;
         }
 
 
@@ -1099,6 +1407,9 @@
             margin: 0;
 
             font-size: 0.88rem;
+
+            color:
+                #493B35;
         }
 
 
@@ -1108,6 +1419,9 @@
 
 
         .archive-subtitle {
+
+            margin:
+                -0.45rem 0 1rem;
 
             color:
                 var(--text-muted);
@@ -1149,6 +1463,8 @@
             font-weight: 800;
 
             text-transform: uppercase;
+
+            letter-spacing: 0.35px;
         }
 
 
@@ -1157,13 +1473,19 @@
             display: block;
 
             margin:
-                0.25rem 0;
+                0.25rem 0 0.35rem;
+
+            color:
+                var(--primary-color);
 
             font-family:
                 Georgia,
+                "Times New Roman",
                 serif;
 
             font-size: 1.05rem;
+
+            line-height: 1.28;
 
             font-weight: 800;
         }
@@ -1174,6 +1496,8 @@
             margin: 0;
 
             font-size: 0.85rem;
+
+            line-height: 1.5;
         }
 
 
@@ -1221,12 +1545,66 @@
 
         .archive-reader h4 {
 
+            margin:
+                0.4rem 0 0.8rem;
+
             font-family:
                 Georgia,
+                "Times New Roman",
                 serif;
 
             font-size: 1.25rem;
+
+            line-height: 1.3;
+
+            color:
+                var(--primary-color);
         }
+
+
+        .archive-reader p {
+
+            font-family:
+                Georgia,
+                "Times New Roman",
+                serif;
+
+            font-size: 0.94rem;
+
+            line-height: 1.6;
+        }
+
+
+        .archive-reader-meta {
+
+            color:
+                var(--accent-color);
+
+            font-size: 0.72rem;
+
+            font-weight: 800;
+
+            text-transform: uppercase;
+        }
+
+
+        .archive-reader-byline {
+
+            margin:
+                0.8rem 0;
+
+            color:
+                var(--text-muted);
+
+            font-size: 0.78rem;
+
+            font-style: italic;
+        }
+
+
+        /* ==================================================
+           FOOTER
+        ================================================== */
 
 
         footer {
@@ -1258,21 +1636,51 @@
             header {
 
                 padding:
-                    1.5rem 1rem;
+                    1.5rem 1rem
+                    1.4rem;
+            }
+
+
+            .brand {
+
+                gap: 0.55rem;
             }
 
 
             .brand h1 {
 
-                font-size:
-                    1.95rem;
+                font-size: 1.95rem;
             }
 
 
             header p {
 
-                font-size:
-                    0.86rem;
+                font-size: 0.86rem;
+            }
+
+
+            .schedule-banner {
+
+                padding:
+                    0.62rem 0.75rem;
+            }
+
+
+            .schedule-line {
+
+                gap: 0.45rem;
+
+                font-size: 0.78rem;
+
+                line-height: 1.35;
+            }
+
+
+            .schedule-detail {
+
+                margin-top: 0.26rem;
+
+                font-size: 0.69rem;
             }
 
 
@@ -1286,6 +1694,8 @@
 
                 padding:
                     0 0.72rem;
+
+                gap: 0;
             }
 
 
@@ -1302,6 +1712,10 @@
             h2 {
 
                 font-size: 1.7rem;
+
+                line-height: 1.12;
+
+                letter-spacing: -0.4px;
             }
 
 
@@ -1311,6 +1725,20 @@
 
                 aspect-ratio:
                     16 / 10;
+
+                border-radius: 13px;
+            }
+
+
+            .summary-box {
+
+                margin:
+                    1rem 0 1.2rem;
+
+                padding:
+                    0.92rem 1rem;
+
+                font-size: 0.92rem;
             }
 
 
@@ -1319,6 +1747,22 @@
                 font-size: 0.97rem;
 
                 line-height: 1.62;
+            }
+
+
+            .why-box {
+
+                padding:
+                    0.95rem 1rem;
+
+                margin:
+                    1.2rem 0;
+            }
+
+
+            .feedback {
+
+                padding: 0.85rem;
             }
 
 
@@ -1333,7 +1777,22 @@
 
             .btn {
 
+                padding:
+                    0.56rem 0.6rem;
+
                 font-size: 0.81rem;
+            }
+
+
+            .share-label {
+
+                font-size: 0.74rem;
+            }
+
+
+            .poll-question {
+
+                font-size: 1.16rem;
             }
 
 
@@ -1344,6 +1803,12 @@
                 aspect-ratio:
                     16 / 9;
             }
+
+
+            .archive-reader p {
+
+                font-size: 0.91rem;
+            }
         }
 
 
@@ -1351,15 +1816,15 @@
             max-width: 390px
         ) {
 
-            h2 {
-
-                font-size: 1.56rem;
-            }
-
-
             .brand h1 {
 
                 font-size: 1.72rem;
+            }
+
+
+            h2 {
+
+                font-size: 1.56rem;
             }
 
 
@@ -1367,6 +1832,33 @@
 
                 grid-template-columns:
                     1fr;
+            }
+
+
+            .article-topline {
+
+                align-items:
+                    flex-start;
+            }
+        }
+
+
+        @media (
+            prefers-reduced-motion: reduce
+        ) {
+
+            *,
+            *::before,
+            *::after {
+
+                animation-duration:
+                    0.01ms !important;
+
+                animation-iteration-count:
+                    1 !important;
+
+                transition-duration:
+                    0.01ms !important;
             }
         }
 
@@ -1412,29 +1904,37 @@
 </header>
 
 
+<!-- ==================================================
+     SMART STATUSRAD
+================================================== -->
+
+
 <div class="schedule-banner">
 
     <div class="schedule-line">
 
-        ⏰
-
-        <strong>
-            RYKANDE FÄRSKT:
-        </strong>
-
-        <span id="fika-time-text">
-            Hämtar...
+        <span
+            id="schedule-main"
+            class="schedule-main"
+        >
+            ☕ Kollar kaffeklockan...
         </span>
 
 
-        <span class="status-badge">
+        <span
+            id="status-badge"
+            class="status-badge"
+        >
             ☕ Nybryggt
         </span>
 
     </div>
 
 
-    <div class="brew-note">
+    <div
+        id="schedule-detail"
+        class="schedule-detail"
+    >
         Nya snackisar bryggs varje vardag inför 09-fikat och 15-rasten.
     </div>
 
@@ -1445,6 +1945,11 @@
 
 
 <main>
+
+
+<!-- ==================================================
+     DAGENS SNACKIS
+================================================== -->
 
 
 <article class="card">
@@ -1531,6 +2036,7 @@
 
     <div class="article-meta-box">
 
+
         <div
             id="article-byline"
             class="byline"
@@ -1565,8 +2071,9 @@
         >
 
             <strong>
-                🔎 Lästs in från:
+                🔎 Dagens scoop hittade vi hos:
             </strong>
+
 
             <span
                 id="source-links"
@@ -1613,7 +2120,7 @@
         <div class="share-row">
 
             <p class="share-label">
-                Skicka vidare till fikagänget.
+                Någon på jobbet som borde få den här?
             </p>
 
 
@@ -1632,7 +2139,12 @@
 </article>
 
 
-<section class="card">
+<!-- ==================================================
+     FIKAFRÅGA + KOMMENTARER
+================================================== -->
+
+
+<section class="card conversation-card">
 
     <div class="section-kicker">
         Fikabordets stora fråga
@@ -1662,7 +2174,7 @@
             onclick="submitPoll()"
             class="btn btn-primary"
         >
-            Skicka din röst
+            Tyck till
         </button>
 
     </div>
@@ -1699,12 +2211,12 @@
     <div class="comment-section">
 
         <h4>
-            💭 Vad sägs i ert fikarum?
+            💭 Snacket runt fikabordet
         </h4>
 
 
         <p class="comment-helper">
-            Här ser alla besökare samma fikarum.
+            Vad säger du – eller kollegan mittemot?
         </p>
 
 
@@ -1720,7 +2232,7 @@
             id="comment-text"
             class="comment-input"
             maxlength="500"
-            placeholder="Vad säger fikabordet?"
+            placeholder="Säg vad du tycker..."
         ></textarea>
 
 
@@ -1729,7 +2241,7 @@
             class="btn btn-primary"
             onclick="addComment()"
         >
-            Skicka kommentar
+            Lägg dig i
         </button>
 
 
@@ -1741,7 +2253,7 @@
         <div id="comments-list">
 
             <div class="empty-comments">
-                Inga kommentarer ännu. Du kan bli först.
+                Ingen har lagt sig i ännu. Varsågod att börja.
             </div>
 
         </div>
@@ -1749,6 +2261,11 @@
     </div>
 
 </section>
+
+
+<!-- ==================================================
+     ARKIV
+================================================== -->
 
 
 <section class="card">
@@ -1759,7 +2276,7 @@
 
 
     <p class="archive-subtitle">
-        Missade du fikat? Här ligger de senaste ämnena kvar.
+        Missade du ett fika? Här ligger de senaste snackisarna kvar.
     </p>
 
 
@@ -1767,7 +2284,7 @@
         id="archive-list"
         class="archive-grid"
     >
-        Hämtar tidigare snackisar...
+        Plockar fram gamla snackisar...
     </div>
 
 
@@ -1776,7 +2293,10 @@
         class="archive-reader"
     >
 
-        <div id="archive-reader-meta">
+        <div
+            id="archive-reader-meta"
+            class="archive-reader-meta"
+        >
         </div>
 
 
@@ -1788,7 +2308,10 @@
         </div>
 
 
-        <div id="archive-reader-byline">
+        <div
+            id="archive-reader-byline"
+            class="archive-reader-byline"
+        >
         </div>
 
 
@@ -1805,6 +2328,11 @@
 
 
 </main>
+
+
+<!-- ==================================================
+     SIDOSPALT
+================================================== -->
 
 
 <aside>
@@ -1992,6 +2520,16 @@ function cleanReaderText(text) {
         )
 
         .replace(
+            /\bwww\.\S+/gi,
+            ""
+        )
+
+        .replace(
+            /\s+([,.!?;:])/g,
+            "$1"
+        )
+
+        .replace(
             /\s{2,}/g,
             " "
         )
@@ -2029,6 +2567,345 @@ function safeHttpUrl(value) {
 
 
 /* =====================================================
+   SMART KAFFEKLOCKA
+===================================================== */
+
+
+function getStockholmNow() {
+
+    const formatter =
+        new Intl.DateTimeFormat(
+            "en-GB",
+            {
+                timeZone:
+                    "Europe/Stockholm",
+
+                weekday:
+                    "short",
+
+                hour:
+                    "2-digit",
+
+                minute:
+                    "2-digit",
+
+                hour12:
+                    false
+            }
+        );
+
+
+    const parts =
+        formatter.formatToParts(
+            new Date()
+        );
+
+
+    const values =
+        {};
+
+
+    parts.forEach(
+        part => {
+
+            if (
+                part.type !== "literal"
+            ) {
+
+                values[
+                    part.type
+                ] =
+                    part.value;
+            }
+        }
+    );
+
+
+    return {
+
+        weekday:
+            values.weekday,
+
+        hour:
+            Number(
+                values.hour
+            ),
+
+        minute:
+            Number(
+                values.minute
+            )
+    };
+}
+
+
+function updateCoffeeClock() {
+
+    const now =
+        getStockholmNow();
+
+
+    const main =
+        document.getElementById(
+            "schedule-main"
+        );
+
+
+    const detail =
+        document.getElementById(
+            "schedule-detail"
+        );
+
+
+    const badge =
+        document.getElementById(
+            "status-badge"
+        );
+
+
+    badge.className =
+        "status-badge";
+
+
+    /*
+        Intl med en-GB ger:
+        Mon, Tue, Wed, Thu, Fri, Sat, Sun
+    */
+
+
+    const saturday =
+        now.weekday === "Sat";
+
+
+    const sunday =
+        now.weekday === "Sun";
+
+
+    const friday =
+        now.weekday === "Fri";
+
+
+    const weekend =
+        saturday ||
+        sunday;
+
+
+    /* ===============================================
+       HELG
+    =============================================== */
+
+
+    if (
+        weekend
+    ) {
+
+        main.textContent =
+            "🎉 Helgläge! Glöm jobbet – vi ses måndag 09:00.";
+
+
+        detail.textContent =
+            "Snackisarna ligger kvar om kaffesuget ändå blir för stort.";
+
+
+        badge.textContent =
+            "😎 Ledigt";
+
+
+        badge.classList.add(
+            "weekend"
+        );
+
+
+        return;
+    }
+
+
+    /* ===============================================
+       TIDIG MORGON
+    =============================================== */
+
+
+    if (
+        now.hour < 7
+    ) {
+
+        main.textContent =
+            "😴 Redaktionen har inte vaknat riktigt än.";
+
+
+        detail.textContent =
+            "Kaffet börjar bryggas inför 09-fikat.";
+
+
+        badge.textContent =
+            "💤 Snart kaffe";
+
+
+        badge.classList.add(
+            "resting"
+        );
+
+
+        return;
+    }
+
+
+    /* ===============================================
+       07:00 – 08:59
+    =============================================== */
+
+
+    if (
+        now.hour < 9
+    ) {
+
+        main.textContent =
+            "☕ God morgon! Dagens första snackis bryggs inför 09-fikat.";
+
+
+        detail.textContent =
+            "Nytt på fikabordet före klockan nio.";
+
+
+        badge.textContent =
+            "🔥 På gång";
+
+
+        return;
+    }
+
+
+    /* ===============================================
+       09:00 – 12:59
+    =============================================== */
+
+
+    if (
+        now.hour < 13
+    ) {
+
+        main.textContent =
+            "☕ Förmiddagsfikat är serverat.";
+
+
+        detail.textContent =
+            "Nästa färska snackis kommer inför 15-rasten.";
+
+
+        badge.textContent =
+            "☕ Nybryggt";
+
+
+        return;
+    }
+
+
+    /* ===============================================
+       13:00 – 14:59
+    =============================================== */
+
+
+    if (
+        now.hour < 15
+    ) {
+
+        main.textContent =
+            "🔥 Eftermiddagens snackis är på väg till fikabordet.";
+
+
+        detail.textContent =
+            "Vi laddar inför 15-rasten.";
+
+
+        badge.textContent =
+            "☕ På gång";
+
+
+        return;
+    }
+
+
+    /* ===============================================
+       15:00 – 17:59
+    =============================================== */
+
+
+    if (
+        now.hour < 18
+    ) {
+
+        main.textContent =
+            "☕ Eftermiddagsfikat är serverat.";
+
+
+        detail.textContent =
+            friday
+                ? "Veckans sista jobb-snackis är framdukad."
+                : "Ny snackis väntar här igen inför 09-fikat i morgon.";
+
+
+        badge.textContent =
+            "☕ Nybryggt";
+
+
+        return;
+    }
+
+
+    /* ===============================================
+       FREDAG KVÄLL
+    =============================================== */
+
+
+    if (
+        friday
+    ) {
+
+        main.textContent =
+            "🎉 Helgen är här! Stäng jobbdatorn – vi ses måndag 09:00.";
+
+
+        detail.textContent =
+            "Veckans snackisar ligger förstås kvar om du får abstinens.";
+
+
+        badge.textContent =
+            "😎 Helgläge";
+
+
+        badge.classList.add(
+            "weekend"
+        );
+
+
+        return;
+    }
+
+
+    /* ===============================================
+       VARDAGSKVÄLL
+    =============================================== */
+
+
+    main.textContent =
+        "☕ Kaffemaskinen vilar för kvällen.";
+
+
+    detail.textContent =
+        "Ny snackis bryggs inför 09-fikat i morgon.";
+
+
+    badge.textContent =
+        "🌙 Stängt för dagen";
+
+
+    badge.classList.add(
+        "resting"
+    );
+}
+
+
+/* =====================================================
    LÄSTID
 ===================================================== */
 
@@ -2037,14 +2914,14 @@ function renderReadTime(article) {
 
     const text = [
 
-        article.summary,
+        article?.summary,
 
         ...safeArray(
-            article.paragraphs
+            article?.paragraphs
         ),
 
         ...safeArray(
-            article.whyTalkAboutIt
+            article?.whyTalkAboutIt
         )
 
     ]
@@ -2226,6 +3103,12 @@ function renderSideCard(
         );
 
 
+    const credit =
+        document.getElementById(
+            `${prefix}-credit`
+        );
+
+
     if (
         item.image?.provider === "pexels"
         &&
@@ -2240,6 +3123,15 @@ function renderSideCard(
             item.image.url;
 
 
+        image.alt =
+            cleanReaderText(
+                item.image.alt ||
+                item.imageAlt ||
+                item.title ||
+                ""
+            );
+
+
         image.style.display =
             "block";
 
@@ -2249,9 +3141,7 @@ function renderSideCard(
 
 
         renderPhotoCredit(
-            document.getElementById(
-                `${prefix}-credit`
-            ),
+            credit,
             item.image
         );
 
@@ -2269,6 +3159,10 @@ function renderSideCard(
         emoji.textContent =
             item.emoji ||
             "☕";
+
+
+        credit.style.display =
+            "none";
     }
 }
 
@@ -2289,6 +3183,7 @@ function sourceDisplayName(
                 source.url
             )
                 .hostname
+                .toLowerCase()
                 .replace(
                     /^www\./,
                     ""
@@ -2303,6 +3198,9 @@ function sourceDisplayName(
             "sverigesradio.se":
                 "Sveriges Radio",
 
+            "sr.se":
+                "Sveriges Radio",
+
             "tv4.se":
                 "TV4",
 
@@ -2313,6 +3211,9 @@ function sourceDisplayName(
                 "AP",
 
             "bbc.com":
+                "BBC",
+
+            "bbc.co.uk":
                 "BBC",
 
             "cnn.com":
@@ -2331,13 +3232,64 @@ function sourceDisplayName(
                 "Aftonbladet",
 
             "expressen.se":
-                "Expressen"
+                "Expressen",
+
+            "people.com":
+                "People",
+
+            "variety.com":
+                "Variety",
+
+            "billboard.com":
+                "Billboard",
+
+            "espn.com":
+                "ESPN"
         };
 
 
+        if (
+            known[
+                domain
+            ]
+        ) {
+
+            return known[
+                domain
+            ];
+        }
+
+
+        const parts =
+            domain.split(
+                "."
+            );
+
+
+        if (
+            parts.length > 2
+        ) {
+
+            const root =
+                parts
+                    .slice(-2)
+                    .join(".");
+
+
+            if (
+                known[
+                    root
+                ]
+            ) {
+
+                return known[
+                    root
+                ];
+            }
+        }
+
+
         return (
-            known[domain]
-            ||
             cleanReaderText(
                 source.title
             )
@@ -2380,13 +3332,24 @@ function renderSources(
 
 
     const valid =
-        safeArray(sources)
+        safeArray(
+            sources
+        )
+
+            .map(
+                source => ({
+                    ...source,
+
+                    safeUrl:
+                        safeHttpUrl(
+                            source?.url
+                        )
+                })
+            )
 
             .filter(
                 source =>
-                    safeHttpUrl(
-                        source.url
-                    )
+                    source.safeUrl
             )
 
             .slice(
@@ -2411,7 +3374,7 @@ function renderSources(
         ) => {
 
             if (
-                index
+                index > 0
             ) {
 
                 box.append(
@@ -2431,7 +3394,7 @@ function renderSources(
 
 
             link.href =
-                source.url;
+                source.safeUrl;
 
 
             link.target =
@@ -2495,20 +3458,20 @@ async function loadLatestNews() {
         result.latest;
 
 
+    if (
+        !currentLatest
+        ||
+        !currentLatest.article
+    ) {
+
+        throw new Error(
+            "Ingen aktuell snackis hittades."
+        );
+    }
+
+
     const article =
         currentLatest.article;
-
-
-    document
-        .getElementById(
-            "fika-time-text"
-        )
-        .textContent =
-            "Senast uppdaterad "
-            +
-            formatPublishedTime(
-                currentLatest.createdAt
-            );
 
 
     document
@@ -2518,7 +3481,10 @@ async function loadLatestNews() {
         .textContent =
             "☕ "
             +
-            article.category;
+            cleanReaderText(
+                article.category ||
+                "Dagens snackis"
+            );
 
 
     document
@@ -2534,6 +3500,9 @@ async function loadLatestNews() {
     renderReadTime(
         article
     );
+
+
+    /* HERO */
 
 
     if (
@@ -2553,11 +3522,17 @@ async function loadLatestNews() {
 
 
         image.alt =
-            currentLatest
-                .heroImage
-                .alt
-            ||
-            "";
+            cleanReaderText(
+                currentLatest
+                    .heroImage
+                    .alt
+                ||
+                article.imageAlt
+                ||
+                article.title
+                ||
+                ""
+            );
     }
 
 
@@ -2569,16 +3544,21 @@ async function loadLatestNews() {
     );
 
 
+    /* SNABBÖVERSIKT */
+
+
+    const summaryBox =
+        document.getElementById(
+            "summary-box"
+        );
+
+
     if (
         article.summary
     ) {
 
-        document
-            .getElementById(
-                "summary-box"
-            )
-            .style.display =
-                "block";
+        summaryBox.style.display =
+            "block";
 
 
         document
@@ -2589,7 +3569,16 @@ async function loadLatestNews() {
                 cleanReaderText(
                     article.summary
                 );
+
+
+    } else {
+
+        summaryBox.style.display =
+            "none";
     }
+
+
+    /* BRÖDTEXT */
 
 
     const articleText =
@@ -2608,6 +3597,17 @@ async function loadLatestNews() {
         .forEach(
             paragraph => {
 
+                const cleaned =
+                    cleanReaderText(
+                        paragraph
+                    );
+
+
+                if (!cleaned) {
+                    return;
+                }
+
+
                 const p =
                     document.createElement(
                         "p"
@@ -2615,9 +3615,7 @@ async function loadLatestNews() {
 
 
                 p.textContent =
-                    cleanReaderText(
-                        paragraph
-                    );
+                    cleaned;
 
 
                 articleText.appendChild(
@@ -2627,32 +3625,37 @@ async function loadLatestNews() {
         );
 
 
+    /* VARFÖR FIKA */
+
+
     const why =
         safeArray(
             article.whyTalkAboutIt
         );
 
 
+    const whyBox =
+        document.getElementById(
+            "why-box"
+        );
+
+
+    const whyList =
+        document.getElementById(
+            "why-list"
+        );
+
+
+    whyList.innerHTML =
+        "";
+
+
     if (
         why.length
     ) {
 
-        document
-            .getElementById(
-                "why-box"
-            )
-            .style.display =
-                "block";
-
-
-        const list =
-            document.getElementById(
-                "why-list"
-            );
-
-
-        list.innerHTML =
-            "";
+        whyBox.style.display =
+            "block";
 
 
         why.forEach(
@@ -2670,30 +3673,45 @@ async function loadLatestNews() {
                     );
 
 
-                list.appendChild(
+                whyList.appendChild(
                     li
                 );
             }
         );
+
+
+    } else {
+
+        whyBox.style.display =
+            "none";
     }
 
 
+    /* BYLINE */
+
+
     const byline =
-        currentLatest.byline
-        ||
-        article.byline;
+        cleanReaderText(
+            currentLatest.byline
+            ||
+            article.byline
+            ||
+            ""
+        );
+
+
+    const bylineBox =
+        document.getElementById(
+            "article-byline"
+        );
 
 
     if (
         byline
     ) {
 
-        document
-            .getElementById(
-                "article-byline"
-            )
-            .style.display =
-                "flex";
+        bylineBox.style.display =
+            "flex";
 
 
         document
@@ -2714,12 +3732,24 @@ async function loadLatestNews() {
                     : byline === "Bettan"
                         ? "☕"
                         : "📰";
+
+
+    } else {
+
+        bylineBox.style.display =
+            "none";
     }
+
+
+    /* KÄLLOR */
 
 
     renderSources(
         currentLatest.sources
     );
+
+
+    /* POLL */
 
 
     currentPollOptions =
@@ -2733,12 +3763,17 @@ async function loadLatestNews() {
             "poll-question"
         )
         .textContent =
-            article.pollQuestion
-            ||
-            "Vad säger fikabordet?";
+            cleanReaderText(
+                article.pollQuestion
+                ||
+                "Vad säger fikabordet?"
+            );
 
 
     renderPollOptions();
+
+
+    /* SIDOINNEHÅLL */
 
 
     if (
@@ -2749,6 +3784,7 @@ async function loadLatestNews() {
             currentLatest
                 .sidebarContent
                 .tip,
+
             "fika-tip"
         );
 
@@ -2757,9 +3793,13 @@ async function loadLatestNews() {
             currentLatest
                 .sidebarContent
                 .fact,
+
             "fika-fact"
         );
     }
+
+
+    /* ENGAGEMANG */
 
 
     await loadEngagement();
@@ -2828,7 +3868,9 @@ async function loadEngagement() {
 
 function renderEngagement() {
 
-    if (!currentEngagement) {
+    if (
+        !currentEngagement
+    ) {
         return;
     }
 
@@ -2858,13 +3900,15 @@ function renderEngagement() {
     );
 
 
-    const voted =
+    const thumbVote =
         localStorage.getItem(
             thumbStorageKey()
         );
 
 
-    if (voted) {
+    if (
+        thumbVote
+    ) {
 
         document
             .getElementById(
@@ -2902,6 +3946,16 @@ async function postEngagement(
     body
 ) {
 
+    if (
+        !currentLatest?.id
+    ) {
+
+        throw new Error(
+            "Ingen aktuell snackis."
+        );
+    }
+
+
     const response =
         await fetch(
             "/.netlify/functions/engagement",
@@ -2931,7 +3985,9 @@ async function postEngagement(
         await response.json();
 
 
-    if (!response.ok) {
+    if (
+        !response.ok
+    ) {
 
         throw new Error(
             result.error
@@ -3051,65 +4107,70 @@ function renderPollOptions() {
         "";
 
 
-    currentPollOptions.forEach(
-        (
-            option,
-            index
-        ) => {
+    currentPollOptions
+        .slice(
+            0,
+            2
+        )
+        .forEach(
+            (
+                option,
+                index
+            ) => {
 
-            const label =
-                document.createElement(
-                    "label"
+                const label =
+                    document.createElement(
+                        "label"
+                    );
+
+
+                label.className =
+                    "poll-option";
+
+
+                const radio =
+                    document.createElement(
+                        "input"
+                    );
+
+
+                radio.type =
+                    "radio";
+
+
+                radio.name =
+                    "poll";
+
+
+                radio.value =
+                    String(
+                        index
+                    );
+
+
+                const span =
+                    document.createElement(
+                        "span"
+                    );
+
+
+                span.textContent =
+                    cleanReaderText(
+                        option
+                    );
+
+
+                label.append(
+                    radio,
+                    span
                 );
 
 
-            label.className =
-                "poll-option";
-
-
-            const radio =
-                document.createElement(
-                    "input"
+                container.appendChild(
+                    label
                 );
-
-
-            radio.type =
-                "radio";
-
-
-            radio.name =
-                "poll";
-
-
-            radio.value =
-                String(
-                    index
-                );
-
-
-            const span =
-                document.createElement(
-                    "span"
-                );
-
-
-            span.textContent =
-                cleanReaderText(
-                    option
-                );
-
-
-            label.append(
-                radio,
-                span
-            );
-
-
-            container.appendChild(
-                label
-            );
-        }
-    );
+            }
+        );
 }
 
 
@@ -3121,7 +4182,9 @@ async function submitPoll() {
         );
 
 
-    if (!selected) {
+    if (
+        !selected
+    ) {
 
         alert(
             "Välj ett alternativ först!"
@@ -3134,7 +4197,9 @@ async function submitPoll() {
     if (
         localStorage.getItem(
             pollStorageKey()
-        ) !== null
+        )
+        !==
+        null
     ) {
 
         showPollResults();
@@ -3227,9 +4292,15 @@ function showPollResults() {
 
 
     const total =
-        votes[0]
+        Number(
+            votes?.[0] ||
+            0
+        )
         +
-        votes[1];
+        Number(
+            votes?.[1] ||
+            0
+        );
 
 
     for (
@@ -3238,14 +4309,22 @@ function showPollResults() {
         index++
     ) {
 
+        const value =
+            Number(
+                votes?.[
+                    index
+                ]
+                ||
+                0
+            );
+
+
         const percentage =
             total
                 ? Math.round(
-                    (
-                        votes[index]
-                        /
-                        total
-                    )
+                    value
+                    /
+                    total
                     *
                     100
                 )
@@ -3343,9 +4422,11 @@ function showPollResults() {
             "poll-total"
         )
         .textContent =
-            total === 1
-                ? "1 person har tyckt till."
-                : `${total} personer har tyckt till.`;
+            total === 0
+                ? "Du är först vid fikabordet."
+                : total === 1
+                    ? "1 person har tyckt till."
+                    : `${total} personer har tyckt till.`;
 }
 
 
@@ -3369,14 +4450,17 @@ async function addComment() {
 
 
     const text =
-        textInput.value
+        textInput
+            .value
             .trim();
 
 
-    if (!text) {
+    if (
+        !text
+    ) {
 
         alert(
-            "Skriv vad fikabordet säger först!"
+            "Du måste säga något innan du lägger dig i. ☕"
         );
 
         return;
@@ -3451,7 +4535,9 @@ function renderComments(
         );
 
 
-    if (!values.length) {
+    if (
+        !values.length
+    ) {
 
         const empty =
             document.createElement(
@@ -3464,7 +4550,7 @@ function renderComments(
 
 
         empty.textContent =
-            "Inga kommentarer ännu. Du kan bli först.";
+            "Ingen har lagt sig i ännu. Varsågod att börja.";
 
 
         list.appendChild(
@@ -3500,7 +4586,10 @@ function renderComments(
 
 
             name.textContent =
-                comment.name ||
+                cleanReaderText(
+                    comment.name
+                )
+                ||
                 "Anonym kollega";
 
 
@@ -3531,8 +4620,9 @@ function renderComments(
 
 
             body.textContent =
-                comment.text ||
-                "";
+                cleanReaderText(
+                    comment.text
+                );
 
 
             item.append(
@@ -3594,8 +4684,13 @@ async function loadArchive() {
         );
 
 
-    if (!response.ok) {
-        return;
+    if (
+        !response.ok
+    ) {
+
+        throw new Error(
+            "Arkivet svarade inte."
+        );
     }
 
 
@@ -3610,6 +4705,10 @@ async function loadArchive() {
 
             .filter(
                 item =>
+                    item
+                    &&
+                    item.article
+                    &&
                     item.id
                     !==
                     currentLatest?.id
@@ -3629,6 +4728,17 @@ async function loadArchive() {
 
     list.innerHTML =
         "";
+
+
+    if (
+        !archiveArticles.length
+    ) {
+
+        list.textContent =
+            "Arkivet är tomt än så länge.";
+
+        return;
+    }
 
 
     archiveArticles.forEach(
@@ -3651,18 +4761,28 @@ async function loadArchive() {
                 "archive-item";
 
 
-            card.innerHTML =
-                `
-                    <div class="archive-meta">
-                        ${cleanReaderText(
-                            article.category
-                        )}
-                        ·
-                        ${formatArchiveDate(
-                            item.createdAt
-                        )}
-                    </div>
-                `;
+            const meta =
+                document.createElement(
+                    "div"
+                );
+
+
+            meta.className =
+                "archive-meta";
+
+
+            meta.textContent =
+                [
+                    cleanReaderText(
+                        article.category
+                    ),
+
+                    formatArchiveDate(
+                        item.createdAt
+                    )
+                ]
+                .filter(Boolean)
+                .join(" · ");
 
 
             const title =
@@ -3707,6 +4827,10 @@ async function loadArchive() {
                 "archive-open";
 
 
+            button.type =
+                "button";
+
+
             button.textContent =
                 "Läs snackisen ↓";
 
@@ -3719,6 +4843,7 @@ async function loadArchive() {
 
 
             card.append(
+                meta,
                 title,
                 summary,
                 button
@@ -3743,6 +4868,17 @@ function openArchiveReader(
         ];
 
 
+    if (
+        !item
+    ) {
+        return;
+    }
+
+
+    const article =
+        item.article;
+
+
     const reader =
         document.getElementById(
             "archive-reader"
@@ -3754,7 +4890,17 @@ function openArchiveReader(
             "archive-reader-meta"
         )
         .textContent =
-            `${item.article.category} · ${formatArchiveDate(item.createdAt)}`;
+            [
+                cleanReaderText(
+                    article.category
+                ),
+
+                formatArchiveDate(
+                    item.createdAt
+                )
+            ]
+            .filter(Boolean)
+            .join(" · ");
 
 
     document
@@ -3762,7 +4908,9 @@ function openArchiveReader(
             "archive-reader-title"
         )
         .textContent =
-            item.article.title;
+            cleanReaderText(
+                article.title
+            );
 
 
     const content =
@@ -3776,10 +4924,23 @@ function openArchiveReader(
 
 
     safeArray(
-        item.article.paragraphs
+        article.paragraphs
     )
         .forEach(
             paragraph => {
+
+                const cleaned =
+                    cleanReaderText(
+                        paragraph
+                    );
+
+
+                if (
+                    !cleaned
+                ) {
+                    return;
+                }
+
 
                 const p =
                     document.createElement(
@@ -3788,9 +4949,7 @@ function openArchiveReader(
 
 
                 p.textContent =
-                    cleanReaderText(
-                        paragraph
-                    );
+                    cleaned;
 
 
                 content.appendChild(
@@ -3800,13 +4959,23 @@ function openArchiveReader(
         );
 
 
+    const byline =
+        cleanReaderText(
+            item.byline
+            ||
+            article.byline
+            ||
+            ""
+        );
+
+
     document
         .getElementById(
             "archive-reader-byline"
         )
         .textContent =
-            item.byline
-                ? `Serverad av ${item.byline} ☕`
+            byline
+                ? `Serverad av ${byline} ☕`
                 : "";
 
 
@@ -3815,10 +4984,15 @@ function openArchiveReader(
     );
 
 
-    reader.scrollIntoView({
-        behavior: "smooth",
-        block: "start"
-    });
+    reader.scrollIntoView(
+        {
+            behavior:
+                "smooth",
+
+            block:
+                "start"
+        }
+    );
 }
 
 
@@ -3839,40 +5013,16 @@ function closeArchiveReader() {
 ===================================================== */
 
 
-function formatPublishedTime(
-    isoDate
-) {
-
-    return new Intl.DateTimeFormat(
-        "sv-SE",
-        {
-            timeZone:
-                "Europe/Stockholm",
-
-            day:
-                "numeric",
-
-            month:
-                "long",
-
-            hour:
-                "2-digit",
-
-            minute:
-                "2-digit"
-        }
-    )
-        .format(
-            new Date(
-                isoDate
-            )
-        );
-}
-
-
 function formatArchiveDate(
     isoDate
 ) {
+
+    if (
+        !isoDate
+    ) {
+        return "";
+    }
+
 
     return new Intl.DateTimeFormat(
         "sv-SE",
@@ -3899,7 +5049,9 @@ function formatCommentTime(
     isoDate
 ) {
 
-    if (!isoDate) {
+    if (
+        !isoDate
+    ) {
         return "";
     }
 
@@ -3967,6 +5119,25 @@ async function copyLink() {
 
 
 async function startKafferasten() {
+
+    /*
+        Kaffeklockan körs direkt.
+        Den behöver alltså inte vänta på backend.
+    */
+
+    updateCoffeeClock();
+
+
+    /*
+        Uppdatera statusen varje minut om någon
+        råkar ha Kafferasten öppen länge.
+    */
+
+    setInterval(
+        updateCoffeeClock,
+        60000
+    );
+
 
     try {
 
