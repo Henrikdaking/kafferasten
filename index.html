@@ -20,15 +20,14 @@
          SEO – GRUND
     ================================================== -->
 
-
     <title>
-        Kafferasten.se – Dagens snackis & samtalsämne till fikat
+        Dagens snackis till fikarasten | Kafferasten.se
     </title>
 
 
     <meta
         name="description"
-        content="Roliga nyheter och aktuella samtalsämnen till fikat på jobbet. Kafferasten.se serverar en ny snackis varje vardag inför 09-fikat och 15-rasten."
+        content="Kafferasten.se serverar aktuella, roliga och oväntade snackisar till fikarasten. Nytt samtalsämne varje vardag inför 09-fikat och 15-rasten."
     >
 
 
@@ -44,86 +43,72 @@
     >
 
 
-    <!-- ==================================================
-         OPEN GRAPH – DELNING
-    ================================================== -->
-
-
-    <meta
-        property="og:locale"
-        content="sv_SE"
+    <link
+        rel="alternate"
+        hreflang="sv-SE"
+        href="https://kafferasten.se/"
     >
 
+
+    <!-- ==================================================
+         OPEN GRAPH
+         För Facebook, Messenger, Teams, Slack m.m.
+    ================================================== -->
 
     <meta
         property="og:type"
         content="website"
     >
 
+    <meta
+        property="og:locale"
+        content="sv_SE"
+    >
 
     <meta
         property="og:site_name"
         content="Kafferasten.se"
     >
 
-
     <meta
         property="og:url"
         content="https://kafferasten.se/"
     >
 
-
     <meta
         property="og:title"
-        content="Kafferasten.se – Dagens snackis till fikat"
+        content="Dagens snackis till fikarasten | Kafferasten.se"
     >
-
 
     <meta
         property="og:description"
-        content="En ny aktuell snackis till fikat på jobbet varje vardag. Något att prata om när kaffet är klart."
+        content="Aktuella, roliga och oväntade samtalsämnen till kaffet. Ny snackis varje vardag inför 09-fikat och 15-rasten."
     >
 
 
     <!-- ==================================================
-         TWITTER / X
+         X / TWITTER
     ================================================== -->
-
 
     <meta
         name="twitter:card"
         content="summary"
     >
 
-
     <meta
         name="twitter:title"
-        content="Kafferasten.se – Dagens snackis till fikat"
+        content="Dagens snackis till fikarasten | Kafferasten.se"
     >
-
 
     <meta
         name="twitter:description"
-        content="Roliga nyheter och aktuella samtalsämnen till fikat på jobbet – ny snackis varje vardag."
+        content="Aktuella, roliga och oväntade samtalsämnen till kaffet. Ny snackis varje vardag inför 09-fikat och 15-rasten."
     >
 
 
     <!-- ==================================================
-         FAVICON
+         STRUKTURERAD DATA
     ================================================== -->
-
-
-    <link
-        rel="icon"
-        type="image/svg+xml"
-        href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232D1A17'/%3E%3Ctext x='32' y='45' text-anchor='middle' font-size='38'%3E%E2%98%95%3C/text%3E%3C/svg%3E"
-    >
-
-
-    <!-- ==================================================
-         STRUCTURED DATA – WEB SITE
-    ================================================== -->
-
 
     <script type="application/ld+json">
     {
@@ -132,10 +117,21 @@
         "name": "Kafferasten.se",
         "alternateName": "Kafferasten",
         "url": "https://kafferasten.se/",
-        "description": "Roliga nyheter och aktuella samtalsämnen till fikat på jobbet. En ny snackis varje vardag inför 09-fikat och 15-rasten.",
+        "description": "Aktuella, roliga och oväntade snackisar och samtalsämnen till fikarasten.",
         "inLanguage": "sv-SE"
     }
     </script>
+
+
+    <!-- ==================================================
+         FAVICON
+    ================================================== -->
+
+    <link
+        rel="icon"
+        type="image/svg+xml"
+        href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232D1A17'/%3E%3Ctext x='32' y='45' text-anchor='middle' font-size='38'%3E%E2%98%95%3C/text%3E%3C/svg%3E"
+    >
 
 
     <style>
@@ -227,11 +223,6 @@
             -webkit-tap-highlight-color:
                 transparent;
         }
-
-
-        /* ==================================================
-           HEADER
-        ================================================== */
 
 
         header {
@@ -437,11 +428,6 @@
         }
 
 
-        /* ==================================================
-           SMART STATUSRAD
-        ================================================== */
-
-
         .schedule-banner {
 
             background:
@@ -514,6 +500,9 @@
             font-size: 0.75rem;
 
             font-weight: 850;
+
+            transition:
+                background 0.2s ease;
         }
 
 
@@ -529,11 +518,6 @@
             background:
                 #7F6A60;
         }
-
-
-        /* ==================================================
-           LAYOUT
-        ================================================== */
 
 
         .container {
@@ -581,11 +565,6 @@
             box-shadow:
                 var(--shadow);
         }
-
-
-        /* ==================================================
-           HUVUDARTIKEL
-        ================================================== */
 
 
         .article-topline {
@@ -825,11 +804,6 @@
         }
 
 
-        /* ==================================================
-           SKRIBENT + KÄLLOR
-        ================================================== */
-
-
         .article-meta-box {
 
             margin-top: 1.4rem;
@@ -960,11 +934,6 @@
         }
 
 
-        /* ==================================================
-           FEEDBACK
-        ================================================== */
-
-
         .feedback {
 
             margin-top: 1rem;
@@ -1031,6 +1000,7 @@
 
 
         .btn:hover:not(:disabled) {
+
             background: white;
         }
 
@@ -1092,11 +1062,6 @@
 
             font-size: 0.78rem;
         }
-
-
-        /* ==================================================
-           FIKAFRÅGA
-        ================================================== */
 
 
         .conversation-card {
@@ -1184,6 +1149,7 @@
 
 
         .poll-option:hover {
+
             background: white;
         }
 
@@ -1274,11 +1240,6 @@
 
             font-size: 0.76rem;
         }
-
-
-        /* ==================================================
-           KOMMENTARER
-        ================================================== */
 
 
         .comment-section {
@@ -1419,11 +1380,6 @@
         }
 
 
-        /* ==================================================
-           SIDOKORT
-        ================================================== */
-
-
         .side-visual {
 
             height: 160px;
@@ -1446,7 +1402,6 @@
             display: none;
 
             width: 100%;
-
             height: 100%;
 
             object-fit: cover;
@@ -1507,11 +1462,6 @@
             color:
                 #493B35;
         }
-
-
-        /* ==================================================
-           ARKIV
-        ================================================== */
 
 
         .archive-subtitle {
@@ -1698,15 +1648,11 @@
         }
 
 
-        /* ==================================================
-           FOOTER / SEO-TEXT
-        ================================================== */
-
-
         footer {
 
-            padding:
-                2rem 1rem 2.25rem;
+            text-align: center;
+
+            padding: 2rem 1rem;
 
             border-top:
                 1px solid
@@ -1715,55 +1661,22 @@
             color:
                 var(--text-muted);
 
-            text-align: center;
-
             font-size: 0.82rem;
         }
 
 
-        .footer-inner {
-
-            max-width: 720px;
-
-            margin: 0 auto;
-        }
-
-
-        .footer-description {
-
-            margin:
-                0 auto 0.75rem;
-
-            line-height: 1.55;
-        }
-
-
-        .footer-links {
-
-            display: flex;
-
-            justify-content: center;
-
-            align-items: center;
-
-            gap: 0.55rem;
-
-            flex-wrap: wrap;
-        }
-
-
-        .footer-links a {
+        footer a {
 
             color:
                 var(--primary-color);
 
-            font-weight: 700;
+            font-weight: 750;
 
             text-decoration: none;
         }
 
 
-        .footer-links a:hover {
+        footer a:hover {
 
             color:
                 var(--accent-color);
@@ -1772,16 +1685,10 @@
         }
 
 
-        .footer-dot {
+        .footer-links {
 
-            color:
-                #B9A99D;
+            margin-top: 0.35rem;
         }
-
-
-        /* ==================================================
-           MOBIL
-        ================================================== */
 
 
         @media (
@@ -1964,21 +1871,6 @@
 
                 font-size: 0.91rem;
             }
-
-
-            footer {
-
-                padding:
-                    1.7rem 1rem 2rem;
-            }
-
-
-            .footer-description {
-
-                max-width: 500px;
-
-                font-size: 0.78rem;
-            }
         }
 
 
@@ -2045,13 +1937,10 @@
     <a
         class="brand"
         href="/"
-        aria-label="Kafferasten.se – startsidan"
+        aria-label="Kafferasten.se – startsida"
     >
 
-        <span
-            class="coffee-mark"
-            aria-hidden="true"
-        >
+        <span class="coffee-mark">
 
             <span class="steam s1"></span>
             <span class="steam s2"></span>
@@ -2147,7 +2036,7 @@
     <img
         id="article-img"
         src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=1400&q=82"
-        alt="Kaffe"
+        alt="En kopp kaffe"
         class="article-hero-img"
     >
 
@@ -2609,35 +2498,14 @@
 
 <footer>
 
-    <div class="footer-inner">
+    <div>
+        Kafferasten.se – dagens snackis och samtalsämnen till fikarasten. ☕
+    </div>
 
-        <p class="footer-description">
-            Kafferasten.se bjuder på roliga nyheter, aktuella samtalsämnen
-            och en ny snackis till fikat på jobbet varje vardag. ☕
-        </p>
-
-
-        <div class="footer-links">
-
-            <a href="/">
-                Kafferasten.se
-            </a>
-
-
-            <span
-                class="footer-dot"
-                aria-hidden="true"
-            >
-                ·
-            </span>
-
-
-            <a href="/om.html">
-                Om Kafferasten
-            </a>
-
-        </div>
-
+    <div class="footer-links">
+        <a href="/om.html">
+            Om Kafferasten
+        </a>
     </div>
 
 </footer>
@@ -2700,11 +2568,6 @@ function cleanReaderText(text) {
         )
 
         .replace(
-            /\bwww\.\S+/gi,
-            ""
-        )
-
-        .replace(
             /\s+([,.!?;:])/g,
             "$1"
         )
@@ -2742,6 +2605,56 @@ function safeHttpUrl(value) {
     } catch {
 
         return null;
+    }
+}
+
+
+/* =====================================================
+   SEO – DYNAMISK SIDTITEL
+===================================================== */
+
+
+function updateDynamicSeo(article) {
+
+    if (!article) {
+        return;
+    }
+
+
+    const title =
+        cleanReaderText(
+            article.title
+        );
+
+
+    const summary =
+        cleanReaderText(
+            article.summary
+        );
+
+
+    if (title) {
+
+        document.title =
+            `${title} | Kafferasten.se`;
+    }
+
+
+    if (summary) {
+
+        const description =
+            document.querySelector(
+                'meta[name="description"]'
+            );
+
+
+        if (description) {
+
+            description.setAttribute(
+                "content",
+                summary
+            );
+        }
     }
 }
 
@@ -3606,6 +3519,11 @@ async function loadLatestNews() {
 
     const article =
         currentLatest.article;
+
+
+    updateDynamicSeo(
+        article
+    );
 
 
     document
