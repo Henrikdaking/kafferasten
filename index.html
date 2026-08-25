@@ -1064,6 +1064,36 @@
         }
 
 
+        .permalink-row {
+
+            margin-top: 0.75rem;
+
+            text-align: right;
+        }
+
+
+        .permalink-link {
+
+            color:
+                var(--accent-color);
+
+            font-size: 0.8rem;
+
+            font-weight: 800;
+
+            text-decoration: none;
+        }
+
+
+        .permalink-link:hover {
+
+            color:
+                var(--accent-hover);
+
+            text-decoration: underline;
+        }
+
+
         .conversation-card {
 
             position: relative;
@@ -1549,6 +1579,8 @@
 
         .archive-open {
 
+            display: inline-block;
+
             margin-top: 0.5rem;
 
             padding: 0;
@@ -1563,6 +1595,17 @@
             cursor: pointer;
 
             font-weight: 800;
+
+            text-decoration: none;
+        }
+
+
+        .archive-open:hover {
+
+            color:
+                var(--accent-hover);
+
+            text-decoration: underline;
         }
 
 
@@ -2186,6 +2229,19 @@
 
         </div>
 
+
+        <div class="permalink-row">
+
+            <a
+                id="current-article-link"
+                class="permalink-link"
+                href="#"
+            >
+                Läs dagens snackis på egen sida →
+            </a>
+
+        </div>
+
     </div>
 
 
@@ -2606,6 +2662,97 @@ function safeHttpUrl(value) {
 
         return null;
     }
+}
+
+
+function createSlug(value) {
+
+    const slug =
+        String(
+            value ||
+            "snackis"
+        )
+
+            .toLowerCase()
+
+            .normalize(
+                "NFD"
+            )
+
+            .replace(
+                /[\u0300-\u036f]/g,
+                ""
+            )
+
+            .replace(
+                /å/g,
+                "a"
+            )
+
+            .replace(
+                /ä/g,
+                "a"
+            )
+
+            .replace(
+                /ö/g,
+                "o"
+            )
+
+            .replace(
+                /[^a-z0-9]+/g,
+                "-"
+            )
+
+            .replace(
+                /^-+|-+$/g,
+                ""
+            )
+
+            .replace(
+                /-{2,}/g,
+                "-"
+            )
+
+            .slice(
+                0,
+                80
+            )
+
+            .replace(
+                /-+$/g,
+                ""
+            );
+
+
+    return slug ||
+        "snackis";
+}
+
+
+function getArticleUrl(item) {
+
+    if (
+        !item?.id
+        ||
+        !item?.article?.title
+    ) {
+
+        return "/";
+    }
+
+
+    return (
+        "/snackis/"
+        +
+        item.id
+        +
+        "-"
+        +
+        createSlug(
+            item.article.title
+        )
+    );
 }
 
 
@@ -3546,6 +3693,16 @@ async function loadLatestNews() {
         .textContent =
             cleanReaderText(
                 article.title
+            );
+
+
+    document
+        .getElementById(
+            "current-article-link"
+        )
+        .href =
+            getArticleUrl(
+                currentLatest
             );
 
 
@@ -4842,36 +4999,31 @@ async function loadArchive() {
                 );
 
 
-            const button =
+            const link =
                 document.createElement(
-                    "button"
+                    "a"
                 );
 
 
-            button.className =
+            link.className =
                 "archive-open";
 
 
-            button.type =
-                "button";
+            link.href =
+                getArticleUrl(
+                    item
+                );
 
 
-            button.textContent =
-                "Läs snackisen ↓";
-
-
-            button.onclick =
-                () =>
-                    openArchiveReader(
-                        index
-                    );
+            link.textContent =
+                "Läs snackisen →";
 
 
             card.append(
                 meta,
                 title,
                 summary,
-                button
+                link
             );
 
 
@@ -5117,15 +5269,25 @@ async function copyLink() {
 
     try {
 
+        const permanentUrl =
+            new URL(
+                getArticleUrl(
+                    currentLatest
+                ),
+                window.location.origin
+            )
+                .toString();
+
+
         await navigator
             .clipboard
             .writeText(
-                window.location.href
+                permanentUrl
             );
 
 
         alert(
-            "Länken är kopierad – skicka den till fikagänget! ☕"
+            "Den permanenta länken är kopierad – skicka den till fikagänget! ☕"
         );
 
 
