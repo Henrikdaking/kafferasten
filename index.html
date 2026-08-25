@@ -1609,6 +1609,44 @@
         }
 
 
+        .archive-all {
+
+            display: flex;
+
+            justify-content: flex-end;
+
+            margin-top: 0.9rem;
+        }
+
+
+        .archive-all-link {
+
+            display: inline-flex;
+
+            align-items: center;
+
+            gap: 0.3rem;
+
+            color:
+                var(--accent-color);
+
+            font-size: 0.84rem;
+
+            font-weight: 850;
+
+            text-decoration: none;
+        }
+
+
+        .archive-all-link:hover {
+
+            color:
+                var(--accent-hover);
+
+            text-decoration: underline;
+        }
+
+
         .archive-reader {
 
             display: none;
@@ -2384,6 +2422,18 @@
         class="archive-grid"
     >
         Plockar fram gamla snackisar...
+    </div>
+
+
+    <div class="archive-all">
+
+        <a
+            class="archive-all-link"
+            href="/arkiv"
+        >
+            Visa hela snackisarkivet →
+        </a>
+
     </div>
 
 
