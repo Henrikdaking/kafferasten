@@ -247,7 +247,13 @@ function renderArticlePage(
     );
 
 
-  const jsonLd = {
+  /* =====================================================
+     NEWSARTICLE
+  ===================================================== */
+
+
+  const articleJsonLd = {
+
     "@context":
       "https://schema.org",
 
@@ -270,6 +276,7 @@ function renderArticlePage(
       "sv-SE",
 
     mainEntityOfPage: {
+
       "@type":
         "WebPage",
 
@@ -278,6 +285,7 @@ function renderArticlePage(
     },
 
     publisher: {
+
       "@type":
         "Organization",
 
@@ -289,21 +297,88 @@ function renderArticlePage(
     },
 
     author: {
+
       "@type":
         "Person",
 
       name:
-        byline
+        byline,
+
+      url:
+        "https://kafferasten.se/om.html"
     }
   };
 
 
   if (imageUrl) {
 
-    jsonLd.image = [
+    articleJsonLd.image = [
       imageUrl
     ];
   }
+
+
+  /* =====================================================
+     BREADCRUMBS
+  ===================================================== */
+
+
+  const breadcrumbJsonLd = {
+
+    "@context":
+      "https://schema.org",
+
+    "@type":
+      "BreadcrumbList",
+
+    itemListElement: [
+
+      {
+
+        "@type":
+          "ListItem",
+
+        position:
+          1,
+
+        name:
+          "Kafferasten.se",
+
+        item:
+          "https://kafferasten.se/"
+      },
+
+      {
+
+        "@type":
+          "ListItem",
+
+        position:
+          2,
+
+        name:
+          "Snackisarkivet",
+
+        item:
+          "https://kafferasten.se/arkiv"
+      },
+
+      {
+
+        "@type":
+          "ListItem",
+
+        position:
+          3,
+
+        name:
+          title,
+
+        item:
+          articleUrl
+      }
+    ]
+  };
 
 
   const heroHtml =
@@ -408,9 +483,7 @@ function renderArticlePage(
     content="#2D1A17"
   >
 
-  <title>
-    ${escapeHtml(title)} | Kafferasten.se
-  </title>
+  <title>${escapeHtml(title)} | Kafferasten.se</title>
 
   <meta
     name="description"
@@ -426,6 +499,9 @@ function renderArticlePage(
     rel="canonical"
     href="${escapeAttribute(articleUrl)}"
   >
+
+
+  <!-- OPEN GRAPH -->
 
   <meta
     property="og:type"
@@ -457,6 +533,7 @@ function renderArticlePage(
     content="${escapeAttribute(summary)}"
   >
 
+
   ${imageUrl
     ? `
       <meta
@@ -468,9 +545,20 @@ function renderArticlePage(
         property="og:image:alt"
         content="${escapeAttribute(imageAlt)}"
       >
+
+      <meta
+        property="og:image:width"
+        content="1200"
+      >
+
+      <meta
+        property="og:image:height"
+        content="627"
+      >
     `
     : ""
   }
+
 
   <meta
     property="article:published_time"
@@ -481,6 +569,9 @@ function renderArticlePage(
     property="article:section"
     content="${escapeAttribute(category)}"
   >
+
+
+  <!-- TWITTER / X -->
 
   <meta
     name="twitter:card"
@@ -497,6 +588,7 @@ function renderArticlePage(
     content="${escapeAttribute(summary)}"
   >
 
+
   ${imageUrl
     ? `
       <meta
@@ -507,15 +599,28 @@ function renderArticlePage(
     : ""
   }
 
+
   <link
     rel="icon"
     type="image/svg+xml"
     href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232D1A17'/%3E%3Ctext x='32' y='45' text-anchor='middle' font-size='38'%3E%E2%98%95%3C/text%3E%3C/svg%3E"
   >
 
+
+  <!-- STRUCTURED DATA: ARTICLE -->
+
   <script type="application/ld+json">
     ${safeJson(
-      jsonLd
+      articleJsonLd
+    )}
+  </script>
+
+
+  <!-- STRUCTURED DATA: BREADCRUMBS -->
+
+  <script type="application/ld+json">
+    ${safeJson(
+      breadcrumbJsonLd
     )}
   </script>
 
@@ -693,6 +798,82 @@ function renderArticlePage(
           23,
           0.055
         );
+    }
+
+
+    /* =====================================================
+       BREADCRUMBS
+    ===================================================== */
+
+
+    .breadcrumbs {
+
+      display:
+        flex;
+
+      align-items:
+        center;
+
+      flex-wrap:
+        wrap;
+
+      gap:
+        0.35rem;
+
+      margin:
+        0 0 1.1rem;
+
+      color:
+        var(--muted);
+
+      font-size:
+        0.74rem;
+    }
+
+
+    .breadcrumbs a {
+
+      color:
+        var(--orange);
+
+      font-weight:
+        750;
+
+      text-decoration:
+        none;
+    }
+
+
+    .breadcrumbs a:hover {
+
+      color:
+        var(--orange-dark);
+
+      text-decoration:
+        underline;
+    }
+
+
+    .breadcrumb-separator {
+
+      color:
+        #B9A79D;
+    }
+
+
+    .breadcrumb-current {
+
+      overflow:
+        hidden;
+
+      max-width:
+        300px;
+
+      text-overflow:
+        ellipsis;
+
+      white-space:
+        nowrap;
     }
 
 
@@ -1096,6 +1277,13 @@ function renderArticlePage(
         font-size:
           1.75rem;
       }
+
+
+      .breadcrumb-current {
+
+        max-width:
+          180px;
+      }
     }
 
   </style>
@@ -1125,6 +1313,41 @@ function renderArticlePage(
 <main>
 
   <article>
+
+
+    <nav
+      class="breadcrumbs"
+      aria-label="Brödsmulor"
+    >
+
+      <a href="/">
+        Kafferasten
+      </a>
+
+      <span
+        class="breadcrumb-separator"
+        aria-hidden="true"
+      >
+        ›
+      </span>
+
+      <a href="/arkiv">
+        Snackisarkivet
+      </a>
+
+      <span
+        class="breadcrumb-separator"
+        aria-hidden="true"
+      >
+        ›
+      </span>
+
+      <span class="breadcrumb-current">
+        ${escapeHtml(title)}
+      </span>
+
+    </nav>
+
 
     <span class="tag">
       ${escapeHtml(category)}
@@ -1208,7 +1431,17 @@ function renderArticlePage(
     Kafferasten.se
   </a>
 
-  – dagens snackis och samtalsämne till fikat.
+  ·
+
+  <a href="/arkiv">
+    Snackisarkivet
+  </a>
+
+  ·
+
+  <a href="/om.html">
+    Om Kafferasten
+  </a>
 
 </footer>
 
