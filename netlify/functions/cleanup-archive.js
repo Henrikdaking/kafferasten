@@ -1,116 +1,181 @@
-exports.handler = async () => {
+import { getStore } from "@netlify/blobs";
+
+
+const STORE_NAME =
+  "kafferasten-news";
+
+
+const TARGET_TITLE =
+  "Sista säsongen av Outer Banks är här";
+
+
+export default async () => {
+
   try {
-    const { getStore } =
-      await import("@netlify/blobs");
 
     const store =
       getStore(
-        "kafferasten-news"
+        STORE_NAME
       );
 
-    const TARGET_TITLE =
-      "Sista säsongen av Outer Banks är här";
-
-    const normalize =
-      value =>
-        String(value || "")
-          .trim()
-          .toLowerCase()
-          .replace(/[“”„]/g, "\"")
-          .replace(/[’‘]/g, "'")
-          .replace(/[–—]/g, "-")
-          .replace(/\s+/g, " ");
 
     const listing =
       await store.list({
-        prefix: "archive/"
+        prefix:
+          "archive/"
       });
 
+
     const deleted = [];
+
 
     for (
       const blob
       of listing.blobs || []
     ) {
+
       const article =
         await store.get(
           blob.key,
           {
-            type: "json",
-            consistency: "strong"
+            type:
+              "json",
+
+            consistency:
+              "strong"
           }
         );
+
 
       const title =
         article?.article?.title ||
         "";
 
+
       if (
-        normalize(title) !==
-        normalize(TARGET_TITLE)
+        normalizeTitle(title) !==
+        normalizeTitle(TARGET_TITLE)
       ) {
+
         continue;
       }
+
 
       await store.delete(
         blob.key
       );
 
+
       deleted.push({
-        key: blob.key,
-        id: article?.id || null,
+        key:
+          blob.key,
+
+        id:
+          article?.id ||
+          null,
+
         title
       });
     }
 
-    return {
-      statusCode: 200,
 
-      headers: {
-        "Content-Type":
-          "application/json; charset=utf-8",
+    return new Response(
+      JSON.stringify(
+        {
+          success:
+            true,
 
-        "Cache-Control":
-          "no-store"
-      },
+          targetTitle:
+            TARGET_TITLE,
 
-      body:
-        JSON.stringify(
-          {
-            success: true,
-            deletedCount:
-              deleted.length,
-            deleted
-          },
-          null,
-          2
-        )
-    };
+          deletedCount:
+            deleted.length,
+
+          deleted
+        },
+        null,
+        2
+      ),
+      {
+        status:
+          200,
+
+        headers: {
+          "Content-Type":
+            "application/json; charset=utf-8",
+
+          "Cache-Control":
+            "no-store"
+        }
+      }
+    );
+
 
   } catch (error) {
+
     console.error(
       "Cleanup-fel:",
       error
     );
 
-    return {
-      statusCode: 500,
 
-      headers: {
-        "Content-Type":
-          "application/json; charset=utf-8"
-      },
+    return new Response(
+      JSON.stringify(
+        {
+          success:
+            false,
 
-      body:
-        JSON.stringify(
-          {
-            success: false,
-            error:
-              "Cleanup misslyckades."
-          },
-          null,
-          2
-        )
-    };
+          error:
+            "Cleanup misslyckades."
+        },
+        null,
+        2
+      ),
+      {
+        status:
+          500,
+
+        headers: {
+          "Content-Type":
+            "application/json; charset=utf-8",
+
+          "Cache-Control":
+            "no-store"
+        }
+      }
+    );
   }
 };
+
+
+function normalizeTitle(
+  value
+) {
+
+  return String(
+    value ||
+    ""
+  )
+    .trim()
+    .toLowerCase()
+
+    .replace(
+      /[“”„]/g,
+      "\""
+    )
+
+    .replace(
+      /[’‘]/g,
+      "'"
+    )
+
+    .replace(
+      /[–—]/g,
+      "-"
+    )
+
+    .replace(
+      /\s+/g,
+      " "
+    );
+}
