@@ -59,19 +59,18 @@ export default async (request) => {
           ?.value
       );
 
-    // Bara 07.00 och 13.00 svensk tid.
+    // Bara 07-timmen och 13-timmen svensk tid.
     //
     // Funktionen körs varje hel timme på vardagar
-    // men startar generatorn endast vid dessa två tider.
+    // men startar generatorn endast under dessa två timmar.
     //
-    // Själva artikeln kan bli färdig några minuter senare.
+    // Vi kontrollerar inte att minuten är exakt 00,
+    // eftersom Netlify kan starta en schemalagd körning
+    // någon minut sent.
 
-const shouldGenerate =
-  minute === 0 &&
-  (
-    hour === 7 ||
-    hour === 13
-  );
+    const shouldGenerate =
+      hour === 7 ||
+      hour === 13;
 
     if (!shouldGenerate) {
       console.log(
