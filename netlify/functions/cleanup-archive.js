@@ -28,6 +28,7 @@ const TITLES_TO_DELETE = [
   "Sista Outer Banks-säsongen är här",
   "Sid Baker är tillbaka i Slow Horses",
   "Outer Banks är tillbaka för sista gången"
+  "Sista säsongen av Outer Banks är här",
 ];
 
 
