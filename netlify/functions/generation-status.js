@@ -13,10 +13,8 @@ export default async () => {
       await store.get(
         "_diagnostics/generation-status",
         {
-          type:
-            "json",
-          consistency:
-            "strong"
+          type: "json",
+          consistency: "strong"
         }
       );
 
@@ -25,10 +23,8 @@ export default async () => {
       await store.get(
         "latest",
         {
-          type:
-            "json",
-          consistency:
-            "strong"
+          type: "json",
+          consistency: "strong"
         }
       );
 
@@ -37,12 +33,43 @@ export default async () => {
       await store.get(
         "_locks/generate-news",
         {
-          type:
-            "json",
-          consistency:
-            "strong"
+          type: "json",
+          consistency: "strong"
         }
       );
+
+
+    const publicGeneration =
+      status
+        ? {
+            status:
+              status.status ||
+              null,
+
+            stage:
+              status.stage ||
+              null,
+
+            message:
+              status.message ||
+              null,
+
+            updatedAt:
+              status.updatedAt ||
+              null,
+
+            finishedAt:
+              status.finishedAt ||
+              null,
+
+            swedishTime:
+              status.swedishTime ||
+              null
+          }
+        : {
+            message:
+              "Ingen diagnostik finns ännu."
+          };
 
 
     return new Response(
@@ -52,11 +79,7 @@ export default async () => {
             true,
 
           generation:
-            status ||
-            {
-              message:
-                "Ingen diagnostik finns ännu."
-            },
+            publicGeneration,
 
           currentLatest: latest
             ? {
@@ -85,8 +108,7 @@ export default async () => {
             : null,
 
           activeLock:
-            lock ||
-            null
+            Boolean(lock)
         },
         null,
         2
@@ -108,6 +130,12 @@ export default async () => {
 
   } catch (error) {
 
+    console.error(
+      "Kunde inte läsa generation-status:",
+      error
+    );
+
+
     return new Response(
       JSON.stringify(
         {
@@ -115,10 +143,7 @@ export default async () => {
             false,
 
           error:
-            "Kunde inte läsa diagnostiken.",
-
-          details:
-            error.message
+            "Kunde inte läsa diagnostiken."
         },
         null,
         2
