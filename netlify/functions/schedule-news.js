@@ -67,7 +67,11 @@ export default async (request) => {
     // Själva artikeln kan bli färdig några minuter senare.
 
 const shouldGenerate =
-  true;
+  minute === 0 &&
+  (
+    hour === 7 ||
+    hour === 13
+  );
 
     if (!shouldGenerate) {
       console.log(
