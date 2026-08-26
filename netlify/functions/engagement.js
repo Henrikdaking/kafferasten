@@ -1,21 +1,32 @@
 import { getStore } from "@netlify/blobs";
+import { createHmac } from "node:crypto";
 
 
 const STORE_NAME =
   "kafferasten-news";
 
-
 const MAX_COMMENTS =
   10;
-
 
 const MAX_NAME_LENGTH =
   50;
 
-
 const MAX_COMMENT_LENGTH =
   500;
 
+const MAX_BODY_LENGTH =
+  6000;
+
+const RATE_LIMIT_WINDOW_MS =
+  60 * 1000;
+
+const RATE_LIMIT_MAX_POSTS =
+  10;
+
+
+/* =========================================================
+   HUVUDFUNKTION
+========================================================= */
 
 export default async (request) => {
 
@@ -41,7 +52,6 @@ export default async (request) => {
     /* =====================================================
        GET – HÄMTA FIKARUMMET
     ===================================================== */
-
 
     if (
       method === "GET"
@@ -88,7 +98,6 @@ export default async (request) => {
        POST – SPARA INTERAKTION
     ===================================================== */
 
-
     if (
       method === "POST"
     ) {
@@ -98,8 +107,30 @@ export default async (request) => {
 
       try {
 
+        const rawBody =
+          await request.text();
+
+
+        if (
+          rawBody.length >
+          MAX_BODY_LENGTH
+        ) {
+
+          return jsonResponse(
+            {
+              success: false,
+              error:
+                "För stor begäran."
+            },
+            413
+          );
+        }
+
+
         body =
-          await request.json();
+          JSON.parse(
+            rawBody
+          );
 
       } catch {
 
@@ -163,6 +194,54 @@ export default async (request) => {
       }
 
 
+      /* ===================================================
+         TILLÅT BARA DAGENS AKTUELLA SNACKIS
+      =================================================== */
+
+      const latest =
+        await store.get(
+          "latest",
+          {
+            type:
+              "json",
+
+            consistency:
+              "strong"
+          }
+        );
+
+
+      if (
+        !latest?.id ||
+        latest.id !==
+          articleId
+      ) {
+
+        return jsonResponse(
+          {
+            success: false,
+            error:
+              "Interaktioner är bara öppna för dagens aktuella snackis."
+          },
+          409
+        );
+      }
+
+
+      /* ===================================================
+         ANONYM BESÖKARNYCKEL
+      =================================================== */
+
+      const visitorKey =
+        createVisitorKey(
+          request
+        );
+
+
+      /* ===================================================
+         LÅS ARTIKELN
+      =================================================== */
+
       const result =
         await withArticleLock({
           store,
@@ -170,6 +249,16 @@ export default async (request) => {
 
           task:
             async () => {
+
+              /* ===========================================
+                 TRAFIKSKYDD
+              =========================================== */
+
+              await enforceRateLimit({
+                store,
+                visitorKey
+              });
+
 
               const current =
                 await readEngagement(
@@ -181,7 +270,6 @@ export default async (request) => {
               /* ===========================================
                  TUMME
               =========================================== */
-
 
               if (
                 action === "thumb"
@@ -231,7 +319,6 @@ export default async (request) => {
                  OMRÖSTNING
               =========================================== */
 
-
               if (
                 action === "poll"
               ) {
@@ -263,7 +350,6 @@ export default async (request) => {
               /* ===========================================
                  KOMMENTAR
               =========================================== */
-
 
               if (
                 action === "comment"
@@ -396,7 +482,6 @@ export default async (request) => {
    DATA
 ========================================================= */
 
-
 function emptyEngagement(
   articleId
 ) {
@@ -510,9 +595,164 @@ function engagementKey(
 
 
 /* =========================================================
-   LÅS – SKYDD MOT SAMTIDIGA RÖSTER
+   TRAFIKSKYDD
 ========================================================= */
 
+async function enforceRateLimit({
+  store,
+  visitorKey
+}) {
+
+  const key =
+    `_rate-limit/engagement-${visitorKey}`;
+
+
+  const now =
+    Date.now();
+
+
+  const saved =
+    await store.get(
+      key,
+      {
+        type:
+          "json",
+
+        consistency:
+          "strong"
+      }
+    );
+
+
+  const windowStartedAt =
+    Number(
+      saved?.windowStartedAt ||
+      0
+    );
+
+
+  const count =
+    safeNumber(
+      saved?.count
+    );
+
+
+  const sameWindow =
+    windowStartedAt > 0 &&
+    now - windowStartedAt <
+      RATE_LIMIT_WINDOW_MS;
+
+
+  if (
+    sameWindow &&
+    count >=
+      RATE_LIMIT_MAX_POSTS
+  ) {
+
+    throw new PublicError(
+      "Lite väl mycket kaffe på en gång. Vänta en minut och försök igen.",
+      429
+    );
+  }
+
+
+  await store.setJSON(
+    key,
+    {
+      windowStartedAt:
+        sameWindow
+          ? windowStartedAt
+          : now,
+
+      count:
+        sameWindow
+          ? count + 1
+          : 1,
+
+      updatedAt:
+        new Date()
+          .toISOString()
+    }
+  );
+}
+
+
+/* =========================================================
+   ANONYM BESÖKARNYCKEL
+========================================================= */
+
+function createVisitorKey(
+  request
+) {
+
+  const clientAddress =
+    getClientAddress(
+      request
+    );
+
+
+  const secret =
+    process.env
+      .KAFFERASTEN_CRON_SECRET
+    ||
+    "kafferasten-rate-limit";
+
+
+  return createHmac(
+    "sha256",
+    secret
+  )
+    .update(
+      clientAddress
+    )
+    .digest(
+      "hex"
+    )
+    .slice(
+      0,
+      32
+    );
+}
+
+
+function getClientAddress(
+  request
+) {
+
+  const netlifyIp =
+    request.headers.get(
+      "x-nf-client-connection-ip"
+    );
+
+
+  if (netlifyIp) {
+
+    return netlifyIp
+      .trim();
+  }
+
+
+  const forwarded =
+    request.headers.get(
+      "x-forwarded-for"
+    );
+
+
+  if (forwarded) {
+
+    return forwarded
+      .split(",")[0]
+      .trim();
+  }
+
+
+  return "unknown";
+}
+
+
+/* =========================================================
+   LÅS – SKYDD MOT SAMTIDIGA RÖSTER
+========================================================= */
 
 async function withArticleLock({
   store,
@@ -635,6 +875,7 @@ async function withArticleLock({
           }
 
         } catch {
+
           // Låt aldrig upplåsningen krascha svaret.
         }
       }
@@ -657,7 +898,6 @@ async function withArticleLock({
 /* =========================================================
    HJÄLPFUNKTIONER
 ========================================================= */
-
 
 class PublicError
   extends Error {
