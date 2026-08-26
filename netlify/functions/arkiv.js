@@ -1054,9 +1054,9 @@ function renderArchivePage(
 
 
     <p>
-      Missade du ett fika? Här samlar vi gamla,
-      roliga, udda och aktuella samtalsämnen från
-      Kafferasten. De senaste ligger överst.
+Missade du fikat? Här samlar vi gamla,
+roliga, udda och aktuella samtalsämnen från
+Kafferasten. De senaste ligger överst.
     </p>
 
 
