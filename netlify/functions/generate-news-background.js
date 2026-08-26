@@ -157,7 +157,72 @@ const FIKA_FACTS = [
    HUVUDFUNKTION
 ========================================================= */
 
-export default async () => {
+export default async (request) => {
+
+  const CRON_SECRET =
+    process.env.KAFFERASTEN_CRON_SECRET;
+
+
+  if (!CRON_SECRET) {
+
+    return jsonResponse(
+      {
+        success: false,
+        error: "KAFFERASTEN_CRON_SECRET saknas i Netlify"
+      },
+      500
+    );
+  }
+
+
+  if (request.method !== "POST") {
+
+    return new Response(
+      JSON.stringify(
+        {
+          success: false,
+          error: "Method not allowed"
+        },
+        null,
+        2
+      ),
+      {
+        status: 405,
+        headers: {
+          "Content-Type":
+            "application/json; charset=utf-8",
+          "Cache-Control":
+            "no-store",
+          "Allow":
+            "POST"
+        }
+      }
+    );
+  }
+
+
+  const authorization =
+    request.headers.get("authorization") || "";
+
+
+  const expectedAuthorization =
+    `Bearer ${CRON_SECRET}`;
+
+
+  if (
+    authorization !==
+    expectedAuthorization
+  ) {
+
+    return jsonResponse(
+      {
+        success: false,
+        error: "Unauthorized"
+      },
+      401
+    );
+  }
+
 
   const OPENAI_API_KEY =
     process.env.OPENAI_API_KEY;
@@ -2758,11 +2823,29 @@ function detectTopicFamily(
       .toLowerCase();
 
 
+  const containsTerm =
+    term => {
+
+      const escaped =
+        String(term)
+          .replace(
+            /[.*+?^${}()|[\]\\]/g,
+            "\\$&"
+          );
+
+
+      return new RegExp(
+        `(^|[^\\p{L}\\p{N}])${escaped}($|[^\\p{L}\\p{N}])`,
+        "iu"
+      )
+        .test(text);
+    };
+
+
   const containsAny =
     words =>
       words.some(
-        word =>
-          text.includes(word)
+        containsTerm
       );
 
 
@@ -2776,19 +2859,15 @@ function detectTopicFamily(
       "wallaby",
       "älg",
       "björn",
-      "bjorn",
       "varg",
       "orm",
       "ödla",
-      "odla",
       "krokodil",
       "alligator",
       "apa",
       "fågel",
-      "fagel",
       "pingvin",
       "häst",
-      "hast",
       "gris",
       "räv",
       "utter",
