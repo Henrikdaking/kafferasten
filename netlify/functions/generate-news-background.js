@@ -287,6 +287,12 @@ export default async () => {
       );
 
 
+    const editorialVarietyForPrompt =
+      buildEditorialVarietyRule(
+        recentHistory
+      );
+
+
     const totalUsage = {
       research1: null,
       verification1: null,
@@ -392,6 +398,43 @@ Kafferasten.se har redan publicerat följande ämnen
 de senaste ${HISTORY_DAYS} dagarna:
 
 ${recentTopicsForPrompt || "Inga tidigare ämnen finns ännu."}
+
+MYCKET VIKTIGT – VARIERA FIKABORDET:
+
+${editorialVarietyForPrompt}
+
+Kafferasten ska kännas som ett blandat fikabord,
+inte som en sajt som fastnat i en enda sorts nyheter.
+
+Titta särskilt på de senaste 6 publiceringarna.
+
+Välj helst en ANNAN ämnesfamilj än de som nyligen dominerat.
+
+Ämnesfamiljer kan exempelvis vara:
+
+- djur
+- TV och streaming
+- musik och kändisar
+- teknik
+- arbetsliv
+- konsument
+- sport
+- internet och viralt
+- mat och livsstil
+- vetenskap
+- vardagsfenomen
+- svenska traditioner
+
+HÅRD REGEL:
+
+Om minst två av de senaste sex snackisarna handlar
+huvudsakligen om djur ska du INTE välja ännu en djurnyhet,
+såvida det inte är en exceptionellt stor och mycket bred snackis.
+
+Samma princip gäller andra ämnesfamiljer:
+om något redan dominerar ska du aktivt leta någon annanstans.
+
+Variation är en del av redaktörsjobbet.
 
 Välj INTE samma huvudsakliga:
 
@@ -1010,26 +1053,101 @@ får du ALDRIG skriva:
 - "enligt svt.se"
 - liknande tekniskt källspråk
 
-KAFFERASTENS RÖST:
+KAFFERASTENS RÖST OCH SPRÅK:
 
-- Skriv idiomatisk och naturlig svenska.
-- Texten får aldrig kännas direktöversatt från engelska.
+MÅLGRUPPEN ÄR SVENSK.
+
+Skriv för en vanlig person i Sverige som läser
+snackisen på jobbet och inte förväntas känna till
+utländska platser, fenomen, djurarter, tv-program
+eller engelska uttryck sedan tidigare.
+
+SPRÅKET:
+
+- Skriv idiomatisk, modern och naturlig svenska.
+- Texten får ALDRIG kännas direktöversatt från engelska.
+- Kontrollera svensk grammatik, genus, böjning och ordföljd.
+- Var särskilt noga med en/ett.
+- Använd etablerad svensk benämning när sådan finns.
 - Översätt engelska beskrivande ord när svenska är naturligt.
 - Skriv exempelvis "kristet metalband", aldrig "Christian metalband".
 - Behåll riktiga egennamn, filmtitlar, artistnamn och varumärken.
 - Undvik svengelska konstruktioner.
 - Undvik pressmeddelandespråk.
 - Undvik stela AI-formuleringar.
+
+OBEKANTA ORD OCH FENOMEN:
+
+Om artikeln innehåller ett ord, en djurart,
+ett fenomen, en institution eller ett begrepp
+som många svenska läsare rimligen inte känner till:
+
+1. använd korrekt svensk benämning om sådan finns
+2. förklara kort vad det är första gången det nämns
+3. gör det naturligt inne i meningen
+
+Exempel:
+
+"En wallaby, ett mindre kängurudjur, ..."
+
+Skriv INTE som om läsaren redan vet vad en wallaby,
+ett amerikanskt tv-format, en lokal myndighet
+eller ett ovanligt engelskt begrepp är.
+
+UTLÄNDSKA NYHETER:
+
+En utländsk snackis är helt okej,
+men den ska berättas ur en svensk läsares perspektiv.
+
+Om platsen är obekant:
+ge precis så mycket geografisk förklaring som behövs.
+
+Skriv hellre:
+"i Cornwall i sydvästra England"
+
+än att bara kasta in ett lokalt ortsnamn utan sammanhang.
+
+TON:
+
 - Våga ta ut svängarna utan att hitta på fakta.
 - Skriv som en kvick människa som verkligen vill berätta nyheten vid fikabordet.
 - Var varm, nyfiken och lite smårolig.
 - Var inte tramsig eller hurtig.
-- Rubriken ska säga vad som hänt och gärna ha en fikakrok.
+- Rubriken ska säga vad som faktiskt hänt.
 - Sammanfattningen ska vara högst två meningar.
 - Brödtexten ska vara 2 eller 3 korta stycken.
 - Tänk mobil.
-- whyTalkAboutIt ska vara 2–3 konkreta samtalsöppnare.
-- Pollfrågan ska ha exakt två alternativ.
+
+SNACKA VIDARE PÅ FIKAT:
+
+Fältet whyTalkAboutIt visas för läsaren
+under rubriken "Snacka vidare på fikat".
+
+Det ska därför INTE förklara varför redaktionen
+tycker att ämnet passar på fika.
+
+Skriv INTE:
+
+- "Det här passar bra på fikat eftersom..."
+- "Det är ett roligt samtalsämne eftersom..."
+- "Nyheten väcker diskussion..."
+- andra interna redaktionella motiveringar.
+
+whyTalkAboutIt ska i stället innehålla
+2–3 konkreta samtalsöppnare som läsaren faktiskt
+kan använda runt bordet.
+
+De får gärna vara frågor.
+
+Exempel:
+
+- "Vilket djur hade varit värst att hitta i trädgården?"
+- "Hade du försökt fånga den – eller låst dörren?"
+- "Vilken helt vanlig vardagspryl borde egentligen uppfinnas om från början?"
+
+Variera formuleringarna och anpassa dem till nyheten.
+
+Pollfrågan ska ha exakt två alternativ.
 
 SKRIBENTENS TON:
 
@@ -2517,6 +2635,294 @@ function formatRecentTopicsForPrompt(
 
 
 /* =========================================================
+   REDAKTIONELL VARIATION
+========================================================= */
+
+function buildEditorialVarietyRule(
+  history
+) {
+
+  const recent =
+    safeArray(history)
+      .slice(0, 6);
+
+
+  if (!recent.length) {
+
+    return `
+Det finns ännu för få tidigare publiceringar
+för att någon ämnesfamilj ska blockeras.
+Försök ändå välja en bred och originell snackis.
+`.trim();
+  }
+
+
+  const families = {};
+
+
+  for (
+    const item
+    of recent
+  ) {
+
+    const family =
+      detectTopicFamily(item);
+
+
+    families[family] =
+      (families[family] || 0) + 1;
+  }
+
+
+  const sorted =
+    Object.entries(families)
+      .sort(
+        (a, b) =>
+          b[1] - a[1]
+      );
+
+
+  const summary =
+    sorted
+      .map(
+        ([family, count]) =>
+          `${family}: ${count}`
+      )
+      .join(", ");
+
+
+  const overused =
+    sorted
+      .filter(
+        ([, count]) =>
+          count >= 2
+      )
+      .map(
+        ([family]) =>
+          family
+      );
+
+
+  if (!overused.length) {
+
+    return `
+De senaste ${recent.length} snackisarna är ganska väl varierade.
+
+Fördelning:
+${summary}
+
+Fortsätt sprida ämnena och undvik helst
+samma ämnesfamilj som den allra senaste artikeln.
+`.trim();
+  }
+
+
+  return `
+De senaste ${recent.length} snackisarna har denna fördelning:
+
+${summary}
+
+FÖR ÖVERREPRESENTERADE ÄMNEN:
+
+${overused.join(", ")}
+
+Välj i första hand INTE någon av dessa ämnesfamiljer
+i den här publiceringen.
+
+Leta aktivt efter ett ämne från en annan del
+av fikabordet.
+`.trim();
+}
+
+
+function detectTopicFamily(
+  item
+) {
+
+  const article =
+    item?.article || {};
+
+
+  const text =
+    [
+      article.title,
+      article.summary,
+      article.category,
+      article.freshTrigger,
+      ...(safeArray(
+        article.paragraphs
+      ))
+    ]
+      .filter(Boolean)
+      .join(" ")
+      .toLowerCase();
+
+
+  const containsAny =
+    words =>
+      words.some(
+        word =>
+          text.includes(word)
+      );
+
+
+  if (
+    containsAny([
+      "djur",
+      "hund",
+      "katt",
+      "känguru",
+      "kanguru",
+      "wallaby",
+      "älg",
+      "björn",
+      "bjorn",
+      "varg",
+      "orm",
+      "ödla",
+      "odla",
+      "krokodil",
+      "alligator",
+      "apa",
+      "fågel",
+      "fagel",
+      "pingvin",
+      "häst",
+      "hast",
+      "gris",
+      "räv",
+      "utter",
+      "säl",
+      "haj",
+      "delfin"
+    ])
+  ) {
+
+    return "djur";
+  }
+
+
+  if (
+    article.category ===
+      "TV & streaming"
+    ||
+    containsAny([
+      "netflix",
+      "hbo",
+      "disney+",
+      "streaming",
+      "tv-serie",
+      "tv-program",
+      "säsong",
+      "sasong"
+    ])
+  ) {
+
+    return "TV och streaming";
+  }
+
+
+  if (
+    containsAny([
+      "artist",
+      "sångare",
+      "sangare",
+      "musik",
+      "album",
+      "konsert",
+      "festival",
+      "kändis",
+      "kandis"
+    ])
+  ) {
+
+    return "musik och kändisar";
+  }
+
+
+  if (
+    article.category ===
+      "Teknik"
+  ) {
+
+    return "teknik";
+  }
+
+
+  if (
+    article.category ===
+      "Arbetsliv"
+  ) {
+
+    return "arbetsliv";
+  }
+
+
+  if (
+    article.category ===
+      "Sport"
+  ) {
+
+    return "sport";
+  }
+
+
+  if (
+    containsAny([
+      "tiktok",
+      "viral",
+      "internet",
+      "sociala medier",
+      "instagram",
+      "youtube",
+      "meme"
+    ])
+  ) {
+
+    return "internet och viralt";
+  }
+
+
+  if (
+    containsAny([
+      "mat",
+      "restaurang",
+      "recept",
+      "godis",
+      "kaffe",
+      "dryck",
+      "glass",
+      "hamburgare"
+    ])
+  ) {
+
+    return "mat och livsstil";
+  }
+
+
+  if (
+    article.category ===
+      "Vardag"
+  ) {
+
+    return "vardagsfenomen";
+  }
+
+
+  if (
+    article.category ===
+      "Nöje"
+  ) {
+
+    return "nöje";
+  }
+
+
+  return "udda och övrigt";
+}
+
+
+/* =========================================================
    SKRIBENTER
 ========================================================= */
 
@@ -2689,7 +3095,7 @@ function safeArray(
 
 
 /* =========================================================
-   DUBLETTER – NY, MINDRE AGGRESSIV VERSION
+   DUBLETTER – MINDRE AGGRESSIV VERSION
 ========================================================= */
 
 function findDuplicateMatch({
@@ -2764,18 +3170,6 @@ function findDuplicateMatch({
       );
 
 
-    /*
-    Viktigt:
-
-    Vi stoppar INTE längre en artikel bara för
-    att ett enda långt ord råkar vara gemensamt.
-
-    Exempel:
-    "traditionella" får aldrig ensamt göra två
-    helt olika nyheter till dubbletter.
-    */
-
-
     const specificSharedTerms =
       intersection.filter(
         token =>
@@ -2787,25 +3181,6 @@ function findDuplicateMatch({
             token
           )
       );
-
-
-    /*
-    TRE sätt att bli dubblett:
-
-    1. Minst tre gemensamma ämnesord och
-       ganska hög överlappning.
-
-    2. Minst fyra gemensamma ord och
-       tydlig Jaccard-likhet.
-
-    3. Minst två ganska specifika gemensamma ord
-       och samtidigt en rimlig överlappning.
-
-    Detta fångar t.ex:
-    "Outer Banks + Netflix"
-    men INTE:
-    "traditionella".
-    */
 
 
     const strongContainment =
@@ -2930,12 +3305,6 @@ const SWEDISH_STOP_WORDS =
     "with"
   ]);
 
-
-/*
-Ord som förekommer i många helt olika nyheter.
-De får finnas med i texten, men ska inte väga
-tungt när vi bestämmer om två snackisar är samma.
-*/
 
 const SOFT_DUPLICATE_WORDS =
   new Set([
